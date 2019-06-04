@@ -25,6 +25,11 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->bind(\App\Repositories\Contracts\UserRepository::class, \App\Repositories\Eloquent\UserRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\Contracts\ImageRepository::class, \App\Repositories\Eloquent\ImageRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\Contracts\UserRepository::class, \App\Repositories\Eloquent\UserRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\Contracts\TeamRepository::class, \App\Repositories\Eloquent\TeamRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\Contracts\PositionRepository::class, \App\Repositories\Eloquent\PositionRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\Contracts\TypeRepository::class, \App\Repositories\Eloquent\TypeRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\Contracts\RegistrationRepository::class, \App\Repositories\Eloquent\RegistrationRepositoryEloquent::class);
         //:end-bindings:
     }
 }
