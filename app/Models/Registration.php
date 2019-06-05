@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @package namespace App\Models;
  */
-class Registration extends App\Models\BaseModel
+class Registration extends BaseModel
 {
     /**
      * The attributes that are mass assignable.

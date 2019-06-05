@@ -7,6 +7,8 @@ use Zizaco\Entrust\EntrustRole;
 class Role extends EntrustRole
 {
     const SUPER_ADMIN = 'super_admin';
+    const PM = 'project_management';
+    const TECH_LEAD = 'tech_lead';
     const MEMBER = 'member';
 
     /**
@@ -14,7 +16,7 @@ class Role extends EntrustRole
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'display_name', 'decription'];
 
     /**
      * @return array List roles

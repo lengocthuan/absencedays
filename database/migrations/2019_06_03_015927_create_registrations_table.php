@@ -20,7 +20,7 @@ class CreateRegistrationsTable extends Migration
             $table->integer('type_id')->unsigned();
             $table->foreign('type_id')->references('id')->on('types');
             $table->text('note')->nullable();
-            $table->integer('status')->default(0)->comment = '0 - empty; 1- approved; 2 - unapproved; 3 - pending';
+            $table->integer('status')->default(0)->comment = '0 - empty; 1- approved; 2 - disapproved; 3 - pending';
             $table->dateTime('requested_date')->nullable();
             $table->dateTime('aprroved_date')->nullable();
             $table->dateTime('time_off_beginning');

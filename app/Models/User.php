@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @package namespace App\Models;
  */
-class User extends App\Models\BaseModel
+class User extends BaseModel
 {
     /**
      * The attributes that are mass assignable.

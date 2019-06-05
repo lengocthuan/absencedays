@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @package namespace App\Models;
  */
-class Team extends App\Models\BaseModel
+class Team extends BaseModel
 {
     /**
      * The attributes that are mass assignable.

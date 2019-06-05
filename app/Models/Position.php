@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @package namespace App\Models;
  */
-class Position extends App\Models\BaseModel
+class Position extends BaseModel
 {
     /**
      * The attributes that are mass assignable.
