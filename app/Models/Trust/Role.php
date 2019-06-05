@@ -23,6 +23,6 @@ class Role extends EntrustRole
      */
     public static function roles()
     {
-        return [self::SUPER_ADMIN, self::MEMBER];
+        return [self::SUPER_ADMIN, self::PM, self::TECH_LEAD, self::MEMBER];
     }
 }

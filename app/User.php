@@ -17,6 +17,8 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     use Notifiable, EntrustUserTrait, Authenticatable, CanResetPassword;
 
     const PF_ADMIN = 'web_admin';
+    const PF_PM = 'web_pm';
+    const PF_TechLead = 'web_techlead';
     const PF_USER = 'web_user';
     const IMAGE_TYPE = 'user';
     /**
@@ -30,6 +32,9 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         'email',
         'phone',
         'address',
+        'first_workday',
+        'team_id', 
+        'position_id',
     ];
 
     /**

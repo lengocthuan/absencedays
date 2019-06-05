@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $credentials = request(['email', 'phone', 'password']);
+        $credentials = request(['email', 'password']);
 
         try {
             if (!$token = auth()->attempt($credentials)) {
@@ -37,8 +37,11 @@ class AuthController extends Controller
                 case User::PF_ADMIN:
                     $trust = auth()->user()->hasRole(Role::SUPER_ADMIN);
                     break;
-                case User::PF_OWNER:
-                    $trust = auth()->user()->hasRole(Role::SALON_OWNER);
+                case User::PF_PM:
+                    $trust = auth()->user()->hasRole(Role::PM);
+                    break;
+                case User::PF_TechLead:
+                    $trust = auth()->user()->hasRole(Role::TECH_LEAD);
                     break;
                 case User::PF_USER:
                 default:
