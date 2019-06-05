@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $credentials = request(['email', 'phone', 'password']);
+        $credentials = request(['email', 'password']);
 
         try {
             if (!$token = auth()->attempt($credentials)) {
@@ -33,18 +33,18 @@ class AuthController extends Controller
                 return response()->json($data, 401);
             }
 
-            switch ($request->get('platform')) {
-                case User::PF_ADMIN:
-                    $trust = auth()->user()->hasRole(Role::SUPER_ADMIN);
-                    break;
-                case User::PF_OWNER:
-                    $trust = auth()->user()->hasRole(Role::SALON_OWNER);
-                    break;
-                case User::PF_USER:
-                default:
-                    $trust = true;
-                    break;
-            }
+            // switch ($request->get('platform')) {
+            //     case User::PF_ADMIN:
+            //         $trust = auth()->user()->hasRole(Role::SUPER_ADMIN);
+            //         break;
+            //     case User::PF_OWNER:
+            //         $trust = auth()->user()->hasRole(Role::SALON_OWNER);
+            //         break;
+            //     case User::PF_USER:
+            //     default:
+            //         $trust = true;
+            //         break;
+            // }
 
             $device_uuid = $request->input('device_uuid');
             $device_token = $request->input('device_token');
@@ -65,19 +65,19 @@ class AuthController extends Controller
                 }
             }
 
-            if (!$trust) {
-                $data = [
-                    'jsonapi' => [
-                        'version' => '1.0',
-                    ],
-                    'errors' => [
-                        'title' => 'AuthenticateError',
-                        'detail' => 'Invalid_email_or_password',
-                    ],
-                ];
+            // if (!$trust) {
+            //     $data = [
+            //         'jsonapi' => [
+            //             'version' => '1.0',
+            //         ],
+            //         'errors' => [
+            //             'title' => 'AuthenticateError',
+            //             'detail' => 'Invalid_email_or_password',
+            //         ],
+            //     ];
 
-                return response()->json($data, 401);
-            }
+            //     return response()->json($data, 401);
+            // }
 
             return response()->json(formatToken($token));
         } catch (JWTAuthException $e) {

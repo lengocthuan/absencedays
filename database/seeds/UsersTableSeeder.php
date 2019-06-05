@@ -2,6 +2,7 @@
 
 use App\Models\Trust\Role;
 use Illuminate\Database\Seeder;
+use App\Models\Trust\Permission;
 
 class UsersTableSeeder extends Seeder
 {
@@ -39,6 +40,14 @@ class UsersTableSeeder extends Seeder
             $user->attachRole($roleSuperAdmin);
         }
 
+        //Set Role Permissions
+        //Get all permission, swift through and attach them to the role
+        $permission = Permission::get();
+        foreach ($permission as $key => $value) {
+            $roleSuperAdmin->attachPermission($value);
+        }
+
+
                 // find or create user PM
         $user1 = \App\User::firstOrCreate(
             ['email' => 'pm@example.com'],
@@ -66,6 +75,9 @@ class UsersTableSeeder extends Seeder
             $user1->attachRole($rolePM);
         }
 
+        $per1 = Permission::where('id', '9')->get()->first();
+        $rolePM->attachPermission($per1);
+
                 // find or create user Tech Lead
         $user2 = \App\User::firstOrCreate(
             ['email' => 'techlead@example.com'],
@@ -92,6 +104,9 @@ class UsersTableSeeder extends Seeder
         if (!$user2->hasRole(Role::TECH_LEAD)) {
             $user2->attachRole($roleTechLead);
         }
+
+        $per2 = Permission::where('id', '10')->get()->first();
+        $roleTechLead->attachPermission($per2);
 
                         // find or create user Member
         $user3 = \App\User::firstOrCreate(

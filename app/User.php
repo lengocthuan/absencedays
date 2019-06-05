@@ -30,6 +30,9 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         'email',
         'phone',
         'address',
+        'first_workday',
+        'team_id', 
+        'position_id',
     ];
 
     /**

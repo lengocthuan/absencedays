@@ -20,6 +20,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('password/forgot/request', 'Auth\ForgotPasswordController@getResetToken');
     Route::post('password/forgot/reset', 'Auth\ResetPasswordController@reset');
     Route::post('register', 'UsersController@register');
+    //user information
+    Route::get('me', 'UsersController@me');
 });
 
 Route::group(['prefix' => 'v1', 'middleware' => ['auth:api']], function () {
