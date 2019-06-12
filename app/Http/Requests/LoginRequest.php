@@ -24,7 +24,7 @@ class LoginRequest extends BaseRequest
         return [
             'email' => 'required|string|email',
             'password' => 'required|string',
-           // 'platform' => 'required|string|in:web_admin,app_owner,web_user',
+            // 'platform' => 'nullable|in:web_admin,web_pm, web_techlead,web_user',
         ];
     }
 }

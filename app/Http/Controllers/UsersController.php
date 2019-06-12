@@ -61,7 +61,6 @@ class UsersController extends Controller
     public function me()
     {
         $user = $this->repository->find(auth()->user()->id);
-
         return response()->json($user);
     }
 

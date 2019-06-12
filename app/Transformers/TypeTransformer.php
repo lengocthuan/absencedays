@@ -9,7 +9,7 @@ use App\Models\Type;
  *
  * @package namespace App\Transformers;
  */
-class TypeTransformer extends App\Transformers\BaseTransformer
+class TypeTransformer extends BaseTransformer
 {
     /**
      * Array attribute doesn't parse.

@@ -9,7 +9,7 @@ use App\Models\Position;
  *
  * @package namespace App\Transformers;
  */
-class PositionTransformer extends App\Transformers\BaseTransformer
+class PositionTransformer extends BaseTransformer
 {
     /**
      * Array attribute doesn't parse.

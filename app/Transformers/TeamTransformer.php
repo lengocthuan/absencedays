@@ -9,7 +9,7 @@ use App\Models\Team;
  *
  * @package namespace App\Transformers;
  */
-class TeamTransformer extends App\Transformers\BaseTransformer
+class TeamTransformer extends BaseTransformer
 {
     /**
      * Array attribute doesn't parse.

@@ -8,6 +8,9 @@ use App\Http\Requests;
 use App\Http\Requests\RegistrationCreateRequest;
 use App\Http\Requests\RegistrationUpdateRequest;
 use App\Repositories\Contracts\RegistrationRepository;
+use Carbon\Carbon;
+use App\Models\Registration;
+use illuminate\database\eloquent\collection;
 
 /**
  * Class RegistrationsController.
@@ -63,8 +66,13 @@ class RegistrationsController extends Controller
     public function store(RegistrationCreateRequest $request)
     {
         $registration = $this->repository->skipPresenter()->create($request->all());
-
-        return response()->json($registration->presenter(), 201);
+        if($registration == 'error')
+        {
+            $error = 'You cant registration over 17 days.';
+            return response()->json($error, 404);
+        }else{
+        return response()->json($registration, 201);
+        }
     }
 
     /**
@@ -109,4 +117,54 @@ class RegistrationsController extends Controller
 
         return response()->json(null, 204);
     }
+
+    /*
+     create a new registration
+    */
+    // public function create(RegistrationCreateRequest $request)
+    // {
+    //     $registration = $this->repository->skipPresenter()->create($request->all());
+
+    //     return $this->presenterPostJson($registration);
+    // }
+
+     public function test()
+     {
+        // $time = Carbon::now()->format('M');
+        // echo $time;
+        // echo "==========";
+        // $time1 = strtotime('06/11/2019');
+
+        // $newformat = date('y',$time1)+1;
+
+        // echo $newformat;
+        // echo"=============";
+        // // $time1 = "2019-06-11";
+        // if($time === $newformat) echo "giong nhau"; else echo "khong giong nhau";
+        // var_dump($time);
+        // if()
+
+        //
+        //
+        //
+        // $registration = Registration::where('id',10)->first();
+        // // $registration1 = Registration::where('id',10)->get(['time_off_ending']);
+        // // if($registration === $registration1) echo "="; else echo "!=";
+      
+        // $time = explode(' ', $registration->time_off_beginning);
+        // echo $time[0];
+
+        // $time1 = explode(' ', $registration->time_off_ending);
+        // echo $time1[0];
+
+        // if($time1[0] == $time[0]) echo '='; else echo"!=";
+        // //echo $registration;
+        //
+        //
+        // $time = new Carbon('2019-06-12');
+        // $day = $time->toDateString();
+        // echo $time->addDay(2);
+        // echo "=====";
+        // echo $day;
+     }
 }

@@ -29,6 +29,9 @@ class UserRegisterRequest extends BaseRequest
             'password' => 'required|string',
             'phone' => 'sometimes|nullable|numeric|unique:users,phone',
             'address' => 'sometimes|nullable|string|max:191',
+            'team_id' => 'required|nullable|string',
+            'position_id' => 'required|nullable|string',
+            'first_workday' => 'required|date',
         ];
     }
 }
