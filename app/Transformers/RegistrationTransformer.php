@@ -29,4 +29,12 @@ class RegistrationTransformer extends BaseTransformer
      * @var array
      */
     protected $defaultIncludes = [];
+
+    public function customAttributes($model): array
+    {
+        return [
+            'user' => $model->getUser,
+            'type' => $model->getType,
+        ];
+    }
 }

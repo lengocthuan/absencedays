@@ -44,13 +44,14 @@ Route::group(['prefix' => 'v1'], function () {
     //edit a type
     //remove a type
     //create new registration
-    Route::post('absence/registration', 'RegistrationsController@store');
+    // Route::post('absence/registration', 'RegistrationsController@store');
+    Route::resource('absence', 'RegistrationsController');
 
     Route::post('test', 'RegistrationsController@test');
-    //edit a registration
-    Route::post('absence/edit', 'RegistrationsController@update');
-    //remove a gistration
-    Route::post('absence/remove', 'RegistrationsController@destroy');
+    // //edit a registration
+    // Route::post('absence/edit', 'RegistrationsController@update');
+    // //remove a gistration
+    // Route::post('absence/remove', 'RegistrationsController@destroy');
 });
 
 Route::group(['prefix' => 'v1'], function () {
