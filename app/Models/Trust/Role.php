@@ -25,4 +25,9 @@ class Role extends EntrustRole
     {
         return [self::SUPER_ADMIN, self::PM, self::TECH_LEAD, self::MEMBER];
     }
+
+    // public function users()
+    // {
+    //     return $this->belongsToMany('App\User');
+    // }
 }

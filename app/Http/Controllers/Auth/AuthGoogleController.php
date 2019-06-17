@@ -32,6 +32,7 @@ class AuthGoogleController extends Controller
             $user = User::find($social->user_id);
         } else {
             $user = User::where(['email' => $profile->email])->first();
+            if($user) RoleService::add($user, 'member'); //create role_user when login the first
             if (!$user) {
                 // $user = new User;
                 // $user->name = $profile->name;

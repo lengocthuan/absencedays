@@ -16,4 +16,8 @@ class User extends BaseModel
      */
     protected $fillable = ['name', 'team_id', 'position_id', 'phone', 'address', 'email', 'password', 'first_workday'];
 
+    // public function roles()
+    // {
+    //     return $this->belongsToMany('App\Models\Trust\Role');
+    // }
 }
