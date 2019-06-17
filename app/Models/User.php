@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Team;
-use App\Position;
 /**
  * Class User.
  *
@@ -17,7 +15,5 @@ class User extends BaseModel
      * @var array
      */
     protected $fillable = ['name', 'team_id', 'position_id', 'phone', 'address', 'email', 'password', 'first_workday'];
-
-
 
 }

@@ -23,7 +23,7 @@ class AuthGoogleController extends Controller
             throw new \Illuminate\Validation\UnauthorizedException('Invalid email');
         }
 
-        $social = Social::firstOrNew([
+        $social = Social::firstOrNew([ //firstOrCreate()
             'social_name' => $provider,
             'social_id' => $profile->id,
         ]);
