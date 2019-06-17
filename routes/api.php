@@ -19,6 +19,7 @@ Route::group(['prefix' => 'v1'], function () {
     //auth
     Route::post('auth/logout', 'Auth\AuthController@logout');
     Route::post('auth/facebook', 'Auth\AuthFacebookController@login');
+    Route::post('auth/google', 'Auth\AuthGoogleController@login');
     Route::post('password/forgot/request', 'Auth\ForgotPasswordController@getResetToken');
     Route::post('password/forgot/reset', 'Auth\ResetPasswordController@reset');
 
@@ -52,6 +53,9 @@ Route::group(['prefix' => 'v1'], function () {
     // Route::post('absence/edit', 'RegistrationsController@update');
     // //remove a gistration
     // Route::post('absence/remove', 'RegistrationsController@destroy');
+    Route::resource('type', 'TypesController');
+    Route::resource('team', 'TeamsController');
+    Route::resource('position', 'PositionsController');
 });
 
 Route::group(['prefix' => 'v1'], function () {
