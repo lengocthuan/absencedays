@@ -38,6 +38,8 @@ class AuthGoogleController extends Controller
                 // $user->email = $profile->email;
                 // $user->password = bcrypt($profile->id . time());
                 // $user->first_workday = Carbon::now()->toDateString();
+                // $user->team_id = 1;
+                // $user->position_id = 1;
                 // $user->save();
                 // RoleService::add($user, 'member');
                 return response()->json('You cant login in system because you not a member.', 404);
