@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterRegistrations01Table extends Migration
+class AlterTimeAbsencesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AlterRegistrations01Table extends Migration
      */
     public function up()
     {
-        Schema::table('registrations', function (Blueprint $table) {
-            $table->string('general_information')->nullable();
+        Schema::table('time_absences', function (Blueprint $table) {
+            $table->dateTime('time_start');
+            $table->dateTime('time_end');
         });
     }
 
@@ -25,7 +26,7 @@ class AlterRegistrations01Table extends Migration
      */
     public function down()
     {
-        Schema::table('registrations', function (Blueprint $table) {
+        Schema::table('time_absences', function (Blueprint $table) {
             //
         });
     }
