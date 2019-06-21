@@ -65,13 +65,26 @@ class RegistrationsController extends Controller
      */
     public function store(RegistrationCreateRequest $request)
     {
-        $registration = $this->repository->skipPresenter()->create($request->all());
+        $registration = $this->repository->create($request->all());
         if($registration == 'error')
         {
             $error = 'You cant registration over 17 days.';
             return response()->json($error, 404);
-        }else{
-        return response()->json($registration, 201);
+        } elseif($registration == 'unallow')
+        {
+            $error = 'You are not allowed to set a date that coincides with the previously registered date.';
+            return response()->json($error, 404);
+        } elseif($registration == 'time_invalid')
+        {
+            $error = 'Registration time is invalid';
+            return response()->json($error, 404);
+        } elseif($registration == 'time_invalid_1')
+        {
+            $error = 'Total inappropriate absence time, other time options or contact administrator.';
+            return response()->json($error, 404);
+        } else
+        {
+            return response()->json($registration, 201);
         }
     }
 
@@ -130,10 +143,33 @@ class RegistrationsController extends Controller
 
      public function test()
      {
-        // $time = Carbon::now()->format('M');
-        // echo $time;
+        // for($i = 0; $i < 3; $i++){
+        //     $array = Array($i);
+        // }
+        // echo $array;
+        // echo [1,2].length;
+        // $y = Carbon::now()->format('Y');
+        // // 2019-06-14
+        // echo $y;
         // echo "==========";
-        // $time1 = strtotime('06/11/2019');
+        // $m = Carbon::now();
+        // echo $m;
+        //  echo "==========";
+        // // $d = Carbon::now()->format('Y');
+        // echo $y;
+        // echo "==========";
+        // $time1 = "31-12" .$y;
+        // echo $time1;
+        // echo "==========";
+        // $time2 = Carbon::parse($time1);
+        // // $time2 = strtotime($time1);
+        // // $newformat = date('Y-m-d',$time2);
+        // echo $time2;
+        // // echo "==========";
+
+        // // $current = Carbon::now();
+        // $sum = $time2 - $m;
+        // echo $sum;
 
         // $newformat = date('y',$time1)+1;
 

@@ -25,6 +25,14 @@ class AlterRegistrationsTable extends Migration
             $table->unsignedDecimal('bereavement_leave', 3, 1)->nullable()->change();
             $table->unsignedDecimal('long_term_unpaid_leave', 3, 1)->nullable()->change();
             $table->unsignedDecimal('short_term_unpaid_leave', 3, 1)->nullable()->change();
+            $table->dropColumn('sick_leave');
+            $table->dropColumn('marriage_leave');
+            $table->dropColumn('maternity_leave');
+            $table->dropColumn('bereavement_leave');
+            $table->dropColumn('long_term_unpaid_leave');
+            $table->dropColumn('short_term_unpaid_leave');
+            $table->renameColumn('annual_leave', 'absence_days');
+
         });
     }
 

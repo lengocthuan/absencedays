@@ -15,10 +15,12 @@
  * Authorized resources
  */
 Route::group(['prefix' => 'v1'], function () {
+    Route::get('getusbyteam/{id}', 'UsersController@getusbyteam');
     Route::post('auth/login', 'Auth\AuthController@login');
     //auth
     Route::post('auth/logout', 'Auth\AuthController@logout');
     Route::post('auth/facebook', 'Auth\AuthFacebookController@login');
+    Route::post('auth/google', 'Auth\AuthGoogleController@login');
     Route::post('password/forgot/request', 'Auth\ForgotPasswordController@getResetToken');
     Route::post('password/forgot/reset', 'Auth\ResetPasswordController@reset');
 
@@ -28,7 +30,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('register', 'UsersController@register');
 
     //create a new user from supper admin with another role
-
+    Route::resource('timeabsence', 'TimeAbsencesController');
 
     //edit a user
 
@@ -44,13 +46,18 @@ Route::group(['prefix' => 'v1'], function () {
     //edit a type
     //remove a type
     //create new registration
-    Route::post('absence/registration', 'RegistrationsController@store');
+    // Route::post('absence/registration', 'RegistrationsController@store');
+    Route::resource('absence', 'RegistrationsController');
 
     Route::post('test', 'RegistrationsController@test');
-    //edit a registration
-    Route::post('absence/edit', 'RegistrationsController@update');
-    //remove a gistration
-    Route::post('absence/remove', 'RegistrationsController@destroy');
+    // //edit a registration
+    // Route::post('absence/edit', 'RegistrationsController@update');
+    // //remove a gistration
+    // Route::post('absence/remove', 'RegistrationsController@destroy');
+    Route::resource('type', 'TypesController');
+    Route::resource('team', 'TeamsController');
+    Route::resource('position', 'PositionsController');
+
 });
 
 Route::group(['prefix' => 'v1'], function () {

@@ -11,6 +11,9 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use App\Models\Team;
+use App\Models\Position;
+use App\Models\Trust\Role;
 
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
@@ -120,4 +123,17 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     {
         return $this->hasMany(\App\Models\DeviceToken::class, 'user_id');
     }
+
+    public function getTeam()
+    {
+        return $this->belongsTo(\App\Models\Team::class, 'team_id');
+    }
+    public function getPosition()
+    {
+        return $this->belongsTo(\App\Models\Position::class, 'position_id');
+    }
+    // public function getRole()
+    // {
+    //     return $this->belongsToMany(\App\Models\Trust\Role::class, 'name');
+    // }
 }

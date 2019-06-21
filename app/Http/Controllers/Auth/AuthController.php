@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
@@ -69,19 +70,19 @@ class AuthController extends Controller
                 }
             }
 
-            // if (!$trust) {
-            //     $data = [
-            //         'jsonapi' => [
-            //             'version' => '1.0',
-            //         ],
-            //         'errors' => [
-            //             'title' => 'AuthenticateError',
-            //             'detail' => 'Invalid_email_or_password',
-            //         ],
-            //     ];
+            if (!$trust) {
+                $data = [
+                    'jsonapi' => [
+                        'version' => '1.0',
+                    ],
+                    'errors' => [
+                        'title' => 'AuthenticateError',
+                        'detail' => 'Invalid_email_or_password',
+                    ],
+                ];
 
-            //     return response()->json($data, 401);
-            // }
+                return response()->json($data, 401);
+            }
 
             return response()->json(formatToken($token));
         } catch (JWTAuthException $e) {
@@ -110,9 +111,15 @@ class AuthController extends Controller
                 $uuid->delete();
             }
         }
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json('You have logged out of the system.', Response::HTTP_OK);
+        } catch (JWTException $e) {
+            return response()->json('There are a few problems when logging out, please log out again.', Response::HTTP_BAD_REQUEST);
+        }
+        // JWTAuth::invalidate(JWTAuth::getToken());
+        // JWTAuth::invalidate(JWTAuth::getToken())):
 
-        JWTAuth::invalidate(JWTAuth::getToken());
-
-        return response()->json(null, 204);
+        // return response()->json(null, 204);
     }
 }

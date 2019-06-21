@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\User;
+use App\Models\Type;
 /**
  * Class Registration.
  *
@@ -14,8 +16,19 @@ class Registration extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'time_off_beginning', 'time_off_ending', 'current_year', 'annual_leave_total', 'annual_leave', 'annual_leave_unused', 'sick_leave', 'marriage_leave', 'maternity_leave', 'bereavement_leave', 'long_term_unpaid_leave', 'short_term_unpaid_leave', 'at_time'];
+    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'time_off_beginning', 'time_off_ending', 'current_year', 'annual_leave_total', 'absence_days', 'annual_leave_unused', 'at_time', 'general_information'];
 
+    public function getUser() {
+        // $user = User::find($this->user_id);
+        // return $user->name;
+        return $this->belongsTo(\App\User::class, 'user_id');
+    }
+
+    public function getType() {
+        // $type = Type::find($this->type_id);
+        // return $type->name;
+        return $this->belongsTo(\App\Models\Type::class, 'type_id');
+    }
     // protected function validator(array $data)
     // {
     //     // return Validator::make([

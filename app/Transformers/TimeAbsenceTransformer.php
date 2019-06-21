@@ -2,14 +2,14 @@
 
 namespace App\Transformers;
 
-use App\Models\Registration;
+use App\Models\TimeAbsence;
 
 /**
- * Class RegistrationTransformer.
+ * Class TimeAbsenceTransformer.
  *
  * @package namespace App\Transformers;
  */
-class RegistrationTransformer extends BaseTransformer
+class TimeAbsenceTransformer extends BaseTransformer
 {
     /**
      * Array attribute doesn't parse.
@@ -29,12 +29,4 @@ class RegistrationTransformer extends BaseTransformer
      * @var array
      */
     protected $defaultIncludes = [];
-
-    public function customAttributes($model): array
-    {
-        return [
-            'user' => $model->getUser,
-            'type' => $model->getType,
-        ];
-    }
 }
