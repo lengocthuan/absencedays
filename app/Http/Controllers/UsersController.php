@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Hash;
-use App\User;
-use App\Http\Requests\UserCreateRequest;
-use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\ChangePasswordRequest;
-use App\Repositories\Contracts\UserRepository;
+use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Repositories\Contracts\UserRepository;
+use App\User;
+use Hash;
 
 /**
  * Class UsersController.
@@ -62,7 +62,7 @@ class UsersController extends Controller
     {
         $user = $this->repository->find(auth()->user()->id);
 
- //       $us = $this->repository->parserResult($user);
+        //       $us = $this->repository->parserResult($user);
         return response()->json($user);
     }
 
@@ -161,5 +161,10 @@ class UsersController extends Controller
         $user = $this->repository->skipPresenter()->create(array_merge($request->all(), ['role' => 'member']));
 
         return $this->presenterPostJson($user);
+    }
+    public function getusbyteam($id)
+    {
+        $user = $this->repository->findwhere(['team_id' => $id]);
+        return response()->json($user, 200);
     }
 }

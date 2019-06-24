@@ -13,7 +13,7 @@ class PositionCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**

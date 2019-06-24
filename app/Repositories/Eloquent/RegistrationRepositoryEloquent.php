@@ -139,390 +139,303 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         }
         $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
         return $res;
-
-        // if($attributes['type'] == 'The specific day') {
-        //     $attributes['absence_days'] = 0;
-        // }
-
-        // TimeAbsenceService::checkTime($id, $attributes);
-        // dd($days);
-        // if ($days == 0) {
-        //     $start = new Carbon($attributes['time_off_beginning']);
-        //     $end = new Carbon($attributes['time_off_ending']);
-
-        //     if ($attributes['time_off_beginning'] == $attributes['time_off_ending']) {
-        //         $attributes['absence_days'] = $holiday;
-        //         if ($attributes['absence_days'] == 0) {
-        //             $attributes['general_information'] = "You have registered the same calendar on holidays or on non-working days. Registration session will not be counted.";
-        //             $attributes['requested_date'] = Carbon::now();
-        //             $attributes['status'] = 0;
-        //             $attributes['current_year'] = $start->year;
-        //         } else {
-        //             if ($attributes['absence_days'] == 1 && ($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                 $attributes['absence_days'] = 0.5;
-        //                 if ($attributes['at_time'] == "Afternoon") {
-        //                     $attributes['general_information'] = "Time off is : Afternoon of " . $attributes['time_off_beginning'];
-        //                     $attributes['requested_date'] = Carbon::now();
-        //                     $attributes['status'] = 3;
-        //                     $attributes['current_year'] = $start->year;
-        //                 } else {
-        //                     $attributes['general_information'] = "Time off is : Morning of " . $attributes['time_off_beginning'];
-        //                     $attributes['requested_date'] = Carbon::now();
-        //                     $attributes['status'] = 3;
-        //                     $attributes['current_year'] = $start->year;
-        //                 }
-        //             } else {
-        //                 $attributes['absence_days'] == 1;
-        //                 $attributes['general_information'] = "Time off is : one day " . $attributes['time_off_beginning'];
-        //                 $attributes['requested_date'] = Carbon::now();
-        //                 $attributes['status'] = 3;
-        //                 $attributes['current_year'] = $start->year;
-        //             }
-        //         }
-        //     } elseif ($attributes['time_off_beginning'] != $attributes['time_off_ending']) {
-        //         if ($end->month == $start->month + 1 && $end->year == $start->year) {
-        //             if ($end->day == 1) {
-        //                 if ($end->month == 4 || $end->month == 6 || $end->month == 9 || $end->month == 11 || $end->month == 2 || $end->month == 8) {
-        //                     if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                         $attributes['absence_days'] = $holiday - 0.5;
-        //                         if ($attributes['at_time'] == "Afternoon") {
-        //                             $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         } else {
-        //                             $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         }
-        //                     } else {
-        //                         $attributes['absence_days'] = $holiday;
-        //                         $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                         $attributes['requested_date'] = Carbon::now();
-        //                         $attributes['status'] = 3;
-        //                         $attributes['current_year'] = $end->year;
-        //                     }
-        //                     //day off 30 (30 - 31 - 1) {31 - 30 = 1 + 1 + 1}
-        //                     //day off 29 (29 - 30 - 31 - 1) {31 - 29 = 2 + 1 + 1}
-        //                 } elseif ($end->month == 3) {
-        //                     if ($end->year == 2100) {
-        //                         if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                             $attributes['absence_days'] = $holiday - 0.5;
-        //                             if ($attributes['at_time'] == "Afternoon") {
-        //                                 $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             } else {
-        //                                 $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             }
-        //                         } else {
-        //                             $attributes['absence_days'] = $holiday;
-        //                             $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         }
-        //                         //2100 % 400 != 0;
-        //                     } else {
-        //                         if ($end->year % 4 == 0) {
-        //                             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                                 $attributes['absence_days'] = $holiday - 0.5;
-        //                                 if ($attributes['at_time'] == "Afternoon") {
-        //                                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 } else {
-        //                                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 }
-        //                             } else {
-        //                                 $attributes['absence_days'] = $holiday;
-        //                                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             }
-        //                             //YYYY % 4 == 0 => This is Leap Year
-        //                         } else {
-        //                             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                                 $attributes['absence_days'] = $holiday - 0.5;
-        //                                 if ($attributes['at_time'] == "Afternoon") {
-        //                                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 } else {
-        //                                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 }
-        //                             } else {
-        //                                 $attributes['absence_days'] = $holiday;
-        //                                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             }
-        //                         }
-        //                     }
-        //                 } else {
-        //                     if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                         $attributes['absence_days'] = $holiday - 0.5;
-        //                         if ($attributes['at_time'] == "Afternoon") {
-        //                             $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         } else {
-        //                             $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         }
-        //                     } else {
-        //                         $attributes['absence_days'] = $holiday;
-        //                         $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                         $attributes['requested_date'] = Carbon::now();
-        //                         $attributes['status'] = 3;
-        //                         $attributes['current_year'] = $end->year;
-        //                     }
-        //                 }
-        //             } elseif ($end->day > 1 && $end->day <= 15) {
-        //                 if ($end->month == 4 || $end->month == 6 || $end->month == 9 || $end->month == 11 || $end->month == 2 || $end->month == 8) {
-        //                     $sum_timeoff = $holiday;
-        //                     if ($sum_timeoff >= 15) {
-        //                         return "time_invalid_1";
-        //                     } else {
-        //                         if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                             $attributes['absence_days'] = $holiday - 0.5;
-        //                             if ($attributes['at_time'] == "Afternoon") {
-        //                                 $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             } else {
-        //                                 $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             }
-        //                         } else {
-        //                             $attributes['absence_days'] = $holiday;
-        //                             $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         }
-        //                     }
-        //                 } elseif ($end->month == 3) {
-        //                     if ($end->year == '2100') {
-        //                         $sum_timeoff = $holiday;
-        //                         if ($sum_timeoff >= 15) {
-        //                             return "time_invalid_1";
-        //                         } else {
-        //                             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                                 $attributes['absence_days'] = $holiday - 0.5;
-        //                                 if ($attributes['at_time'] == "Afternoon") {
-        //                                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 } else {
-        //                                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 }
-        //                             } else {
-        //                                 $attributes['absence_days'] = $holiday;
-        //                                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             }
-        //                         }
-        //                     } else {
-        //                         if ($end->year % 4 == 0) {
-        //                             //YYYY % 4 == 0 => This is Leap Year
-        //                             $sum_timeoff = $holiday;
-        //                             if ($sum_timeoff >= 15) {
-        //                                 return "time_invalid_1";
-        //                             } else {
-        //                                 if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                                     $attributes['absence_days'] = $holiday - 0.5;
-        //                                     if ($attributes['at_time'] == "Afternoon") {
-        //                                         $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                         $attributes['requested_date'] = Carbon::now();
-        //                                         $attributes['status'] = 3;
-        //                                         $attributes['current_year'] = $end->year;
-        //                                     } else {
-        //                                         $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                         $attributes['requested_date'] = Carbon::now();
-        //                                         $attributes['status'] = 3;
-        //                                         $attributes['current_year'] = $end->year;
-        //                                     }
-        //                                 } else {
-        //                                     $attributes['absence_days'] = $holiday;
-        //                                     $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 }
-        //                             }
-        //                         } else {
-        //                             $sum_timeoff = $holiday;
-        //                             if ($sum_timeoff >= 15) {
-        //                                 return "time_invalid_1";
-        //                             } else {
-        //                                 if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                                     $attributes['absence_days'] = $holiday - 0.5;
-        //                                     if ($attributes['at_time'] == "Afternoon") {
-        //                                         $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                         $attributes['requested_date'] = Carbon::now();
-        //                                         $attributes['status'] = 3;
-        //                                         $attributes['current_year'] = $end->year;
-        //                                     } else {
-        //                                         $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                         $attributes['requested_date'] = Carbon::now();
-        //                                         $attributes['status'] = 3;
-        //                                         $attributes['current_year'] = $end->year;
-        //                                     }
-        //                                 } else {
-        //                                     $attributes['absence_days'] = $holiday;
-        //                                     $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                                     $attributes['requested_date'] = Carbon::now();
-        //                                     $attributes['status'] = 3;
-        //                                     $attributes['current_year'] = $end->year;
-        //                                 }
-        //                             }
-        //                         }
-        //                     }
-        //                 } else {
-        //                     $sum_timeoff = $holiday;
-        //                     if ($sum_timeoff >= 15) {
-        //                         return "time_invalid_1";
-        //                     } else {
-        //                         if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                             $attributes['absence_days'] = $holiday - 0.5;
-        //                             if ($attributes['at_time'] == "Afternoon") {
-        //                                 $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             } else {
-        //                                 $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                                 $attributes['requested_date'] = Carbon::now();
-        //                                 $attributes['status'] = 3;
-        //                                 $attributes['current_year'] = $end->year;
-        //                             }
-        //                         } else {
-        //                             $attributes['absence_days'] = $holiday;
-        //                             $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                             $attributes['requested_date'] = Carbon::now();
-        //                             $attributes['status'] = 3;
-        //                             $attributes['current_year'] = $end->year;
-        //                         }
-        //                     }
-        //                 }
-        //             } else {
-        //                 return 'error';
-        //             }
-        //         } elseif ($end->month == $start->month && $end->year == $start->year) {
-
-        //             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                 // $attributes['absence_days'] = $holiday;
-        //                 // if ($attributes['absence_days'] == 1) {
-        //                 //     $attributes['absence_days'] + 1 - 0.5;
-        //                 // }
-
-        //                 if($holiday == 0) {
-        //                     $attributes['absence_days'] = $holiday;
-        //                 }
-        //                 else $attributes['absence_days'] = $holiday - 0.5;
-        //                 if ($attributes['at_time'] == "Afternoon") {
-        //                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                     $attributes['requested_date'] = Carbon::now();
-        //                     $attributes['status'] = 3;
-        //                     $attributes['current_year'] = $end->year;
-        //                 } else {
-        //                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                     $attributes['requested_date'] = Carbon::now();
-        //                     $attributes['status'] = 3;
-        //                     $attributes['current_year'] = $end->year;
-        //                 }
-        //             } else {
-        //                 // $attributes['absence_days'] = $holiday;
-        //                 $attributes['absence_days'] = $holiday;
-        //                 // if ($attributes['absence_days'] == 1) {
-        //                 //     $attributes['absence_days'] += 1;
-        //                 // }
-        //                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                 $attributes['requested_date'] = Carbon::now();
-        //                 $attributes['status'] = 3;
-        //                 $attributes['current_year'] = $end->year;
-        //             }
-        //         } else {
-        //             if ($start->month == 12 && $end->month == 1 && $start->year == $end->year + 1) {
-        //                 $endyear = $dayend->year - 1;
-        //                 $combine = $endyear . strtotime('-12-31');
-        //                 $lastday = Carbon::parse($combine);
-        //                 $holiday1 = $this->getWorkdays($daystart, $lastday);
-
-        //                 if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
-        //                     $attributes['absence_days'] = $holiday1 - 0.5;
-
-        //                     if ($attributes['at_time'] == "Afternoon") {
-        //                         $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
-        //                         $attributes['requested_date'] = Carbon::now();
-        //                         $attributes['status'] = 3;
-        //                         $attributes['current_year'] = $endyear;
-        //                         // $attributes['absence_days'] = 31 - $start->day + 1 - 0.5;
-
-        //                     } else {
-        //                         $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
-        //                         $attributes['requested_date'] = Carbon::now();
-        //                         $attributes['status'] = 3;
-        //                         $attributes['current_year'] = $end->year;
-        //                     }
-        //                 } else {
-        //                     $attributes['absence_days'] = $holiday;
-        //                     $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
-        //                     $attributes['requested_date'] = Carbon::now();
-        //                     $attributes['status'] = 3;
-        //                     $attributes['current_year'] = $end->year;
-        //                 }
-        //             } else {
-        //                 return 'time_invalid';
-        //             }
-        //         }
-        //     }
-
-        //     $registration = parent::create($attributes);
-        //     return $registration;
-        // } else {
-        //     return 'unallow';
-        // }
-        // $bookrooms = $this->model()::where([['daystart', $attributes['daystart']], ['room_id', $attributes['room_id']]])
-        //     ->where(function ($query) use ($timeend, $timestart) {
-        //     $query->where([['timestart', '<=', $timestart], ['timeend', '>=', $timeend]])
-        //     ->orwhere([['timestart', '>', $timestart], ['timestart', '<', $timeend]])
-        //     ->orwhere([['timeend', '>', $timestart], ['timeend', '<', $timeend]]);
-        //     })->get();
-        //     $sl = $bookrooms->count();
-
-        // $now = new Carbon::now();
-        // if($attributes['time_off_ending'] <= )
-        // dd('done1');
-
     }
-
 }
+
+// if($attributes['type'] == 'The specific day') {
+//     $attributes['absence_days'] = 0;
+// }
+
+// TimeAbsenceService::checkTime($id, $attributes);
+// dd($days);
+// if ($days == 0) {
+//     $start = new Carbon($attributes['time_off_beginning']);
+//     $end = new Carbon($attributes['time_off_ending']);
+
+//     if ($attributes['time_off_beginning'] == $attributes['time_off_ending']) {
+//         $attributes['absence_days'] = $holiday;
+//         if ($attributes['absence_days'] == 0) {
+//             $attributes['general_information'] = "You have registered the same calendar on holidays or on non-working days. Registration session will not be counted.";
+//             $attributes['requested_date'] = Carbon::now();
+//             $attributes['status'] = 0;
+//             $attributes['current_year'] = $start->year;
+//         } else {
+//             if ($attributes['absence_days'] == 1 && ($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                 $attributes['absence_days'] = 0.5;
+//                 if ($attributes['at_time'] == "Afternoon") {
+//                     $attributes['general_information'] = "Time off is : Afternoon of " . $attributes['time_off_beginning'];
+//                     $attributes['requested_date'] = Carbon::now();
+//                     $attributes['status'] = 3;
+//                     $attributes['current_year'] = $start->year;
+//                 } else {
+//                     $attributes['general_information'] = "Time off is : Morning of " . $attributes['time_off_beginning'];
+//                     $attributes['requested_date'] = Carbon::now();
+//                     $attributes['status'] = 3;
+//                     $attributes['current_year'] = $start->year;
+//                 }
+//             } else {
+//                 $attributes['absence_days'] == 1;
+//                 $attributes['general_information'] = "Time off is : one day " . $attributes['time_off_beginning'];
+//                 $attributes['requested_date'] = Carbon::now();
+//                 $attributes['status'] = 3;
+//                 $attributes['current_year'] = $start->year;
+//             }
+//         }
+//     } elseif ($attributes['time_off_beginning'] != $attributes['time_off_ending']) {
+//         if ($end->month == $start->month + 1 && $end->year == $start->year) {
+//             if ($end->day == 1) {
+//                 if ($end->month == 4 || $end->month == 6 || $end->month == 9 || $end->month == 11 || $end->month == 2 || $end->month == 8) {
+//                     if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                         $attributes['absence_days'] = $holiday - 0.5;
+//                         if ($attributes['at_time'] == "Afternoon") {
+//                             $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         } else {
+//                             $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         }
+//                     } else {
+//                         $attributes['absence_days'] = $holiday;
+//                         $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                         $attributes['requested_date'] = Carbon::now();
+//                         $attributes['status'] = 3;
+//                         $attributes['current_year'] = $end->year;
+//                     }
+//                     //day off 30 (30 - 31 - 1) {31 - 30 = 1 + 1 + 1}
+//                     //day off 29 (29 - 30 - 31 - 1) {31 - 29 = 2 + 1 + 1}
+//                 } elseif ($end->month == 3) {
+//                     if ($end->year == 2100) {
+//                         if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                             $attributes['absence_days'] = $holiday - 0.5;
+//                             if ($attributes['at_time'] == "Afternoon") {
+//                                 $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             } else {
+//                                 $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             }
+//                         } else {
+//                             $attributes['absence_days'] = $holiday;
+//                             $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         }
+//                         //2100 % 400 != 0;
+//                     } else {
+//                         if ($end->year % 4 == 0) {
+//                             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                                 $attributes['absence_days'] = $holiday - 0.5;
+//                                 if ($attributes['at_time'] == "Afternoon") {
+//                                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 } else {
+//                                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 }
+//                             } else {
+//                                 $attributes['absence_days'] = $holiday;
+//                                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             }
+//                             //YYYY % 4 == 0 => This is Leap Year
+//                         } else {
+//                             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                                 $attributes['absence_days'] = $holiday - 0.5;
+//                                 if ($attributes['at_time'] == "Afternoon") {
+//                                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 } else {
+//                                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 }
+//                             } else {
+//                                 $attributes['absence_days'] = $holiday;
+//                                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             }
+//                         }
+//                     }
+//                 } else {
+//                     if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                         $attributes['absence_days'] = $holiday - 0.5;
+//                         if ($attributes['at_time'] == "Afternoon") {
+//                             $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         } else {
+//                             $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         }
+//                     } else {
+//                         $attributes['absence_days'] = $holiday;
+//                         $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                         $attributes['requested_date'] = Carbon::now();
+//                         $attributes['status'] = 3;
+//                         $attributes['current_year'] = $end->year;
+//                     }
+//                 }
+//             } elseif ($end->day > 1 && $end->day <= 15) {
+//                 if ($end->month == 4 || $end->month == 6 || $end->month == 9 || $end->month == 11 || $end->month == 2 || $end->month == 8) {
+//                     $sum_timeoff = $holiday;
+//                     if ($sum_timeoff >= 15) {
+//                         return "time_invalid_1";
+//                     } else {
+//                         if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                             $attributes['absence_days'] = $holiday - 0.5;
+//                             if ($attributes['at_time'] == "Afternoon") {
+//                                 $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             } else {
+//                                 $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             }
+//                         } else {
+//                             $attributes['absence_days'] = $holiday;
+//                             $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         }
+//                     }
+//                 } elseif ($end->month == 3) {
+//                     if ($end->year == '2100') {
+//                         $sum_timeoff = $holiday;
+//                         if ($sum_timeoff >= 15) {
+//                             return "time_invalid_1";
+//                         } else {
+//                             if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                                 $attributes['absence_days'] = $holiday - 0.5;
+//                                 if ($attributes['at_time'] == "Afternoon") {
+//                                     $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 } else {
+//                                     $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 }
+//                             } else {
+//                                 $attributes['absence_days'] = $holiday;
+//                                 $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             }
+//                         }
+//                     } else {
+//                         if ($end->year % 4 == 0) {
+//                             //YYYY % 4 == 0 => This is Leap Year
+//                             $sum_timeoff = $holiday;
+//                             if ($sum_timeoff >= 15) {
+//                                 return "time_invalid_1";
+//                             } else {
+//                                 if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                                     $attributes['absence_days'] = $holiday - 0.5;
+//                                     if ($attributes['at_time'] == "Afternoon") {
+//                                         $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                         $attributes['requested_date'] = Carbon::now();
+//                                         $attributes['status'] = 3;
+//                                         $attributes['current_year'] = $end->year;
+//                                     } else {
+//                                         $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                         $attributes['requested_date'] = Carbon::now();
+//                                         $attributes['status'] = 3;
+//                                         $attributes['current_year'] = $end->year;
+//                                     }
+//                                 } else {
+//                                     $attributes['absence_days'] = $holiday;
+//                                     $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 }
+//                             }
+//                         } else {
+//                             $sum_timeoff = $holiday;
+//                             if ($sum_timeoff >= 15) {
+//                                 return "time_invalid_1";
+//                             } else {
+//                                 if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                                     $attributes['absence_days'] = $holiday - 0.5;
+//                                     if ($attributes['at_time'] == "Afternoon") {
+//                                         $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                         $attributes['requested_date'] = Carbon::now();
+//                                         $attributes['status'] = 3;
+//                                         $attributes['current_year'] = $end->year;
+//                                     } else {
+//                                         $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                         $attributes['requested_date'] = Carbon::now();
+//                                         $attributes['status'] = 3;
+//                                         $attributes['current_year'] = $end->year;
+//                                     }
+//                                 } else {
+//                                     $attributes['absence_days'] = $holiday;
+//                                     $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                                     $attributes['requested_date'] = Carbon::now();
+//                                     $attributes['status'] = 3;
+//                                     $attributes['current_year'] = $end->year;
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 } else {
+//                     $sum_timeoff = $holiday;
+//                     if ($sum_timeoff >= 15) {
+//                         return "time_invalid_1";
+//                     } else {
+//                         if (($attributes['at_time'] == "Afternoon" || $attributes['at_time'] == "Morning")) {
+//                             $attributes['absence_days'] = $holiday - 0.5;
+//                             if ($attributes['at_time'] == "Afternoon") {
+//                                 $attributes['general_information'] = "Time off start at : Afternoon of " . $attributes['time_off_beginning'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             } else {
+//                                 $attributes['general_information'] = "Time off  end at : Morning of " . $attributes['time_off_ending'];
+//                                 $attributes['requested_date'] = Carbon::now();
+//                                 $attributes['status'] = 3;
+//                                 $attributes['current_year'] = $end->year;
+//                             }
+//                         } else {
+//                             $attributes['absence_days'] = $holiday;
+//                             $attributes['general_information'] = "Your absence day is full day. From at " . $attributes['time_off_beginning'] . " to at " . $attributes['time_off_ending'];
+//                             $attributes['requested_date'] = Carbon::now();
+//                             $attributes['status'] = 3;
+//                             $attributes['current_year'] = $end->year;
+//                         }
+//                     }
+//                 }
+//             } else {
+//                 return 'error';
+//             }
+//         } elseif ($end->month == $start->month && $end->year == $start->year) {
