@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\TimeAbsence;
 use App\Models\Registration;
+use App\Models\TimeAbsence;
 use App\Presenters\TimeAbsencePresenter;
 use App\Repositories\Contracts\TimeAbsenceRepository;
 use App\Services\TimeAbsenceService;
@@ -80,6 +80,7 @@ class TimeAbsenceRepositoryEloquent extends BaseRepository implements TimeAbsenc
         $daystart = "";
         $dayend = "";
         $array = array();
+        $arr = array();
         // dd($dayoff);
         // dd($attributes['date']);
         if (empty($attributes['date'])) {
@@ -94,9 +95,22 @@ class TimeAbsenceRepositoryEloquent extends BaseRepository implements TimeAbsenc
                     $sum = $end->day - $start->day + 1;
                     $dayoff = $this->getWorkdays($daystart, $dayend);
                 }
-                $lastest = Registration::where('id', $attributes['registration_id'])->filter('user_id')->first();
-                var_dump($lastest);
-                dd("abc");
+                // $date1 = Registration::where('user_id', )
+                // $lastest = Registration::where('id', $attributes['registration_id'])->first();
+                // $lastest1 = Registration::where('user_id', $lastest->user_id)->get();
+                // foreach ($lastest1 as $val) {
+                //     if ($val->id != $lastest->id) {
+                //         $arr[] = $val->id;
+                //     }
+                // }
+                // dd($arr);
+                // $id = explode(' ', $arr);
+                // dd($id);
+                // $lastest3 = TimeAbsence::where('registration_id', $lastest1)->get();
+                // dd($lastest3);
+                // $days = $lastest1->count();
+                // dd($days);
+                // dd("abc");
 
                 $latest = $this->model()::where('registration_id', $attributes['registration_id'])
                     ->where(function ($query) use ($daystart, $dayend) {
@@ -171,8 +185,8 @@ class TimeAbsenceRepositoryEloquent extends BaseRepository implements TimeAbsenc
             // if($attributes['date']->registration_id == 100) {
             //     echo 'abc';
             // }
-            // $daystart = 
-            $latest = TimeAbsence::where('registration_id', $regis)->whereIn('type',[ 'From day to day','The specific day'])->get();
+            // $daystart =
+            $latest = TimeAbsence::where('registration_id', $regis)->whereIn('type', ['From day to day', 'The specific day'])->get();
             dd($latest);
             //     ->where(function ($query) use ($type, $daystart, $dayend) {
             //         $query->where([['time_start', '<=', $daystart], ['time_end', '>=', $dayend]])

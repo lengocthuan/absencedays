@@ -30,8 +30,8 @@ class RegistrationCreateRequest extends FormRequest
             'status' => 'integer|max:3|min:0',
             'requested_date' => 'date_format:Y-m-d H:i:s|before_or_equal:time_off_beginning',
             'approved_date' => 'date_format:Y-m-d H:i:s|after_or_equal:time_off_beginning',
-            'time_off_beginning' => 'required|date_format:Y-m-d|before_or_equal:time_off_ending',
-            'time_off_ending' => 'required|date_format:Y-m-d|after_or_equal:time_off_beginning',
+            // 'time_off_beginning' => 'required|date_format:Y-m-d|before_or_equal:time_off_ending',
+            // 'time_off_ending' => 'required|date_format:Y-m-d|after_or_equal:time_off_beginning',
             'current_year' => 'integer|min:1900|max:2500',
             'annual_leave_total' => 'numeric|between:0.5,99.99',
             'annual_leave' => 'numeric|between:0.5,99.99',
@@ -42,7 +42,6 @@ class RegistrationCreateRequest extends FormRequest
             'bereavement_leave' => 'numeric|between:0.5,99.99',
             'long_term_unpaid_leave' => 'numeric|between:0.5,99.99',
             'short_term_unpaid_leave' => 'numeric|between:0.5,99.99',
-            'at_time' => 'required',
         ];
     }
 }

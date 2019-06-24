@@ -29,7 +29,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('register', 'UsersController@register');
 
     //create a new user from supper admin with another role
-    Route::resource('timeabsence', 'TimeAbsencesController');
+    // Route::resource('timeabsence', 'TimeAbsencesController');
 
     //edit a user
 

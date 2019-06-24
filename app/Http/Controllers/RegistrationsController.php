@@ -65,6 +65,7 @@ class RegistrationsController extends Controller
      */
     public function store(RegistrationCreateRequest $request)
     {
+        
         $registration = $this->repository->create($request->all());
         if($registration == 'error')
         {

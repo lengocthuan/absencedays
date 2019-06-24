@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class AlterTimeAbsences01Table extends Migration
+class AlterTimeAbsences03Table extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +14,10 @@ class AlterTimeAbsences01Table extends Migration
     public function up()
     {
         Schema::table('time_absences', function (Blueprint $table) {
-            $table->dateTime('time_details')->nullable()->change();
-            $table->string('at_time')->nullable()->change()->comment = '1. Morning; 2. Afternoon; 3. Full';
-            $table->dateTime('time_start')->nullable()->change();
-            $table->dateTime('time_end')->nullable()->change();
+            $table->unsignedDecimal('annual_leave_total', 3, 1)->nullable();
+            $table->unsignedDecimal('annual_leave_unused', 3, 1)->nullable();
+            $table->year('current_year')->nullable();
+            $table->string('general_information')->nullable();
         });
     }
 
