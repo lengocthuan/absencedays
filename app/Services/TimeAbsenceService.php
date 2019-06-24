@@ -20,7 +20,6 @@ class TimeAbsenceService
 
             $timestart = new Carbon($attribute['time_start']);
             $timeend = new Carbon($attribute['time_end']);
-            // $count = $timestart->toDateString();
             $n = $timeend->diffInDays($timestart) + 1;
             for ($i = 0; $i < $n; $i++) {
                 $ta = new TimeAbsence;
@@ -54,12 +53,6 @@ class TimeAbsenceService
                 $details->save();
                 // return $details;
             }
-
-            // $registration = new Registration;
-            // $registration->current_year = $timeend->year;
-            // $registration->general_information = "Time absence of you start at : " . $timestart->toDateString() . "and end at: " . $timeend->toDateString();
-            // $registration->absence_days = $timeend->diffInDays($timestart);
-            // $registration->save();
         }
 
     }

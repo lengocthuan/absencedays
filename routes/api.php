@@ -50,6 +50,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('absence', 'RegistrationsController');
 
     Route::post('test', 'RegistrationsController@test');
+    Route::get('information/{id}', 'RegistrationsController@getProfile');
     // //edit a registration
     // Route::post('absence/edit', 'RegistrationsController@update');
     // //remove a gistration

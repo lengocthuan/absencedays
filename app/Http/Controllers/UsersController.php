@@ -162,9 +162,11 @@ class UsersController extends Controller
 
         return $this->presenterPostJson($user);
     }
+
     public function getusbyteam($id)
     {
         $user = $this->repository->findwhere(['team_id' => $id]);
         return response()->json($user, 200);
     }
+
 }

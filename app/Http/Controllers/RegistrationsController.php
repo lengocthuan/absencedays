@@ -133,15 +133,14 @@ class RegistrationsController extends Controller
     }
 
     /*
-     create a new registration
+    Get information Time absences of users
     */
-    // public function create(RegistrationCreateRequest $request)
-    // {
-    //     $registration = $this->repository->skipPresenter()->create($request->all());
+    public function getProfile($id)
+    {
+        $user = $this->repository->findwhere(['user_id' => $id]);
 
-    //     return $this->presenterPostJson($registration);
-    // }
-
+        return response()->json($user, 200);
+    }
      public function test()
      {
         // for($i = 0; $i < 3; $i++){

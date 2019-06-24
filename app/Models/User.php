@@ -14,7 +14,7 @@ class User extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'team_id', 'position_id', 'phone', 'address', 'email', 'password', 'first_workday'];
+    protected $fillable = ['name', 'team_id', 'position_id', 'phone', 'address', 'email', 'password', 'first_workday', 'approved_role'];
 
     // public function roles()
     // {
