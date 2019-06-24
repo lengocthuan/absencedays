@@ -35,6 +35,7 @@ class RegistrationTransformer extends BaseTransformer
         return [
             'user' => $model->getUser,
             'type' => $model->getType,
+            'time' => $model->getTimeAbsence,
         ];
     }
 }

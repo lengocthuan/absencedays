@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Registration;
 /**
  * Class TimeAbsence.
  *
@@ -14,6 +15,11 @@ class TimeAbsence extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['registration_id', 'type', 'time_details', 'at_time', 'time_start', 'time_end'];
+    protected $fillable = ['registration_id', 'type', 'time_details', 'at_time', 'current_year', '  absence_days', 'annual_leave_total', 'annual_leave_unused', 'general_information'];
+
+    public function getTimeAbsence() {
+        return $this->belongsTo(\App\Models\Registration::class, 'registration_id');
+    }
+
 
 }

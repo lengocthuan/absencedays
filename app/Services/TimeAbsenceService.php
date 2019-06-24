@@ -30,6 +30,8 @@ class TimeAbsenceService
                 $timestart = $timestart->addDay();
                 $ta->at_time = 'Full';
                 $ta->absence_days = 1;
+                $ta->current_year = Carbon::parse($timestart->toDateString())->format('Y');
+                $ta->general_information = 'The time absence of you at: ' . $timestart->toDateString();
                 $ta->save();
                 // return $ta;
             }

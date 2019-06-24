@@ -29,4 +29,12 @@ class TimeAbsenceTransformer extends BaseTransformer
      * @var array
      */
     protected $defaultIncludes = [];
+
+
+    // public function customAttributes($model): array
+    // {
+    //     return [
+    //        'time' => $model->getTimeAbsence,
+    //     ];
+    // }
 }

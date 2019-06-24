@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AlterRegistrationsTable extends Migration
 {
@@ -32,6 +32,7 @@ class AlterRegistrationsTable extends Migration
             $table->dropColumn('long_term_unpaid_leave');
             $table->dropColumn('short_term_unpaid_leave');
             $table->renameColumn('annual_leave', 'absence_days');
+
         });
     }
 

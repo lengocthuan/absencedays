@@ -15,6 +15,7 @@
  * Authorized resources
  */
 Route::group(['prefix' => 'v1'], function () {
+    Route::get('getusbyteam/{id}', 'UsersController@getusbyteam');
     Route::post('auth/login', 'Auth\AuthController@login');
     //auth
     Route::post('auth/logout', 'Auth\AuthController@logout');
@@ -56,6 +57,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('type', 'TypesController');
     Route::resource('team', 'TeamsController');
     Route::resource('position', 'PositionsController');
+
 });
 
 Route::group(['prefix' => 'v1'], function () {
