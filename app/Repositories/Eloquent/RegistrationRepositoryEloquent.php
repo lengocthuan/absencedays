@@ -138,6 +138,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             $id[] = $date[$i]->id;
         }
         $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
+
         return parent::find($res['data']['id']);
     }
 }
