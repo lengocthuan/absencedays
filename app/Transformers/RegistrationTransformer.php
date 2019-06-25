@@ -36,6 +36,7 @@ class RegistrationTransformer extends BaseTransformer
             'user' => $model->getUser,
             'type' => $model->getType,
             'time' => $model->getTimeAbsence,
+            'total' => $model->getTotalTime(),
         ];
     }
 }

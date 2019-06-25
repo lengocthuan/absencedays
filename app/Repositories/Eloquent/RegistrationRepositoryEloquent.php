@@ -102,7 +102,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         // $timestart = new Carbon($attributes['time_start']);
         // $timeend = new Carbon($attributes['time_end']);
         // $check = Registration::where('user_id', $attributes['user_id'])->first();
-        
+
         // $checkTime = TimeAbsence::where('registration_id', $attributes['id'])
         // dd($check->user_id);
 
@@ -128,4 +128,22 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
 
         return parent::find($res['data']['id']);
     }
+
+    // public function getTotal($id)
+    // {
+    //     $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
+    //     $sum = 0;
+    //     foreach ($total as $value) {
+    //         $sum += $value->absence_days;
+    //     }
+    //     return $sum;
+    // }
+    // public function getTotalTime($id) {
+    //     $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
+    //     $sum = 0;
+    //     foreach ($total as $value) {
+    //         $sum += $value->absence_days;
+    //     }
+    //     return $sum;
+    // }
 }

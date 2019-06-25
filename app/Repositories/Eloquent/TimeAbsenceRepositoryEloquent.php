@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Models\Registration;
 use App\Models\TimeAbsence;
 use App\Presenters\TimeAbsencePresenter;
 use App\Repositories\Contracts\TimeAbsenceRepository;
@@ -75,157 +74,140 @@ class TimeAbsenceRepositoryEloquent extends BaseRepository implements TimeAbsenc
         return intval($workdays);
     }
 
-    public function create(array $attributes)
-    {
-        $daystart = "";
-        $dayend = "";
-        $array = array();
-        $arr = array();
-        // dd($dayoff);
-        // dd($attributes['date']);
-        if (empty($attributes['date'])) {
-            if ($attributes['type'] == "From day to day") {
-                $daystart = $attributes['time_start'];
-                $dayend = $attributes['time_end'];
-                if (!empty($daystart) && !empty($dayend)) {
-                    $daystart = $attributes['time_start'];
-                    $dayend = $attributes['time_end'];
-                    $start = new Carbon($attributes['time_start']);
-                    $end = new Carbon($attributes['time_end']);
-                    $sum = $end->day - $start->day + 1;
-                    $dayoff = $this->getWorkdays($daystart, $dayend);
-                }
-                // $date1 = Registration::where('user_id', )
-                // $lastest = Registration::where('id', $attributes['registration_id'])->first();
-                // $lastest1 = Registration::where('user_id', $lastest->user_id)->get();
-                // foreach ($lastest1 as $val) {
-                //     if ($val->id != $lastest->id) {
-                //         $arr[] = $val->id;
-                //     }
-                // }
-                // dd($arr);
-                // $id = explode(' ', $arr);
-                // dd($id);
-                // $lastest3 = TimeAbsence::where('registration_id', $lastest1)->get();
-                // dd($lastest3);
-                // $days = $lastest1->count();
-                // dd($days);
-                // dd("abc");
-
-                $latest = $this->model()::where('registration_id', $attributes['registration_id'])
-                    ->where(function ($query) use ($daystart, $dayend) {
-                        $query->where([['time_start', '<=', $daystart], ['time_end', '>=', $dayend]])
-                            ->orwhere([['time_start', '>=', $daystart], ['time_start', '<=', $dayend]])
-                            ->orwhere([['time_end', '>=', $daystart], ['time_end', '<=', $dayend]]);
-                    })->get();
-                $days = $latest->count();
-                // dd($days);
-                if ($days == 0) {
-                    // dd('abcs');
-                    if ($daystart == $dayend) {
-                        // dd('hoply');
-                        TimeAbsenceService::add($attributes['registration_id'], $sum);
-                        // $timeAbsence = parent::create($attributes);
-                        // return $timeAbsence;
-                    } elseif ($daystart != $dayend) {
-                        // dd('khonghoply');
-                        if ($dayoff <= 15) {
-                            TimeAbsenceService::add($attributes['registration_id'], $dayoff);
-                            // $timeAbsence = parent::create($attributes);
-                            // return $timeAbsence;
-                            // dd($dayoff);
-                        } else {
-                            return "Over";
-                            // dd('over');
-                        }
-                    }
-                    $timeAbsence = parent::create($attributes);
-                    return $timeAbsence;
-                } else {
-                    // dd('dvcf');
-                    return 'Invalidate';
-                }
-
-            }
-        } else {
-            //if($attributes['type'] == "The specific day")
-            $regis = 0;
-            $time = explode(';', $attributes['date']);
-            for ($i = 0; $i < count($time); $i++) {
-                $time_children = explode(',', $time[$i]);
-                // dd($time_children);
-                $details = new TimeAbsence;
-                $details->registration_id = $time_children[0];
-                $regis = $time_children[0];
-                $details->type = $time_children[1];
-                $details->time_details = $time_children[2];
-                $details->at_time = $time_children[3];
-                // $details->save();
-                // $array[]=  $time_children[2] . $time_children[3];
-                array_push($array, $time_children[2], $time_children[3]);
-
-            }
-            // print_r($array);
-            for ($i = 0; $i < count($array); $i++) {
-                var_dump($array[$i]);
-                echo " ";
-            }
-            // dd($array);
-            // dd($time_children);
-            // dd($regis);
-
-            // dd($time);
-            // $cut = explode(',', $details);
-            // dd($cut);
-            // for ($i = 0; $i < count($time); $i++) {
-            //     $time_children = explode(',', $time[$i]);
-            //     $details = new TimeAbsence;
-            //     dd($details);
-            // }
-            // if($attributes['date']->registration_id == 100) {
-            //     echo 'abc';
-            // }
-            // $daystart =
-            $latest = TimeAbsence::where('registration_id', $regis)->whereIn('type', ['From day to day', 'The specific day'])->get();
-            dd($latest);
-            //     ->where(function ($query) use ($type, $daystart, $dayend) {
-            //         $query->where([['time_start', '<=', $daystart], ['time_end', '>=', $dayend]])
-            //             ->orwhere([['time_start', '>=', $daystart], ['time_start', '<=', $dayend]])
-            //             ->orwhere([['time_end', '>=', $daystart], ['time_end', '<=', $dayend]]);
-            //     })->get();
-            // $days = $latest->count();
-            // if ($days == 0) {
-            // dd('tuan');
-
-            // TimeAbsenceService::addTime($attributes['date']); //recived string from FE;
-
-            // } else {
-            //     // return 'Invalidate';
-            //     dd('tuan1');
-            // }
-
-        }
-        // else {
-        //     // dd('khongcogi');
-        //     return "InvalidateType";
-        // }
-
-    }
-
-    // public function dateDetails()
+    // public function create(array $attributes)
     // {
-    //     // $begin = new DateTime('2019-05-28');
-    //     $begin = $attributes['time_start'];
-    //     // $end = new DateTime('2019-06-01');
-    //     $end = $attributes['time_end'];
+    //     $daystart = "";
+    //     $dayend = "";
+    //     $array = array();
+    //     $arr = array();
+    //     // dd($dayoff);
+    //     // dd($attributes['date']);
+    //     if (empty($attributes['date'])) {
+    //         if ($attributes['type'] == "From day to day") {
+    //             $daystart = $attributes['time_start'];
+    //             $dayend = $attributes['time_end'];
+    //             if (!empty($daystart) && !empty($dayend)) {
+    //                 $daystart = $attributes['time_start'];
+    //                 $dayend = $attributes['time_end'];
+    //                 $start = new Carbon($attributes['time_start']);
+    //                 $end = new Carbon($attributes['time_end']);
+    //                 $sum = $end->day - $start->day + 1;
+    //                 $dayoff = $this->getWorkdays($daystart, $dayend);
+    //             }
+    //             // $date1 = Registration::where('user_id', )
+    //             // $lastest = Registration::where('id', $attributes['registration_id'])->first();
+    //             // $lastest1 = Registration::where('user_id', $lastest->user_id)->get();
+    //             // foreach ($lastest1 as $val) {
+    //             //     if ($val->id != $lastest->id) {
+    //             //         $arr[] = $val->id;
+    //             //     }
+    //             // }
+    //             // dd($arr);
+    //             // $id = explode(' ', $arr);
+    //             // dd($id);
+    //             // $lastest3 = TimeAbsence::where('registration_id', $lastest1)->get();
+    //             // dd($lastest3);
+    //             // $days = $lastest1->count();
+    //             // dd($days);
+    //             // dd("abc");
 
-    //     $end = $end->modify('+1 day');
+    //             $latest = $this->model()::where('registration_id', $attributes['registration_id'])
+    //                 ->where(function ($query) use ($daystart, $dayend) {
+    //                     $query->where([['time_start', '<=', $daystart], ['time_end', '>=', $dayend]])
+    //                         ->orwhere([['time_start', '>=', $daystart], ['time_start', '<=', $dayend]])
+    //                         ->orwhere([['time_end', '>=', $daystart], ['time_end', '<=', $dayend]]);
+    //                 })->get();
+    //             $days = $latest->count();
+    //             // dd($days);
+    //             if ($days == 0) {
+    //                 // dd('abcs');
+    //                 if ($daystart == $dayend) {
+    //                     // dd('hoply');
+    //                     TimeAbsenceService::add($attributes['registration_id'], $sum);
+    //                     // $timeAbsence = parent::create($attributes);
+    //                     // return $timeAbsence;
+    //                 } elseif ($daystart != $dayend) {
+    //                     // dd('khonghoply');
+    //                     if ($dayoff <= 15) {
+    //                         TimeAbsenceService::add($attributes['registration_id'], $dayoff);
+    //                         // $timeAbsence = parent::create($attributes);
+    //                         // return $timeAbsence;
+    //                         // dd($dayoff);
+    //                     } else {
+    //                         return "Over";
+    //                         // dd('over');
+    //                     }
+    //                 }
+    //                 $timeAbsence = parent::create($attributes);
+    //                 return $timeAbsence;
+    //             } else {
+    //                 // dd('dvcf');
+    //                 return 'Invalidate';
+    //             }
 
-    //     $interval = new DateInterval('P1D');
-    //     $daterange = new DatePeriod($begin, $interval, $end);
+    //         }
+    //     } else {
+    //         //if($attributes['type'] == "The specific day")
+    //         $regis = 0;
+    //         $time = explode(';', $attributes['date']);
+    //         for ($i = 0; $i < count($time); $i++) {
+    //             $time_children = explode(',', $time[$i]);
+    //             // dd($time_children);
+    //             $details = new TimeAbsence;
+    //             $details->registration_id = $time_children[0];
+    //             $regis = $time_children[0];
+    //             $details->type = $time_children[1];
+    //             $details->time_details = $time_children[2];
+    //             $details->at_time = $time_children[3];
+    //             // $details->save();
+    //             // $array[]=  $time_children[2] . $time_children[3];
+    //             array_push($array, $time_children[2], $time_children[3]);
 
-    //     foreach ($daterange as $date) {
-    //         echo $date->format("Y-m-d") . "<br>";
+    //         }
+    //         // print_r($array);
+    //         for ($i = 0; $i < count($array); $i++) {
+    //             var_dump($array[$i]);
+    //             echo " ";
+    //         }
+    //         // dd($array);
+    //         // dd($time_children);
+    //         // dd($regis);
+
+    //         // dd($time);
+    //         // $cut = explode(',', $details);
+    //         // dd($cut);
+    //         // for ($i = 0; $i < count($time); $i++) {
+    //         //     $time_children = explode(',', $time[$i]);
+    //         //     $details = new TimeAbsence;
+    //         //     dd($details);
+    //         // }
+    //         // if($attributes['date']->registration_id == 100) {
+    //         //     echo 'abc';
+    //         // }
+    //         // $daystart =
+    //         $latest = TimeAbsence::where('registration_id', $regis)->whereIn('type', ['From day to day', 'The specific day'])->get();
+    //         dd($latest);
+    //         //     ->where(function ($query) use ($type, $daystart, $dayend) {
+    //         //         $query->where([['time_start', '<=', $daystart], ['time_end', '>=', $dayend]])
+    //         //             ->orwhere([['time_start', '>=', $daystart], ['time_start', '<=', $dayend]])
+    //         //             ->orwhere([['time_end', '>=', $daystart], ['time_end', '<=', $dayend]]);
+    //         //     })->get();
+    //         // $days = $latest->count();
+    //         // if ($days == 0) {
+    //         // dd('tuan');
+
+    //         // TimeAbsenceService::addTime($attributes['date']); //recived string from FE;
+
+    //         // } else {
+    //         //     // return 'Invalidate';
+    //         //     dd('tuan1');
+    //         // }
+
     //     }
+    //     // else {
+    //     //     // dd('khongcogi');
+    //     //     return "InvalidateType";
+    //     // }
+
     // }
 }

@@ -6,7 +6,7 @@ use App\Http\Requests\TimeAbsenceCreateRequest;
 use App\Http\Requests\TimeAbsenceUpdateRequest;
 use App\Repositories\Contracts\TimeAbsenceRepository;
 use Illuminate\Http\Request;
-
+use App\Models\TimeAbsence;
 /**
  * Class TimeAbsencesController.
  *
@@ -122,5 +122,18 @@ class TimeAbsencesController extends Controller
         $this->repository->delete($id);
 
         return response()->json(null, 204);
+    }
+
+    public function statistic($id)
+    {
+        /*
+        get Total absence days for a user in a registration.
+        */
+        $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
+        $sum = 0;
+        foreach ($total as $value) {
+            $sum += $value->absence_days;
+        }
+        return $sum;
     }
 }

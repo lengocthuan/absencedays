@@ -10,6 +10,7 @@ use App\Http\Requests\RegistrationUpdateRequest;
 use App\Repositories\Contracts\RegistrationRepository;
 use Carbon\Carbon;
 use App\Models\Registration;
+use App\Models\TimeAbsence;
 use illuminate\database\eloquent\collection;
 
 /**
@@ -138,9 +139,9 @@ class RegistrationsController extends Controller
     public function getProfile($id)
     {
         $user = $this->repository->findwhere(['user_id' => $id]);
-
         return response()->json($user, 200);
     }
+
      public function test()
      {
         // for($i = 0; $i < 3; $i++){

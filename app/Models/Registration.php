@@ -17,7 +17,7 @@ class Registration extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'time_off_beginning', 'time_off_ending', 'current_year', 'annual_leave_total', 'absence_days', 'annual_leave_unused', 'at_time', 'general_information'];
+    protected $fillable = ['id', 'user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'time_off_beginning', 'time_off_ending', 'current_year', 'annual_leave_total', 'absence_days', 'annual_leave_unused', 'at_time', 'general_information'];
 
     public function getUser() {
         // $user = User::find($this->user_id);
@@ -32,7 +32,22 @@ class Registration extends BaseModel
     }
 
     public function getTimeAbsence() {
-        return $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
+        $timeAB =  $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
+        return $timeAB;
     }
     
+    public function getTotalTime() {
+        // $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
+        // $total = $this->getTimeAbsence;
+        // dd($total);
+        // $user = User::find($this->user_id);
+        // return $user->name;
+        $total = TimeAbsence::where('registration_id', $this->id)->select('absence_days')->get();
+        // dd($total);
+        $sum = 0;
+        foreach ($total as $value) {
+            $sum += $value->absence_days;
+        }
+        return $sum;
+    }
 }

@@ -15,11 +15,11 @@ class TimeAbsence extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['registration_id', 'type', 'time_details', 'at_time', 'current_year', '  absence_days', 'annual_leave_total', 'annual_leave_unused', 'general_information'];
+    protected $fillable = ['registration_id', 'type', 'time_details', 'at_time', 'current_year', 'absence_days', 'annual_leave_total', 'annual_leave_unused', 'general_information'];
 
-    public function getTimeAbsence() {
-        return $this->belongsTo(\App\Models\Registration::class, 'registration_id');
-    }
+    // public function getTimeAbsence() {
+    //     return $this->belongsTo(\App\Models\Registration::class, 'registration_id');
+    // }
 
 
 }
