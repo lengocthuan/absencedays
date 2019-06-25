@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
-use Socialite;
-use App\Services\RoleService;
-use App\Models\Social;
-use App\Models\DeviceToken;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthGoogleRequest;
-use Carbon\Carbon;
+use App\Models\DeviceToken;
+use App\Models\Social;
+use App\Services\RoleService;
+use App\User;
+use Socialite;
 
 class AuthGoogleController extends Controller
 {
@@ -32,7 +31,13 @@ class AuthGoogleController extends Controller
             $user = User::find($social->user_id);
         } else {
             $user = User::where(['email' => $profile->email])->first();
-            if($user) RoleService::add($user, 'member'); //create role_user when login the first
+            // dd($user);
+            if ($user) {
+                if (!$user->hasrole(['member', 'super_admin', 'project_management', 'tech_lead'])) {
+                    RoleService::add($user, 'member'); //check role for user when login;
+                }
+                User::where('email', $profile->email)->update(['avatar' => $profile->avatar]);
+            }
             if (!$user) {
                 // $user = new User;
                 // $user->name = $profile->name;

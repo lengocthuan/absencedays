@@ -129,12 +129,9 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     {
         return $this->belongsTo(\App\Models\Team::class, 'team_id');
     }
+
     public function getPosition()
     {
         return $this->belongsTo(\App\Models\Position::class, 'position_id');
     }
-    // public function getRole()
-    // {
-    //     return $this->belongsToMany(\App\Models\Trust\Role::class, 'name');
-    // }
 }
