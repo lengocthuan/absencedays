@@ -9,6 +9,7 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Repositories\Contracts\UserRepository;
 use App\User;
 use Hash;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class UsersController.
@@ -60,9 +61,8 @@ class UsersController extends Controller
      */
     public function me()
     {
-        $user = $this->repository->find(auth()->user()->id);
-
-        //       $us = $this->repository->parserResult($user);
+        $user = $this->repository->parserResult(Auth::user());
+        // $user = parserResult(Auth::user());
         return response()->json($user);
     }
 
