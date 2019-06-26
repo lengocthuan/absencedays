@@ -51,6 +51,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('absence', 'RegistrationsController');
 
     Route::post('test', 'RegistrationsController@test');
+    Route::post('updated/{id}', 'RegistrationsController@updateStatusRegis');
     Route::get('search', 'RegistrationsController@search');
     Route::get('information/{id}', 'RegistrationsController@getProfile');
     Route::get('approved/{id}', 'RegistrationsController@getApproved');

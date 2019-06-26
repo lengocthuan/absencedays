@@ -163,6 +163,13 @@ class RegistrationsController extends Controller
         $pending = $this->repository->findwhere(['approver_id' => $id, 'status' => 3]);
         return response()->json($pending, 200);
     }
+
+    public function updateStatusRegis($id)
+    {
+        $user = Registration::where('id', $id)->update(['status' => 1]);
+        $information = $this->repository->findwhere(['id' => $id]);
+        return response()->json($information, 200);
+    }
     // public function searchuser($key)
     // {
     //     $user = $this->repository->searchuser($key);
