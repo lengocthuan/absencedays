@@ -100,7 +100,6 @@ class RegistrationsController extends Controller
     public function show($id)
     {
         $registration = $this->repository->find($id);
-        
         return response()->json($registration);
     }
 
@@ -141,6 +140,19 @@ class RegistrationsController extends Controller
         $user = $this->repository->findwhere(['user_id' => $id]);
         return response()->json($user, 200);
     }
+
+    public function search(Request $request )
+    {
+
+        $days = $this->repository->search($request->all());
+        return response()->json($days);
+    }
+
+    // public function searchuser($key)
+    // {
+    //     $user = $this->repository->searchuser($key);
+    //     return response()->json($user);
+    // }
 
      public function test()
      {

@@ -15,7 +15,6 @@ class TimeAbsenceService
     // }
     public static function add($id, array $attribute)
     {
-
         if ($attribute['type'] == 'From day to day') {
 
             $timestart = new Carbon($attribute['time_start']);
@@ -44,9 +43,12 @@ class TimeAbsenceService
                 $details->type = $attribute['type'];
                 $details->time_details = $time_children[0];
                 $details->at_time = $time_children[1];
-                if($details->at_time == 'Morning' || $details->at_time == 'Afternoon') {
+                if ($details->at_time == 'Morning' || $details->at_time == 'Afternoon') {
                     $details->absence_days = 0.5;
-                } else $details->absence_days = 1;
+                } else {
+                    $details->absence_days = 1;
+                }
+
                 // $time = new Carbon($details->time_details);
                 $details->current_year = Carbon::parse($time_children[0])->format('Y');
                 $details->general_information = 'Time absence of you at: ' . $time_children[1] . $time_children[0];
@@ -94,4 +96,29 @@ class TimeAbsenceService
 
     //     return $user->roles()->sync($role);
     // }
+    public static function search($id, $attributes)
+    {
+        $arr = array();
+        foreach ($id as $value) {
+            $arr[] = $value->id;
+        }
+        if (isset($attributes['day'])) {
+            $time = $attributes['day'];
+            $registration_id = TimeAbsence::whereIn('registration_id', $arr)->where('time_details', $time)->select('registration_id')->get();
+            return $registration_id;
+        } elseif (isset($attributes['month'])) {
+            $time = $attributes['month'];
+            $a = explode('-', $time);
+            $month = $a[1];
+            $year = $a[0];
+            $registration_id = TimeAbsence::whereIn('registration_id', $arr)->whereMonth('time_details', $month)->whereYear('time_details', $year)->select('registration_id')->get();
+            return $registration_id;
+        } else {
+            $time = $attributes['year'];
+            $registration_id = TimeAbsence::whereIn('registration_id', $arr)->whereYear('time_details', $time)->select('registration_id')->get();
+            return $registration_id;
+        }
+// >where(function ($query) use ($daystart, $dayend)
+
+    }
 }

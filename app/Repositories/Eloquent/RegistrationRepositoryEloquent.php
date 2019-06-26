@@ -10,6 +10,7 @@ use App\Services\TimeAbsenceService;
 use Carbon\Carbon;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class RegistrationRepositoryEloquent.
@@ -44,6 +45,15 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function search(array $attributes) {
+        // dd($attributes['time']);
+        $id = Auth::user()->id;
+        $search = $this->model()::where('user_id', $id)->select('id')->get();
+        $time = TimeAbsenceService::search($search, $attributes);
+        $result = $this->model()::whereIn('id', $time)->get();
+        return $this->parserResult($result);
     }
 
     public function getWorkdays($date1, $date2, $workSat = false, $patron = null)

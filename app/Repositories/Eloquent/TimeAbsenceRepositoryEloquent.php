@@ -210,4 +210,15 @@ class TimeAbsenceRepositoryEloquent extends BaseRepository implements TimeAbsenc
     //     // }
 
     // }
+    // public function search(array $attributes) {
+    //     dd($attributes['time']);
+    //     $days = $time->toDateTimeString();
+    //     $date = $this->model()::where('time_details', $time)->get();
+    //     dd($date);
+    // }
+    // public function searchuser($key)
+    // {
+    //     $user = $this->model()::where('name', 'like', '%' . $key . '%')->orwhere('email', 'like', '%' . $key . '%')->get();
+    //     return $this->parserResult($user);
+    // }
 }
