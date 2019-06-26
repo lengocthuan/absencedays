@@ -26,6 +26,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     //user information
     Route::get('me', 'UsersController@me');
+    Route::get('teamlead', 'UsersController@getUsTeamLead');
     //registration a new user
     Route::post('register', 'UsersController@register');
 
@@ -52,7 +53,11 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('test', 'RegistrationsController@test');
     Route::get('search', 'RegistrationsController@search');
     Route::get('information/{id}', 'RegistrationsController@getProfile');
+    Route::get('approved/{id}', 'RegistrationsController@getApproved');
+    Route::get('pending', 'RegistrationsController@getRegisPending');
     Route::get('sum/{id}', 'TimeAbsencesController@statistic');
+
+
     
     // //edit a registration
     // Route::post('absence/edit', 'RegistrationsController@update');

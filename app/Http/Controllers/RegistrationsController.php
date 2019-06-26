@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\Registration;
 use App\Models\TimeAbsence;
 use illuminate\database\eloquent\collection;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class RegistrationsController.
@@ -137,7 +138,15 @@ class RegistrationsController extends Controller
     */
     public function getProfile($id)
     {
-        $user = $this->repository->findwhere(['user_id' => $id]);
+        $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
+        // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
+        return response()->json($user, 200);
+    }
+
+    public function getApproved($id)
+    {
+        $user = $this->repository->findwhere(['user_id' => $id, 'status' => '1']);
+        // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
         return response()->json($user, 200);
     }
 
@@ -148,6 +157,12 @@ class RegistrationsController extends Controller
         return response()->json($days);
     }
 
+    public function getRegisPending()
+    {
+        $id = Auth::user()->id;
+        $pending = $this->repository->findwhere(['approver_id' => $id, 'status' => 3]);
+        return response()->json($pending, 200);
+    }
     // public function searchuser($key)
     // {
     //     $user = $this->repository->searchuser($key);

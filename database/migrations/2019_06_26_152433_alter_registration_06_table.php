@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterUsers02Table extends Migration
+class AlterRegistration06Table extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AlterUsers02Table extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('avatar')->default('https://picsum.photos/200/300?grayscale')->nullable();
+        Schema::table('registrations', function (Blueprint $table) {
+            $table->integer('approver_id')->unsigned();
         });
     }
 
@@ -25,7 +25,7 @@ class AlterUsers02Table extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('registrations', function (Blueprint $table) {
             //
         });
     }
