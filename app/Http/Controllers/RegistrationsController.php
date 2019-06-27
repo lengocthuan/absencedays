@@ -171,7 +171,7 @@ class RegistrationsController extends Controller
     {
         $user = Registration::where('id', $id)->update(['status' => 1]);
         $date = Carbon::now();
-        $aprroved_date = Registration::where('id', $id)->update(['aprroved_date' => $date]);
+        $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
         $information = $this->repository->findwhere(['id' => $id]);
         return response()->json($information, 200);
     }

@@ -17,7 +17,6 @@ class CreateTeamsTable extends Migration
             $table->increments('id');
             $table->string('name')->nullable()->comment = 'Solution; BA; Java; PHP; .Net; Mobile; Design; Front-end; QM; HC-QT; PM; AI';
             $table->string('description')->nullable();
-            // $table->integer('note')->comment = 'use for approval';
             $table->timestamps();
         });
     }
