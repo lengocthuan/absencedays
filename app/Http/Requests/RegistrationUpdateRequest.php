@@ -13,7 +13,7 @@ class RegistrationUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,8 @@ class RegistrationUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'type_id' => 'required|string|max:191',
+            'note' => 'required|string|min:20',
         ];
     }
 }

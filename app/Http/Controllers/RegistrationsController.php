@@ -114,9 +114,12 @@ class RegistrationsController extends Controller
      */
     public function update(RegistrationUpdateRequest $request, $id)
     {
-        $registration = $this->repository->skipPresenter()->update($request->all(), $id);
-
-        return response()->json($registration->presenter(), 200);
+        $registration = $this->repository->update($request->all(), $id);
+        if($registration == 'unsuitable') {
+            $error = 'Your registration table has an inappropriate state in this case.';
+            return response()->json($error, 404);
+        }
+        return response()->json($registration, 200);
     }
 
     /**
@@ -167,6 +170,8 @@ class RegistrationsController extends Controller
     public function updateStatusRegis($id)
     {
         $user = Registration::where('id', $id)->update(['status' => 1]);
+        $date = Carbon::now();
+        $aprroved_date = Registration::where('id', $id)->update(['aprroved_date' => $date]);
         $information = $this->repository->findwhere(['id' => $id]);
         return response()->json($information, 200);
     }

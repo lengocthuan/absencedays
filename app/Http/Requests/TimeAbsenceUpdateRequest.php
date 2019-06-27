@@ -13,7 +13,7 @@ class TimeAbsenceUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,9 @@ class TimeAbsenceUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'type' => 'string|max:191',
+            'time_details' => 'date_format:Y-m-d',
+            'at_time' => 'string|max:191',
         ];
     }
 }

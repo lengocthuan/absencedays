@@ -3,14 +3,13 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Registration;
-use App\Models\TimeAbsence;
 use App\Presenters\RegistrationPresenter;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\Services\TimeAbsenceService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Class RegistrationRepositoryEloquent.
@@ -47,7 +46,8 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    public function search(array $attributes) {
+    public function search(array $attributes)
+    {
         // dd($attributes['time']);
         $id = Auth::user()->id;
         $search = $this->model()::where('user_id', $id)->select('id')->get();
@@ -139,21 +139,17 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         return parent::find($res['data']['id']);
     }
 
-    // public function getTotal($id)
-    // {
-    //     $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
-    //     $sum = 0;
-    //     foreach ($total as $value) {
-    //         $sum += $value->absence_days;
-    //     }
-    //     return $sum;
-    // }
-    // public function getTotalTime($id) {
-    //     $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
-    //     $sum = 0;
-    //     foreach ($total as $value) {
-    //         $sum += $value->absence_days;
-    //     }
-    //     return $sum;
-    // }
+    public function update(array $attributes, $id)
+    {
+        $abc = 'unsuitable';
+        $status = $this->model()::where('id', $id)->select('status')->get();
+        // dd($status[0]->status);
+        if ($status[0]->status == 3) {
+            $registration = parent::update(array_except($attributes, ['user_id', 'status', 'requested_date']), $id);
+            TimeAbsenceService::update($id, $attributes);
+            return $registration;
+        } else {
+            return $abc;
+        }
+    }
 }

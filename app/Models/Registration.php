@@ -17,7 +17,7 @@ class Registration extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'time_off_beginning', 'time_off_ending', 'current_year', 'annual_leave_total', 'absence_days', 'annual_leave_unused', 'at_time', 'general_information', 'approver_id'];
+    protected $fillable = ['id', 'user_id', 'type_id', 'note', 'status', 'requested_date', 'aprroved_date', 'time_off_beginning', 'time_off_ending', 'current_year', 'annual_leave_total', 'absence_days', 'annual_leave_unused', 'at_time', 'general_information', 'approver_id'];
 
     public function getUser() {
         // $user = User::find($this->user_id);
@@ -49,5 +49,9 @@ class Registration extends BaseModel
             $sum += $value->absence_days;
         }
         return $sum;
+    }
+
+    public function getApprover() {
+        return $this->belongsTo(\App\User::class, 'approver_id');
     }
 }
