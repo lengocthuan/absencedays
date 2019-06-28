@@ -37,7 +37,7 @@ class RegistrationTransformer extends BaseTransformer
             'type' => $model->getType,
             'time' => $model->getTimeAbsence,
             'total' => $model->getTotalTime(),
-            'approver_id' =>$model->getApprover,
+            'approver_id' =>$model->getApprover(),
         ];
     }
 }

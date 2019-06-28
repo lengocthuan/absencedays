@@ -52,6 +52,14 @@ class Registration extends BaseModel
     }
 
     public function getApprover() {
-        return $this->belongsTo(\App\User::class, 'approver_id');
+        $approver = Registration::select('approver_id')->get();
+        $app = explode(',', $approver[0]->approver_id); //array 0->2 ; 1->3
+        $arr = array();
+        foreach ($app as $value) {
+            $info = User::where('id', $value)->get();
+            $arr[] =$info;
+        }
+        return $arr;
+        // return $this->belongsTo(\App\User::class, 'approver_id');
     }
 }

@@ -11,6 +11,7 @@ use App\Repositories\Contracts\RegistrationRepository;
 use Carbon\Carbon;
 use App\Models\Registration;
 use App\Models\TimeAbsence;
+use App\User;
 use illuminate\database\eloquent\collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -183,6 +184,16 @@ class RegistrationsController extends Controller
 
      public function test()
      {
+        $approver = Registration::select('approver_id')->get();
+        $app = explode(',', $approver[0]->approver_id);
+        // dd($approver[0]->approver_id);
+        // dd($app[0]);
+        $arr = array();
+        foreach ($app as $value) {
+            $info = User::where('id', $value)->get();
+            $arr[] =$info;
+        }
+        dd($arr);
         // for($i = 0; $i < 3; $i++){
         //     $array = Array($i);
         // }
