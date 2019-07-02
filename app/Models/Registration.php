@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use App\User;
-use App\Models\Type;
 use App\Models\TimeAbsence;
+use App\Models\Type;
+use App\User;
+
 /**
  * Class Registration.
  *
@@ -19,24 +20,28 @@ class Registration extends BaseModel
      */
     protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'approver_id'];
 
-    public function getUser() {
+    public function getUser()
+    {
         // $user = User::find($this->user_id);
         // return $user->name;
         return $this->belongsTo(\App\User::class, 'user_id');
     }
 
-    public function getType() {
+    public function getType()
+    {
         // $type = Type::find($this->type_id);
         // return $type->name;
         return $this->belongsTo(\App\Models\Type::class, 'type_id');
     }
 
-    public function getTimeAbsence() {
-        $timeAB =  $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
+    public function getTimeAbsence()
+    {
+        $timeAB = $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
         return $timeAB;
     }
-    
-    public function getTotalTime() {
+
+    public function getTotalTime()
+    {
         // $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
         // $total = $this->getTimeAbsence;
         // dd($total);
@@ -51,15 +56,16 @@ class Registration extends BaseModel
         return $sum;
     }
 
-    public function getApprover() {
+    public function getApprover()
+    {
         $approver = Registration::select('approver_id')->get();
         $app = explode(',', $approver[0]->approver_id); //array 0->2 ; 1->3
-        $arr = array();
+        $arr = [];
         foreach ($app as $value) {
-            $info = User::where('id', $value)->get();
-            $arr[] =$info;
+            $info = User::where('id', $value)->select('id', 'name', 'email')->get();
+            $r = ['id' => $info[0]['id'], 'name' => $info[0]['name'], 'email' => $info[0]['email']];
+            $arr[] = $r;
         }
         return $arr;
-        // return $this->belongsTo(\App\User::class, 'approver_id');
     }
 }
