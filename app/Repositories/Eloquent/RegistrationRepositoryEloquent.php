@@ -10,6 +10,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
+use App\User;
+use App\Mail\SendMailable;
+use App\Models\Type;
+use Mail;
 
 /**
  * Class RegistrationRepositoryEloquent.
@@ -136,6 +140,44 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         }
         $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
 
+        //send mail
+        
+        // dd($type->name);
+        
+        // dd($user->name);
+        // $mail = array();
+        // for ($i=0; $i < count($res['data']['attributes']['approver_id']) ; $i++) { 
+        //      $mail[] = $res['data']['attributes']['approver_id'][$i][0]['email'];
+        //  }
+        // if (isset($attributes['approver_id'])) {
+        //     $user = Auth::user();
+        //     $type = Type::find($attributes['type_id']);
+        //     if($attributes['type'] == 'From day to day') {
+        //         $time_start = $attributes['time_start'];
+        //         $time_end = $attributes['time_end'];
+        //     } else {
+        //         $date = explode(';', $attributes['date']);
+        //         //[0] ->2019-06-01, 
+        //         //Morning;
+        //         //[0] ->2019-06-01, 
+        //         //Morning;
+        //         //[0] ->2019-06-01, Morning;
+        //         //[0] ->2019-06-01, Morning;
+        //         for ($i=0; $i < count($date) ; $i++) { 
+        //             $at_time = explode(',', $date[$i]);
+        //             $add = 
+        //         }
+        //     }
+        //     for ($i=0; $i < count($mail) ; $i++) { 
+        //         $data = [
+        //             'name' => $user->name,
+        //             'type_id' => $type->name,
+        //             'note' => $attributes['note'],
+        //         ];
+        //         Mail::to($mail[$i])->send(new SendMailable());
+        //     }
+                
+        // }
         return parent::find($res['data']['id']);
     }
 
