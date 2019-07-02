@@ -58,7 +58,7 @@ class Registration extends BaseModel
 
     public function getApprover()
     {
-        $approver = Registration::select('approver_id')->get();
+        $approver = Registration::where('id', $this->id)->select('approver_id')->get();
         $app = explode(',', $approver[0]->approver_id); //array 0->2 ; 1->3
         $arr = [];
         foreach ($app as $value) {
