@@ -62,6 +62,38 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         $result = $this->model()::whereIn('id', $time)->get();
         return $this->parserResult($result);
     }
+    public function searchPending(array $attributes)
+    {
+        // dd($attributes['time']);
+        $id = Auth::user()->id;
+        $search = $this->model()::where('user_id', $id)->where('status', 3)->select('id')->get();
+        // dd($search);
+        $time = TimeAbsenceService::search($search, $attributes);
+        $result = $this->model()::whereIn('id', $time)->get();
+        return $this->parserResult($result);
+    }
+
+    public function searchApproved(array $attributes)
+    {
+        // dd($attributes['time']);
+        $id = Auth::user()->id;
+        $search = $this->model()::where('user_id', $id)->where('status', 1)->select('id')->get();
+        // dd($search);
+        $time = TimeAbsenceService::search($search, $attributes);
+        $result = $this->model()::whereIn('id', $time)->get();
+        return $this->parserResult($result);
+    }
+
+    public function searchDisApproved(array $attributes)
+    {
+        // dd($attributes['time']);
+        $id = Auth::user()->id;
+        $search = $this->model()::where('user_id', $id)->where('status', 2)->select('id')->get();
+        // dd($search);
+        $time = TimeAbsenceService::search($search, $attributes);
+        $result = $this->model()::whereIn('id', $time)->get();
+        return $this->parserResult($result);
+    }
 
     // public function searchByStatus(array $attributes)
     // {

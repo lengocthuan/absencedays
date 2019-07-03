@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Requests\RegistrationCreateRequest;
 use App\Http\Requests\RegistrationUpdateRequest;
-use App\Repositories\Contracts\RegistrationRepository;
-use Carbon\Carbon;
 use App\Models\Registration;
-use App\Models\TimeAbsence;
+use App\Repositories\Contracts\RegistrationRepository;
 use App\User;
-use illuminate\database\eloquent\collection;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -45,7 +41,7 @@ class RegistrationsController extends Controller
     public function index()
     {
         $limit = request()->get('limit', null);
-        
+
         $includes = request()->get('include', '');
 
         if ($includes) {
@@ -68,26 +64,21 @@ class RegistrationsController extends Controller
      */
     public function store(RegistrationCreateRequest $request)
     {
-        
+
         $registration = $this->repository->create($request->all());
-        if($registration == 'error')
-        {
+        if ($registration == 'error') {
             $error = 'You cant registration over 17 days.';
             return response()->json($error, 404);
-        } elseif($registration == 'unallow')
-        {
+        } elseif ($registration == 'unallow') {
             $error = 'You are not allowed to set a date that coincides with the previously registered date.';
             return response()->json($error, 404);
-        } elseif($registration == 'time_invalid')
-        {
+        } elseif ($registration == 'time_invalid') {
             $error = 'Registration time is invalid';
             return response()->json($error, 404);
-        } elseif($registration == 'time_invalid_1')
-        {
+        } elseif ($registration == 'time_invalid_1') {
             $error = 'Total inappropriate absence time, other time options or contact administrator.';
             return response()->json($error, 404);
-        } else
-        {
+        } else {
             return response()->json($registration, 201);
         }
     }
@@ -116,7 +107,7 @@ class RegistrationsController extends Controller
     public function update(RegistrationUpdateRequest $request, $id)
     {
         $registration = $this->repository->update($request->all(), $id);
-        if($registration == 'unsuitable') {
+        if ($registration == 'unsuitable') {
             $error = 'Your registration table has an inappropriate state in this case.';
             return response()->json($error, 404);
         }
@@ -139,7 +130,7 @@ class RegistrationsController extends Controller
 
     /*
     Get information Time absences of users
-    */
+     */
     public function getProfile()
     {
         $id = Auth::user()->id;
@@ -156,9 +147,35 @@ class RegistrationsController extends Controller
         return response()->json($user, 200);
     }
 
-    public function search(Request $request )
+    public function getDisApproved()
+    {
+        $id = Auth::user()->id;
+        $user = $this->repository->findwhere(['user_id' => $id, 'status' => '2']);
+        // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
+        return response()->json($user, 200);
+    }
+
+    public function search(Request $request)
     {
         $days = $this->repository->search($request->all());
+        return response()->json($days);
+    }
+
+    public function searchPending(Request $request)
+    {
+        $days = $this->repository->searchPending($request->all());
+        return response()->json($days);
+    }
+
+    public function searchApproved(Request $request)
+    {
+        $days = $this->repository->searchApproved($request->all());
+        return response()->json($days);
+    }
+
+    public function searchDisApproved(Request $request)
+    {
+        $days = $this->repository->searchDisApproved($request->all());
         return response()->json($days);
     }
 
@@ -177,14 +194,32 @@ class RegistrationsController extends Controller
         $information = $this->repository->findwhere(['id' => $id]);
         return response()->json($information, 200);
     }
+
+    public function updateStatusRegis2($id)
+    {
+        $user1 = Registration::where('id', $id)->select('status')->get();
+        // dd($user1[0]->status);
+        if ($user1[0]->status == 1) {
+            return "Your request has been approved. Please do not disturb the system.";
+        } elseif ($user1[0]->status == 3) {
+            $user = Registration::where('id', $id)->update(['status' => 2]);
+            $date = Carbon::now();
+            $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
+            $information = $this->repository->findwhere(['id' => $id]);
+            return response()->json($information, 200);
+        } else {
+            return "Your request is invalid. Please do not disturb the system.";
+        }
+
+    }
     // public function searchuser($key)
     // {
     //     $user = $this->repository->searchuser($key);
     //     return response()->json($user);
     // }
 
-     public function test()
-     {
+    public function test()
+    {
         $approver = Registration::select('approver_id')->get();
         $app = explode(',', $approver[0]->approver_id);
         // dd($approver[0]->approver_id);
@@ -192,7 +227,7 @@ class RegistrationsController extends Controller
         $arr = array();
         foreach ($app as $value) {
             $info = User::where('id', $value)->get();
-            $arr[] =$info;
+            $arr[] = $info;
         }
         dd($arr);
         // for($i = 0; $i < 3; $i++){
@@ -238,7 +273,7 @@ class RegistrationsController extends Controller
         // $registration = Registration::where('id',10)->first();
         // // $registration1 = Registration::where('id',10)->get(['time_off_ending']);
         // // if($registration === $registration1) echo "="; else echo "!=";
-      
+
         // $time = explode(' ', $registration->time_off_beginning);
         // echo $time[0];
 
@@ -254,5 +289,5 @@ class RegistrationsController extends Controller
         // echo $time->addDay(2);
         // echo "=====";
         // echo $day;
-     }
+    }
 }

@@ -52,7 +52,13 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('test', 'RegistrationsController@test');
     Route::put('updated/{id}', 'RegistrationsController@updateStatusRegis');
+    Route::put('updated2/{id}', 'RegistrationsController@updateStatusRegis2');
+
     Route::get('search', 'RegistrationsController@search');
+    Route::get('searchpending', 'RegistrationsController@searchPending');
+    Route::get('searchapproved', 'RegistrationsController@searchApproved');
+    Route::get('searchdisapproved', 'RegistrationsController@searchDisApproved');
+
     Route::get('information', 'RegistrationsController@getProfile');
     Route::get('approved', 'RegistrationsController@getApproved');
     Route::get('pending', 'RegistrationsController@getRegisPending');
