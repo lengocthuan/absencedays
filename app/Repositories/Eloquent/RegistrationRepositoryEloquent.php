@@ -57,30 +57,21 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         // dd($attributes['time']);
         $id = Auth::user()->id;
         $search = $this->model()::where('user_id', $id)->select('id')->get();
+        // dd($search);
         $time = TimeAbsenceService::search($search, $attributes);
         $result = $this->model()::whereIn('id', $time)->get();
         return $this->parserResult($result);
     }
 
-    public function searchByStatus(array $attributes)
-    {
-        // dd($attributes['time']);
-        $id = Auth::user()->id;
-        $search = $this->model()::where('user_id', $id)->select('id')->get();
-        $time = TimeAbsenceService::search($search, $attributes);
-        $result = $this->model()::whereIn('id', $time)->get();
-        return $this->parserResult($result);
-    }
-
-    public function search(array $attributes)
-    {
-        // dd($attributes['time']);
-        $id = Auth::user()->id;
-        $search = $this->model()::where('user_id', $id)->select('id')->get();
-        $time = TimeAbsenceService::search($search, $attributes);
-        $result = $this->model()::whereIn('id', $time)->get();
-        return $this->parserResult($result);
-    }
+    // public function searchByStatus(array $attributes)
+    // {
+    //     // dd($attributes['time']);
+    //     $id = Auth::user()->id;
+    //     $search = $this->model()::where('user_id', $id)->select('id','status')->get();
+    //     $time = TimeAbsenceService::search($search, $attributes);
+    //     $result = $this->model()::whereIn('id', $time)->get();
+    //     return $this->parserResult($result);
+    // }
 
     public function getWorkdays($date1, $date2, $workSat = false, $patron = null)
     {

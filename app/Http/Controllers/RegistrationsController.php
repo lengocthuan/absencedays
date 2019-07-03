@@ -140,15 +140,17 @@ class RegistrationsController extends Controller
     /*
     Get information Time absences of users
     */
-    public function getProfile($id)
+    public function getProfile()
     {
+        $id = Auth::user()->id;
         $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
         // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
         return response()->json($user, 200);
     }
 
-    public function getApproved($id)
+    public function getApproved()
     {
+        $id = Auth::user()->id;
         $user = $this->repository->findwhere(['user_id' => $id, 'status' => '1']);
         // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
         return response()->json($user, 200);
@@ -156,7 +158,6 @@ class RegistrationsController extends Controller
 
     public function search(Request $request )
     {
-
         $days = $this->repository->search($request->all());
         return response()->json($days);
     }
