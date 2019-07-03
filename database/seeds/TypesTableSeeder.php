@@ -14,31 +14,31 @@ class TypesTableSeeder extends Seeder
     {
         $types = [
             [
-                'name' => 'annual leave',
+                'name' => 'nghỉ phép (năm)',
                 'requirement' => 'bit.ly/annual_leave'
             ],
             [
-                'name' => 'sick leave',
+                'name' => 'nghỉ ốm',
                 'requirement' => 'bit.ly/sick_leave_01'
             ],
             [
-                'name' => 'marriage leave',
+                'name' => 'nghỉ việc riêng (kết hôn)',
                 'requirement' => 'bit.ly/marriage_leave'
             ],
             [
-                'name' => 'maternity leave',
+                'name' => 'nghỉ thai sản (khám thai)',
                 'requirement' => 'bit.ly/maternity_leave_01'
             ],
             [
-                'name' => 'bereavement leave',
+                'name' => 'nghỉ việc riêng (ma chay)',
                 'requirement' => 'bit.ly/bereavement_leave'
             ],
             [
-                'name' => 'short term unpaid leave',
+                'name' => 'nghỉ không lương ngắn hạn',
                 'requirement' => 'bit.ly/short_term_unpaid_leave'
             ],
             [
-                'name' => 'long term unpaid leave',
+                'name' => 'nghỉ không lương dài hạn',
                 'requirement' => 'bit.ly/long_term_unpaid_leave'
             ],
         ];

@@ -3,9 +3,11 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Registration;
+use App\Models\Approver;
 use App\Presenters\RegistrationPresenter;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\Services\TimeAbsenceService;
+use App\Services\ApproverService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -48,6 +50,26 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function search(array $attributes)
+    {
+        // dd($attributes['time']);
+        $id = Auth::user()->id;
+        $search = $this->model()::where('user_id', $id)->select('id')->get();
+        $time = TimeAbsenceService::search($search, $attributes);
+        $result = $this->model()::whereIn('id', $time)->get();
+        return $this->parserResult($result);
+    }
+
+    public function searchByStatus(array $attributes)
+    {
+        // dd($attributes['time']);
+        $id = Auth::user()->id;
+        $search = $this->model()::where('user_id', $id)->select('id')->get();
+        $time = TimeAbsenceService::search($search, $attributes);
+        $result = $this->model()::whereIn('id', $time)->get();
+        return $this->parserResult($result);
     }
 
     public function search(array $attributes)
@@ -139,44 +161,57 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             $id[] = $date[$i]->id;
         }
         $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
+        $approver_id = ApproverService::add($res['data']['id'], $attributes);
 
         //send mail
         
         // dd($type->name);
         
         // dd($user->name);
+
         // $mail = array();
+        // // dd('oke');
         // for ($i=0; $i < count($res['data']['attributes']['approver_id']) ; $i++) { 
-        //      $mail[] = $res['data']['attributes']['approver_id'][$i][0]['email'];
+        //      $mail[] = $res['data']['attributes']['approver_id'][$i]['email'];
         //  }
+        // dd($mail);
         // if (isset($attributes['approver_id'])) {
         //     $user = Auth::user();
         //     $type = Type::find($attributes['type_id']);
         //     if($attributes['type'] == 'From day to day') {
         //         $time_start = $attributes['time_start'];
         //         $time_end = $attributes['time_end'];
+        //         $str = null;
+
         //     } else {
         //         $date = explode(';', $attributes['date']);
-        //         //[0] ->2019-06-01, 
-        //         //Morning;
-        //         //[0] ->2019-06-01, 
-        //         //Morning;
-        //         //[0] ->2019-06-01, Morning;
-        //         //[0] ->2019-06-01, Morning;
+        //         $arr = array();
+        //         $result = '';
         //         for ($i=0; $i < count($date) ; $i++) { 
         //             $at_time = explode(',', $date[$i]);
-        //             $add = 
+        //             //Nguyen thanh thoi gian nghi: 
+        //             //1. ngay buoi 1/07/2019 (buoi sang)
+        //             //2 .
+        //             $add ="$at_time[0] ($at_time[1])";
+        //             $arr[] = $add;
         //         }
+        //         $str = implode(', ', $arr);
+        //         $time_start = null;
+        //         $time_end = null;
         //     }
         //     for ($i=0; $i < count($mail) ; $i++) { 
         //         $data = [
         //             'name' => $user->name,
         //             'type_id' => $type->name,
         //             'note' => $attributes['note'],
+        //             'type' => $attributes['type'],
+        //             'time_start' => $time_start,
+        //             'time_end' => $time_end,
+        //             'time_off' => $str,
         //         ];
-        //         Mail::to($mail[$i])->send(new SendMailable());
+        //         // Mail::to($mail[$i])->queue(new SendMailable($data));
         //     }
-                
+        //     Mail::queue(new SendMailable($data));
         // }
         return parent::find($res['data']['id']);
     }
@@ -193,5 +228,12 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         } else {
             return $abc;
         }
+    }
+
+    public function getPending($email) {
+        $regis = Registration::whereHas('approvers', function($query) use($email) {
+            $query->where('email', $email);
+        })->where('status', 3)->get();
+        return $this->parserResult($regis);
     }
 }

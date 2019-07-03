@@ -11,6 +11,7 @@ class SendMailable extends Mailable
 {
     use Queueable, SerializesModels;
 
+    protected $data;
     /**
      * Create a new message instance.
      *
@@ -28,6 +29,24 @@ class SendMailable extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        $subject = '[Nhân sự] Xin ' . $this->data['type_id'];
+        $input = [
+            'name' => $this->data['name'],
+            'type_id' => $this->data['type_id'],
+            'reason' => $this->data['note'],
+            'type_registration' => $this->data['type'],
+            'timestart' => $this->data['time_start'],
+            'timeend' => $this->data['time_end'],
+            'timeoff' => $this->data['time_off'],
+        ];
+        $email = ['comebacktohero@gmail.com', 'comebacktohero1@gmail.com'];
+        /*
+        Mail::send('emails.welcome', [], function($message) use ($emails)
+        {    
+            $message->to($emails)->subject('This is test e-mail');    
+        });
+        */
+        return $this->to($email)->subject("$subject")->cc('lengocthuan2581997@gmail.com')->view('emails.message')->with(['inputs' => $input]);
+        // return $this->cc('hr@greenglobal.vn')->view('emails.message');
     }
 }
