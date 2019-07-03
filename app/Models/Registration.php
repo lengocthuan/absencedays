@@ -18,8 +18,12 @@ class Registration extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'approver_id'];
+    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date'];
 
+    public function approvers()
+    {
+        return $this->belongsToMany(\App\Models\Approver::class);
+    }
     public function getUser()
     {
         // $user = User::find($this->user_id);
@@ -56,16 +60,19 @@ class Registration extends BaseModel
         return $sum;
     }
 
-    public function getApprover()
-    {
-        $approver = Registration::where('id', $this->id)->select('approver_id')->get();
-        $app = explode(',', $approver[0]->approver_id); //array 0->2 ; 1->3
-        $arr = [];
-        foreach ($app as $value) {
-            $info = User::where('id', $value)->select('id', 'name', 'email')->get();
-            $r = ['id' => $info[0]['id'], 'name' => $info[0]['name'], 'email' => $info[0]['email']];
-            $arr[] = $r;
-        }
-        return $arr;
+    // public function getApprover()
+    // {
+    //     $approver = Registration::where('id', $this->id)->select('approver_id')->get();
+    //     $app = explode(',', $approver[0]->approver_id); //array 0->2 ; 1->3
+    //     $arr = [];
+    //     foreach ($app as $value) {
+    //         $info = User::where('id', $value)->select('id', 'name', 'email')->get();
+    //         $r = ['id' => $info[0]['id'], 'name' => $info[0]['name'], 'email' => $info[0]['email']];
+    //         $arr[] = $r;
+    //     }
+    //     return $arr;
+    // }
+    public function getApprover() {
+        return $this->approvers()->pluck('email')->toArray();
     }
 }

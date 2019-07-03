@@ -26,7 +26,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     //user information
     Route::get('me', 'UsersController@me');
-    Route::get('teamlead', 'UsersController@getUsTeamLead');
+    // Route::get('teamlead', 'UsersController@getUsTeamLead');
     //registration a new user
     Route::post('register', 'UsersController@register');
 
@@ -67,6 +67,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('type', 'TypesController');
     Route::resource('team', 'TeamsController');
     Route::resource('position', 'PositionsController');
+    Route::resource('approver', 'ApproversController');
 
 });
 

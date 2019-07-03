@@ -169,10 +169,10 @@ class UsersController extends Controller
         return response()->json($user, 200);
     }
 
-    public function getUsTeamLead()
-    {
-        $user = $this->repository->findwhere(['approved_role' => 1]);
-        return response()->json($user, 200);
-    }
+    // public function getUsTeamLead()
+    // {
+    //     $user = $this->repository->findwhere(['approved_role' => 1]);
+    //     return response()->json($user, 200);
+    // }
 
 }

@@ -142,6 +142,7 @@
           BUTTONS
       ------------------------------------- */
       .btn {
+        text-align: center;
         box-sizing: border-box;
         width: 100%; }
         .btn > tbody > tr > td {
@@ -306,12 +307,24 @@
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <p class="content-title"><b>Password Reset</b></p>
-                          <h2>Hi {{$user->name}},</h2>
-                          <p>We received a request to reset your password for your M2B account: <a href="maito:{{$user->email}}">{{$user->email}}</a>. We’re here to help!</p>
-                          <p>Simply click on the button to set a new password:</p>
-                          <p class="btn"><a class="button-primary" href="{{$sourceLink}}">RESET YOUR PASSWORD</a></p>
-                          <p>If you didn’t ask to change your password, don’t worry! Your password is still safe and you can delete this email.</p>
+                          <p class="content-title"><b>Xin {{ $inputs['type_id'] }}</b></p>
+                          <div>
+                            <h2>Xin chào, </h2>
+                            <h2>Tôi là {{$inputs['name']}}</h2>
+                            @if($inputs['type_registration'] == 'From day to day')
+                              <p>Tôi xin phép được nghỉ vào thời gian:
+                                    Từ ngày {{ $inputs['timestart'] }}
+                                    Đến hết ngày {{ $inputs['timeend'] }}
+                              </p>
+                            @else
+                              <p>Tôi xin phép được nghỉ vào các thời gian sau:
+                                  {{ $inputs['timeoff'] }}
+                              </p>
+                              @endif
+                              <p>Lý do: {{ $inputs['reason'] }}</p>
+                            <p class="content-title">Vui lòng kiểm duyệt đợt nghỉ phép này của tôi tại đây</p>
+                            <p class="btn"><a class="button-primary" href="">Duyệt ngày phép</a></p>
+                          </div>
                         </td>
                       </tr>
                     </table>

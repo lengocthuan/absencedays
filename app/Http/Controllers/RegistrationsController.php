@@ -163,8 +163,8 @@ class RegistrationsController extends Controller
 
     public function getRegisPending()
     {
-        $id = Auth::user()->id;
-        $pending = $this->repository->findwhere(['approver_id' => $id, 'status' => 3]);
+        $email = Auth::user()->email;
+        $pending = $this->repository->getPending($email);
         return response()->json($pending, 200);
     }
 
