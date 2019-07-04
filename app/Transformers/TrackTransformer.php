@@ -29,4 +29,12 @@ class TrackTransformer extends BaseTransformer
      * @var array
      */
     protected $defaultIncludes = [];
+
+    public function customAttributes($model): array
+    {
+        return [
+            'user' => $model->getUser,
+            'registration' => $model->getRegistration(),
+        ];
+    }
 }
