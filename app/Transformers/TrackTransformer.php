@@ -9,7 +9,7 @@ use App\Models\Track;
  *
  * @package namespace App\Transformers;
  */
-class TrackTransformer extends App\Transformers\BaseTransformer
+class TrackTransformer extends BaseTransformer
 {
     /**
      * Array attribute doesn't parse.

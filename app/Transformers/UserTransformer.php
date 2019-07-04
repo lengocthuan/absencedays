@@ -40,6 +40,7 @@ class UserTransformer extends BaseTransformer
             'tokens' => $model->tokens,
             'team' =>$model->getTeam,
             'position' =>$model->getPosition,
+            'track' => $model->getTrack,
             // 'role' => $model->getRole,
         ];
     }

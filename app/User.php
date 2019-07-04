@@ -14,6 +14,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use App\Models\Team;
 use App\Models\Position;
 use App\Models\Trust\Role;
+use App\Models\Track;
 
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
@@ -134,5 +135,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function getPosition()
     {
         return $this->belongsTo(\App\Models\Position::class, 'position_id');
+    }
+
+    public function getTrack()
+    {
+        $track = $this->hasMany(\App\Models\Track::class, 'user_id');
+        return $track;
     }
 }
