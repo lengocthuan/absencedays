@@ -90,4 +90,10 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
 
         return $user;
     }
+
+    public function userStatistics ()
+    {
+        $user = $this->model()::get();
+        dd($user);
+    }
 }

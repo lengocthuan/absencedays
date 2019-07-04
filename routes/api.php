@@ -61,9 +61,11 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('information', 'RegistrationsController@getProfile');
     Route::get('approved', 'RegistrationsController@getApproved');
+    Route::get('disapproved', 'RegistrationsController@getDisApproved');
     Route::get('pending', 'RegistrationsController@getRegisPending');
     Route::get('sum/{id}', 'TimeAbsencesController@statistic');
 
+    Route::get('statistic', 'UsersController@getInformation');
 
     
     // //edit a registration

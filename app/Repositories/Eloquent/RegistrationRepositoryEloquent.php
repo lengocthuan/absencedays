@@ -4,10 +4,12 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Registration;
 use App\Models\Approver;
+use App\Models\Track;
 use App\Presenters\RegistrationPresenter;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\Services\TimeAbsenceService;
 use App\Services\ApproverService;
+use App\Services\TrackService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -95,16 +97,6 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         return $this->parserResult($result);
     }
 
-    // public function searchByStatus(array $attributes)
-    // {
-    //     // dd($attributes['time']);
-    //     $id = Auth::user()->id;
-    //     $search = $this->model()::where('user_id', $id)->select('id','status')->get();
-    //     $time = TimeAbsenceService::search($search, $attributes);
-    //     $result = $this->model()::whereIn('id', $time)->get();
-    //     return $this->parserResult($result);
-    // }
-
     public function getWorkdays($date1, $date2, $workSat = false, $patron = null)
     {
         if (!defined('SATURDAY')) {
@@ -183,8 +175,11 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         for ($i = 0; $i < count($date); $i++) {
             $id[] = $date[$i]->id;
         }
+        
         $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
         $approver_id = ApproverService::add($res['data']['id'], $attributes);
+        $track = TrackService::update($res['data']['id'], $attributes);
+
 
         //send mail
         

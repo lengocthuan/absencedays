@@ -7,6 +7,7 @@ use App\Http\Requests\AuthGoogleRequest;
 use App\Models\DeviceToken;
 use App\Models\Social;
 use App\Services\RoleService;
+use App\Services\TrackService;
 use App\User;
 use Socialite;
 
@@ -36,6 +37,8 @@ class AuthGoogleController extends Controller
                     RoleService::add($user, 'member'); //check role for user when login;
                 }
                 User::where('email', $profile->email)->update(['avatar' => $profile->avatar]);
+                $id = User::where('email', $profile->email)->select('id')->get();
+                TrackService::create($id[0]->id);
             }
         } else {
             $user = User::where(['email' => $profile->email])->first();
@@ -45,6 +48,8 @@ class AuthGoogleController extends Controller
                     RoleService::add($user, 'member'); //check role for user when login;
                 }
                 User::where('email', $profile->email)->update(['avatar' => $profile->avatar]);
+                $id = User::where('email', $profile->email)->select('id')->get();
+                TrackService::create($id[0]->id);
             }
             if (!$user) {
                 // $user = new User;
