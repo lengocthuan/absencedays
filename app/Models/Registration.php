@@ -72,7 +72,11 @@ class Registration extends BaseModel
     //     }
     //     return $arr;
     // }
-    public function getApprover() {
-        return $this->approvers()->pluck('email')->toArray();
+    public function getMailto() {
+        return $this->approvers()->where('type', 0)->pluck('email')->toArray();
+    }
+
+    public function getMailcc() {
+        return $this->approvers()->where('type', 1)->pluck('email')->toArray();
     }
 }

@@ -76,6 +76,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('team', 'TeamsController');
     Route::resource('position', 'PositionsController');
     Route::resource('approver', 'ApproversController');
+    Route::get('to', 'ApproversController@getMailto');
+    Route::get('cc', 'ApproversController@getMailcc');
     Route::resource('track', 'TracksController');
 
 });

@@ -30,6 +30,8 @@ class SendMailable extends Mailable
     public function build()
     {
         $subject = '[Nhân sự] Xin ' . $this->data['type_id'];
+        $to = explode(',', $this->data['to']);
+        $cc = explode(',', $this->data['cc']);
         $input = [
             'name' => $this->data['name'],
             'type_id' => $this->data['type_id'],
@@ -39,14 +41,8 @@ class SendMailable extends Mailable
             'timeend' => $this->data['time_end'],
             'timeoff' => $this->data['time_off'],
         ];
-        $email = ['comebacktohero@gmail.com', 'comebacktohero1@gmail.com'];
-        /*
-        Mail::send('emails.welcome', [], function($message) use ($emails)
-        {    
-            $message->to($emails)->subject('This is test e-mail');    
-        });
-        */
-        return $this->to($email)->subject("$subject")->cc('lengocthuan2581997@gmail.com')->view('emails.message')->with(['inputs' => $input]);
+        return $this->to($to)->cc($cc)->subject("$subject")->view('emails.message')->with(['inputs' => $input]);
+        // return $this->to($email)->subject("$subject")->cc('lengocthuan2581997@gmail.com')->view('emails.message')->with(['inputs' => $input]);
         // return $this->cc('hr@greenglobal.vn')->view('emails.message');
     }
 }

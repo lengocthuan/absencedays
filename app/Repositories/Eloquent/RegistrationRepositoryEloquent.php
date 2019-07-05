@@ -2,22 +2,20 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Mail\SendMailable;
 use App\Models\Registration;
-use App\Models\Approver;
-use App\Models\Track;
 use App\Presenters\RegistrationPresenter;
 use App\Repositories\Contracts\RegistrationRepository;
-use App\Services\TimeAbsenceService;
 use App\Services\ApproverService;
+use App\Services\TimeAbsenceService;
 use App\Services\TrackService;
+use App\User;
+use App\Models\Type;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Mail;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
-use App\User;
-use App\Mail\SendMailable;
-use App\Models\Type;
-use Mail;
 
 /**
  * Class RegistrationRepositoryEloquent.
@@ -175,62 +173,47 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         for ($i = 0; $i < count($date); $i++) {
             $id[] = $date[$i]->id;
         }
-        
+
         $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
         $approver_id = ApproverService::add($res['data']['id'], $attributes);
+        // $cc = ApproverService::carbonCopy($res['data']['id'], $attributes);
         $track = TrackService::update($res['data']['id'], $attributes);
 
-
         //send mail
-        
-        // dd($type->name);
-        
-        // dd($user->name);
+        $user = Auth::user();
+        $type = Type::find($attributes['type_id']);
+        if ($attributes['type'] == 'From day to day') {
+            $time_start = $attributes['time_start'];
+            $time_end = $attributes['time_end'];
+            $str = null;
 
-        // $mail = array();
-        // // dd('oke');
-        // for ($i=0; $i < count($res['data']['attributes']['approver_id']) ; $i++) { 
-        //      $mail[] = $res['data']['attributes']['approver_id'][$i]['email'];
-        //  }
-        // dd($mail);
-        // if (isset($attributes['approver_id'])) {
-        //     $user = Auth::user();
-        //     $type = Type::find($attributes['type_id']);
-        //     if($attributes['type'] == 'From day to day') {
-        //         $time_start = $attributes['time_start'];
-        //         $time_end = $attributes['time_end'];
-        //         $str = null;
+        } else {
+            $date = explode(';', $attributes['date']);
+            $arr = array();
+            $result = '';
+            for ($i = 0; $i < count($date); $i++) {
+                $at_time = explode(',', $date[$i]);
+                $add = "$at_time[0] ($at_time[1])";
+                $arr[] = $add;
+            }
+            $str = implode(', ', $arr);
+            $time_start = null;
+            $time_end = null;
+        }
+        $data = [
+            'name' => $user->name,
+            'type_id' => $type->name,
+            'note' => $attributes['note'],
+            'type' => $attributes['type'],
+            'time_start' => $time_start,
+            'time_end' => $time_end,
+            'time_off' => $str,
+            'to' => $attributes['emails'],
+            'cc' => $attributes['cc'],
+        ];
 
-        //     } else {
-        //         $date = explode(';', $attributes['date']);
-        //         $arr = array();
-        //         $result = '';
-        //         for ($i=0; $i < count($date) ; $i++) { 
-        //             $at_time = explode(',', $date[$i]);
-        //             //Nguyen thanh thoi gian nghi: 
-        //             //1. ngay buoi 1/07/2019 (buoi sang)
-        //             //2 .
-        //             $add ="$at_time[0] ($at_time[1])";
-        //             $arr[] = $add;
-        //         }
-        //         $str = implode(', ', $arr);
-        //         $time_start = null;
-        //         $time_end = null;
-        //     }
-        //     for ($i=0; $i < count($mail) ; $i++) { 
-        //         $data = [
-        //             'name' => $user->name,
-        //             'type_id' => $type->name,
-        //             'note' => $attributes['note'],
-        //             'type' => $attributes['type'],
-        //             'time_start' => $time_start,
-        //             'time_end' => $time_end,
-        //             'time_off' => $str,
-        //         ];
-        //         // Mail::to($mail[$i])->queue(new SendMailable($data));
-        //     }
-        //     Mail::queue(new SendMailable($data));
-        // }
+        // Mail::send(new SendMailable($data));
+        Mail::queue(new SendMailable($data));
         return parent::find($res['data']['id']);
     }
 
@@ -248,8 +231,9 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         }
     }
 
-    public function getPending($email) {
-        $regis = Registration::whereHas('approvers', function($query) use($email) {
+    public function getPending($email)
+    {
+        $regis = Registration::whereHas('approvers', function ($query) use ($email) {
             $query->where('email', $email);
         })->where('status', 3)->get();
         return $this->parserResult($regis);

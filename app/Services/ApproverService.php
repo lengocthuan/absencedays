@@ -18,16 +18,23 @@ class ApproverService
             $arr[] = $mails;
         }
 
+        $cc = explode(',', $atrributes['cc']);
+        $arr1 = array();
+        for ($i=0; $i < count($cc); $i++) { 
+            $mails_cc = Approver::firstOrCreate(['email' => $cc[$i]]);
+            $arr1[] = $mails_cc;
+        }
+
         for ($i=0; $i < count($arr) ; $i++) { 
             $approver->approvers()->attach($arr[$i]);
+        }
+
+        for ($i=0; $i < count($arr1) ; $i++) {
+            $approver->approvers()->attach($arr1[$i]);
         }
         return $approver;
     }
 
-    // public static function show()
-    // {
-        
-    // }
     // public static function sync(User $user, $roleName)
     // {
     //     if (!$roleName) {

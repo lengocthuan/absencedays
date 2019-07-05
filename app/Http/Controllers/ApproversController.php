@@ -108,9 +108,15 @@ class ApproversController extends Controller
         return response()->json(null, 204);
     }
 
-    // public function getUsTeamLead()
-    // {
-    //     $user = $this->repository->get();
-    //     return response()->json($user, 200);
-    // }
+    public function getMailto()
+    {
+        $to = $this->repository->findwhere(['type' => 0]);
+        return response()->json($to, 200);
+    }
+
+    public function getMailcc()
+    {
+        $cc = $this->repository->findwhere(['type' => 1]);
+        return response()->json($cc, 200);
+    }
 }
