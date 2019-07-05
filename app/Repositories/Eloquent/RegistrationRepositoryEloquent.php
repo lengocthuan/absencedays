@@ -155,7 +155,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         // $checkTime = TimeAbsence::where('registration_id', $attributes['id'])
         // dd($check->user_id);
 
-        if ($attributes['type'] == 'From day to day') {
+        if ($attributes['type'] == 'Từ ngày đến ngày') {
             $attributes['status'] = 3;
             if ($attributes['status'] == 3) {
                 $attributes['requested_date'] = Carbon::now()->toDateString();
@@ -182,7 +182,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         //send mail
         $user = Auth::user();
         $type = Type::find($attributes['type_id']);
-        if ($attributes['type'] == 'From day to day') {
+        if ($attributes['type'] == 'Từ ngày đến ngày') {
             $time_start = $attributes['time_start'];
             $time_end = $attributes['time_end'];
             $str = null;

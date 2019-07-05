@@ -16,7 +16,7 @@
       body {
         font-family: sans-serif;
         -webkit-font-smoothing: antialiased;
-        font-size: 16px;
+        font-size: 21px;
         line-height: 1.4;
         margin: 0;
         padding: 50px;
@@ -310,19 +310,19 @@
                           <p class="content-title"><b>Xin {{ $inputs['type_id'] }}</b></p>
                           <div>
                             <h2>Xin chào, </h2>
-                            <h2>Tôi là {{$inputs['name']}}</h2>
+                            <h2>Tôi là {{$inputs['name']}},</h2>
                             @if($inputs['type_registration'] == 'From day to day')
-                              <p>Tôi xin phép được nghỉ vào thời gian:
-                                    Từ ngày {{ $inputs['timestart'] }}
-                                    Đến hết ngày {{ $inputs['timeend'] }}
+                              <p>Tôi xin phép được nghỉ vào thời gian:<br>
+                                    Từ ngày <b>{{ $inputs['timestart'] }}</b><br>
+                                    Đến hết ngày <b>{{ $inputs['timeend'] }}</b>
                               </p>
                             @else
-                              <p>Tôi xin phép được nghỉ vào các thời gian sau:
-                                  {{ $inputs['timeoff'] }}
+                              <p>Tôi xin phép được nghỉ vào các thời gian sau:<br>
+                                  <b>{{ $inputs['timeoff'] }}.</b><br>
                               </p>
                               @endif
-                              <p>Lý do: {{ $inputs['reason'] }}</p>
-                            <p class="content-title">Vui lòng kiểm duyệt đợt nghỉ phép này của tôi tại đây</p>
+                              <p>Lý do: <i>{{ $inputs['reason'] }}.</i></p>
+                            <p><b>Vui lòng kiểm duyệt đợt nghỉ phép này của tôi tại đây:</b></p>
                             <p class="btn"><a class="button-primary" href="">Duyệt ngày phép</a></p>
                           </div>
                         </td>

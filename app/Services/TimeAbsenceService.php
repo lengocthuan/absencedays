@@ -15,7 +15,7 @@ class TimeAbsenceService
     // }
     public static function add($id, array $attribute)
     {
-        if ($attribute['type'] == 'From day to day') {
+        if ($attribute['type'] == 'Từ ngày đến ngày') {
 
             $timestart = new Carbon($attribute['time_start']);
             $timeend = new Carbon($attribute['time_end']);
@@ -25,7 +25,7 @@ class TimeAbsenceService
                 $ta->registration_id = $id;
                 $ta->type = $attribute['type'];
                 $ta->time_details = $timestart->toDateString();
-                $ta->at_time = 'Full';
+                $ta->at_time = 'Cả Ngày';
                 $ta->absence_days = 1;
                 $ta->current_year = Carbon::parse($timestart->toDateString())->format('Y');
                 $ta->general_information = 'The time absence of you at: ' .$timestart;
@@ -43,7 +43,7 @@ class TimeAbsenceService
                 $details->type = $attribute['type'];
                 $details->time_details = $time_children[0];
                 $details->at_time = $time_children[1];
-                if ($details->at_time == 'Morning' || $details->at_time == 'Afternoon') {
+                if ($details->at_time == 'Buổi Sáng' || $details->at_time == 'Buổi Chiều') {
                     $details->absence_days = 0.5;
                 } else {
                     $details->absence_days = 1;
@@ -63,7 +63,7 @@ class TimeAbsenceService
     public static function update($id, array $attribute)
     {
         $timedt = TimeAbsence::where('registration_id', $id)->delete();
-        if ($attribute['type'] == 'From day to day') {
+        if ($attribute['type'] == 'Từ ngày đến ngày') {
 
             $timestart = new Carbon($attribute['time_start']);
             $timeend = new Carbon($attribute['time_end']);
@@ -74,7 +74,7 @@ class TimeAbsenceService
                 $ta->registration_id = $id;
                 $ta->type = $attribute['type'];
                 $ta->time_details = $timestart->toDateString();
-                $ta->at_time = 'Full';
+                $ta->at_time = 'Cả Ngày';
                 $ta->absence_days = 1;
                 $ta->current_year = Carbon::parse($timestart->toDateString())->format('Y');
                 $ta->general_information = 'The time absence of you at: ' .$timestart;
@@ -92,7 +92,7 @@ class TimeAbsenceService
                 $details->type = $attribute['type'];
                 $details->time_details = $time_children[0];
                 $details->at_time = $time_children[1];
-                if ($details->at_time == 'Morning' || $details->at_time == 'Afternoon') {
+                if ($details->at_time == 'Buổi Sáng' || $details->at_time == 'Buổi Chiều') {
                     $details->absence_days = 0.5;
                 } else {
                     $details->absence_days = 1;
