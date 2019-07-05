@@ -29,7 +29,7 @@ class Track extends BaseModel
 
     public function getRegistration()
     {
-        $id = Auth::user()->id;
+        $id = $this->user_id;
         // dd($id);
         $registration = Registration::where('user_id', $id)->get();
         $arr = array();
