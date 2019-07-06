@@ -234,7 +234,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
     public function getPending($email)
     {
         $regis = Registration::whereHas('approvers', function ($query) use ($email) {
-            $query->where('email', $email);
+            $query->where('email', $email)->where('type', 0);
         })->where('status', 3)->get();
         return $this->parserResult($regis);
     }
