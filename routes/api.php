@@ -51,13 +51,15 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('absence', 'RegistrationsController');
 
     Route::get('test', 'RegistrationsController@test');
-    Route::put('updated/{id}', 'RegistrationsController@updateStatusRegis');
-    Route::put('updated2/{id}', 'RegistrationsController@updateStatusRegis2');
+    Route::put('updated/{id}', 'RegistrationsController@updateStatusRegis'); //cái này gửi thông tin và thay đổi trạng thái đã duyệt
+    Route::put('updated2/{id}', 'RegistrationsController@updateStatusRegis2'); //cái này gửi thông tin và thay đổi trạng thái ko duyệt
+    Route::put('updated3/{id}', 'RegistrationsController@updateMessage'); //cái này dùng khi chỉ gửi mess mà ko update thông tin;
 
     Route::get('search', 'RegistrationsController@search');
     Route::get('searchpending', 'RegistrationsController@searchPending');
     Route::get('searchapproved', 'RegistrationsController@searchApproved');
     Route::get('searchdisapproved', 'RegistrationsController@searchDisApproved');
+    Route::get('searchregispending', 'RegistrationsController@searchRegisPending'); //search trong danh sách mấy cái đang chờ duyệt;
 
     Route::get('information', 'RegistrationsController@getProfile');
     Route::get('approved', 'RegistrationsController@getApproved');

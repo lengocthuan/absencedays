@@ -18,11 +18,11 @@ class Registration extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date'];
+    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message'];
 
     public function approvers()
     {
-        return $this->belongsToMany(\App\Models\Approver::class);
+        return $this->belongsToMany(\App\Models\Approver::class)->withTimestamps();
     }
     public function getUser()
     {

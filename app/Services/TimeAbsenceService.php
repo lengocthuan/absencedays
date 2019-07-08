@@ -15,7 +15,7 @@ class TimeAbsenceService
     // }
     public static function add($id, array $attribute)
     {
-        if ($attribute['type'] == 'Từ ngày đến ngày') {
+        if ($attribute['type'] == 'Từ ngày đến hết ngày') {
 
             $timestart = new Carbon($attribute['time_start']);
             $timeend = new Carbon($attribute['time_end']);
@@ -63,7 +63,7 @@ class TimeAbsenceService
     public static function update($id, array $attribute)
     {
         $timedt = TimeAbsence::where('registration_id', $id)->delete();
-        if ($attribute['type'] == 'Từ ngày đến ngày') {
+        if ($attribute['type'] == 'Từ ngày đến hết ngày') {
 
             $timestart = new Carbon($attribute['time_start']);
             $timeend = new Carbon($attribute['time_end']);
@@ -167,7 +167,5 @@ class TimeAbsenceService
             $registration_id = TimeAbsence::whereIn('registration_id', $arr)->whereYear('time_details', $time)->select('registration_id')->get();
             return $registration_id;
         }
-// >where(function ($query) use ($daystart, $dayend)
-
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterApproversTable extends Migration
+class AlterRegistrationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AlterApproversTable extends Migration
      */
     public function up()
     {
-        Schema::table('approvers', function (Blueprint $table) {
-            $table->integer('type')->default(0)->comment = '0 => Approvers (to in Mail); 1 => Viewer(cc in Mail)';
+        Schema::table('registrations', function (Blueprint $table) {
+            $table->text('message')->nullable();
         });
     }
 
@@ -25,7 +25,8 @@ class AlterApproversTable extends Migration
      */
     public function down()
     {
-        Schema::table('approvers', function (Blueprint $table) {
+        Schema::table('registrations', function (Blueprint $table) {
+            //
         });
     }
 }

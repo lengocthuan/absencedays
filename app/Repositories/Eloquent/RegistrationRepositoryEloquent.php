@@ -3,14 +3,15 @@
 namespace App\Repositories\Eloquent;
 
 use App\Mail\SendMailable;
+use App\Mail\UpdateMessageMailable;
 use App\Models\Registration;
+use App\Models\Type;
 use App\Presenters\RegistrationPresenter;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\Services\ApproverService;
 use App\Services\TimeAbsenceService;
 use App\Services\TrackService;
 use App\User;
-use App\Models\Type;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Mail;
@@ -155,7 +156,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         // $checkTime = TimeAbsence::where('registration_id', $attributes['id'])
         // dd($check->user_id);
 
-        if ($attributes['type'] == 'Từ ngày đến ngày') {
+        if ($attributes['type'] == 'Từ ngày đến hết ngày') {
             $attributes['status'] = 3;
             if ($attributes['status'] == 3) {
                 $attributes['requested_date'] = Carbon::now()->toDateString();
@@ -182,7 +183,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         //send mail
         $user = Auth::user();
         $type = Type::find($attributes['type_id']);
-        if ($attributes['type'] == 'Từ ngày đến ngày') {
+        if ($attributes['type'] == 'Từ ngày đến hết ngày') {
             $time_start = $attributes['time_start'];
             $time_end = $attributes['time_end'];
             $str = null;
@@ -237,5 +238,70 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             $query->where('email', $email)->where('type', 0);
         })->where('status', 3)->get();
         return $this->parserResult($regis);
+    }
+
+    public function searchRegisPending(array $attributes)
+    {
+        $email = Auth::user()->email;
+        $regis = Registration::whereHas('approvers', function ($query) use ($email) {
+            $query->where('email', $email)->where('type', 0);
+        })->where('status', 3)->select('id')->get();
+        $idSearch = TimeAbsenceService::search($regis, $attributes);
+        $result = $this->model()::whereIn('id', $idSearch)->get();
+        return $this->parserResult($result);
+    }
+
+    public function getMessage($id, array $attributes)
+    {
+        $message = $this->model()::where('id', $id)->update(['message' => $attributes['message']]);
+        return $message;
+    }
+
+    public function updateMail($id, $user)
+    {
+        //update mail
+        // if($user == 1) {
+        //     $update = 'Your absence days are approved.';
+        // }
+        $info = Auth::user()->name;
+        $info_email = Auth::user()->email;
+        // dd($user);
+        $email = parent::find($id);
+        // dd('abc');
+        $emailTypeAbsence = $email['data']['attributes']['time'][0]['type'];
+        // dd('def');
+        $emailType = $email['data']['attributes']['type']['name'];
+        $emailNote = $email['data']['attributes']['note'];
+        $emailMessage = $email['data']['attributes']['message'];
+        $emailRegistration = $email['data']['attributes']['user']['email'];
+        $emailName = $email['data']['attributes']['user']['name'];
+        $emailTo = $email['data']['attributes']['mailto'];
+        $emailCc = $email['data']['attributes']['mailcc'];
+        $emailTo = array_unique(array_merge($emailTo, $emailCc));
+        // dd($emailTo);
+        $timeDetails = $email['data']['attributes']['time'];
+        $oldDayOff = array();
+        for ($i = 0; $i < count($timeDetails); $i++) {
+            $date = new Carbon($timeDetails[$i]['time_details']);
+            $time = $date->toDateString() . " " ."(".$timeDetails[$i]['at_time'] .")";
+            $oldDayOff[] = $time;
+        }
+        $oldDayOff = implode(', ', $oldDayOff);
+        $data = [
+            'name' => $info,
+            'register_name' => $emailName,
+            'type_id' => $emailType,
+            'note' => $emailNote,
+            'type' => $emailTypeAbsence,
+            'time_off' => $oldDayOff,
+            'to' => $emailRegistration,
+            'cc' => $emailTo,
+            'message' => $emailMessage,
+            'user' => $user,
+            'info_email' => $info_email,
+        ];
+
+        // Mail::send(new SendMailable($data));
+        Mail::queue(new UpdateMessageMailable($data));
     }
 }

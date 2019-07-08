@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegistrationCreateRequest;
 use App\Http\Requests\RegistrationUpdateRequest;
+use App\Http\Requests\RegistrationUpdateStatusRequest;
 use App\Models\Registration;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\User;
@@ -179,6 +180,12 @@ class RegistrationsController extends Controller
         return response()->json($days);
     }
 
+    public function searchRegisPending(Request $request)
+    {
+        $pending = $this->repository->searchRegisPending($request->all());
+        return response()->json($pending, 200);
+    }
+
     public function getRegisPending()
     {
         $email = Auth::user()->email;
@@ -186,31 +193,57 @@ class RegistrationsController extends Controller
         return response()->json($pending, 200);
     }
 
-    public function updateStatusRegis($id)
-    {
-        $user = Registration::where('id', $id)->update(['status' => 1]);
-        $date = Carbon::now();
-        $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
-        $information = $this->repository->findwhere(['id' => $id]);
-        return response()->json($information, 200);
-    }
-
-    public function updateStatusRegis2($id)
+    public function updateStatusRegis($id, RegistrationUpdateStatusRequest $request)
     {
         $user1 = Registration::where('id', $id)->select('status')->get();
-        // dd($user1[0]->status);
+        if ($user1[0]->status == 2) {
+            return "Your request has been disapproved. Please do not disturb the system.";
+        } else {
+            $user = Registration::where('id', $id)->update(['status' => 1]);
+            $date = Carbon::now();
+            $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
+            $message = $this->repository->getMessage($id, $request->all());
+            $mailUpdate = $this->repository->updateMail($id, $user);
+            $information = $this->repository->findwhere(['id' => $id]);
+            return response()->json($information, 200);
+        }
+
+    }
+
+    public function updateStatusRegis2($id, RegistrationUpdateStatusRequest $request)
+    {
+        $user1 = Registration::where('id', $id)->select('status')->get();
         if ($user1[0]->status == 1) {
             return "Your request has been approved. Please do not disturb the system.";
         } elseif ($user1[0]->status == 3) {
             $user = Registration::where('id', $id)->update(['status' => 2]);
+            $user = Registration::where('id', $id)->select('status')->get();
+            $user = $user[0]->status;
             $date = Carbon::now();
             $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
+            $message = $this->repository->getMessage($id, $request->all());
+            $mailUpdate = $this->repository->updateMail($id, $user);
             $information = $this->repository->findwhere(['id' => $id]);
             return response()->json($information, 200);
         } else {
             return "Your request is invalid. Please do not disturb the system.";
         }
+    }
 
+    public function updateMessage($id, RegistrationUpdateStatusRequest $request)
+    {
+        $user1 = Registration::where('id', $id)->select('status')->get();
+        if ($user1[0]->status == 1) {
+            return "Your request has been approved. Please do not disturb the system.";
+        } elseif ($user1[0]->status == 2) {
+            return "Your request has been disapproved. Please do not disturb the system.";
+        } else {
+            $user = 3;
+            $message = $this->repository->getMessage($id, $request->all());
+            $mailUpdate = $this->repository->updateMail($id, $user);
+            $information = $this->repository->findwhere(['id' => $id]);
+            return response()->json($information, 200);
+        }
     }
     // public function searchuser($key)
     // {
