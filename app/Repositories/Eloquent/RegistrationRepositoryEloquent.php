@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Mail\SendMailable;
 use App\Mail\UpdateMessageMailable;
+use App\Mail\UpdateMailable;
 use App\Models\Registration;
 use App\Models\Type;
 use App\Presenters\RegistrationPresenter;
@@ -220,15 +221,71 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
 
     public function update(array $attributes, $id)
     {
-        $abc = 'unsuitable';
+        $error = 'unsuitable';
         $status = $this->model()::where('id', $id)->select('status')->get();
-        // dd($status[0]->status);
         if ($status[0]->status == 3) {
+            $oldName = Auth::user()->name;
+            $old = parent::find($id);
+            $oldTime = $old['data']['attributes']['time'];
+            $oldDayOff = array();
+            for ($i = 0; $i < count($oldTime); $i++) {
+                $date = new Carbon($oldTime[$i]['time_details']);
+                $time = $date->toDateString() . " " . "(" . $oldTime[$i]['at_time'] . ")";
+                $oldDayOff[] = $time;
+            }
+            $oldDayOff = implode(', ', $oldDayOff);
+            // dd($oldDayOff);
+            $oldTo = $old['data']['attributes']['mailto'];
+            $oldCc = $old['data']['attributes']['mailcc'];
+            $newMessage = $old['data']['attributes']['message'];
+            $oldNote = $old['data']['attributes']['note'];
+            $oldType = $old['data']['attributes']['type']['name'];
+            $oldTypeAbsence = $old['data']['attributes']['time'][0]['type'];
+            // dd($oldTypeAbsence);
+            // $data = [
+            //     'registerName' => $oldName,
+            //     'typeId' => $oldType,
+            //     'note' => $oldNote,
+            //     'type' => $oldTypeAbsence,
+            //     'timeOff' => $oldDayOff,
+            //     'to' => $oldTo,
+            //     'cc' => $oldCc,
+            //     'message' => $newMessage,
+            // ];
             $registration = parent::update(array_except($attributes, ['user_id', 'status', 'requested_date']), $id);
             TimeAbsenceService::update($id, $attributes);
-            return $registration;
+            //update email from user;
+            $new = parent::find($id);
+            $newTime = $new['data']['attributes']['time'];
+            $newDayOff = array();
+            for ($i = 0; $i < count($newTime); $i++) {
+                $date = new Carbon($newTime[$i]['time_details']);
+                $time = $date->toDateString() . " " . "(" . $newTime[$i]['at_time'] . ")";
+                $newDayOff[] = $time;
+            }
+            $newDayOff = implode(', ', $newDayOff);
+            // dd($newDayOff);
+            $newNote = $new['data']['attributes']['note'];
+            $newType = $new['data']['attributes']['type']['name'];
+            $newTypeAbsence = $new['data']['attributes']['time'][0]['type'];
+            $data = [
+                'registerName' => $oldName,
+                'oldTypeId' => $oldType,
+                'oldNote' => $oldNote,
+                'oldType' => $oldTypeAbsence,
+                'oldTimeOff' => $oldDayOff,
+                'typeId' => $newType,
+                'note' => $newNote,
+                'type' => $newTypeAbsence,
+                'timeOff' => $newDayOff,
+                'to' => $oldTo,
+                'cc' => $oldCc,
+                'message' => $newMessage,
+            ];
+            Mail::queue(new UpdateMailable($data));
+            return $new;
         } else {
-            return $abc;
+            return $error;
         }
     }
 
@@ -283,7 +340,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         $oldDayOff = array();
         for ($i = 0; $i < count($timeDetails); $i++) {
             $date = new Carbon($timeDetails[$i]['time_details']);
-            $time = $date->toDateString() . " " ."(".$timeDetails[$i]['at_time'] .")";
+            $time = $date->toDateString() . " " . "(" . $timeDetails[$i]['at_time'] . ")";
             $oldDayOff[] = $time;
         }
         $oldDayOff = implode(', ', $oldDayOff);

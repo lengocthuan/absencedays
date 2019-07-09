@@ -26,7 +26,7 @@ class RegistrationCreateRequest extends FormRequest
         return [
             'user_id' => 'required|string|max:191',
             'type_id' => 'required|string|max:191',
-            'note' => 'required|string|min:20',
+            'note' => 'required|string|min:10',
             'status' => 'integer|max:3|min:0',
             'requested_date' => 'date_format:Y-m-d H:i:s|before_or_equal:time_off_beginning',
             'approved_date' => 'date_format:Y-m-d H:i:s|after_or_equal:time_off_beginning',
