@@ -68,9 +68,10 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             }
         }
         // dd($array);
-
+        // dd(count($registration));
         $detail = array();
         $timeDetails = TimeAbsence::select('registration_id', 'time_details', 'at_time')->get();
+        dd($timeDetails);
         for ($i = 0; $i < count($registration); $i++) {
             foreach ($timeDetails as $value) {
                 if ($registration[$i]->user_id == $value->registration_id) {

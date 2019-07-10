@@ -13,7 +13,7 @@ class TrackCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,8 @@ class TrackCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'from' => 'date_format:Y-m-d|before_or_equal:to',
+            'to' => 'date_format:Y-m-d|after_or_equal:from',
         ];
     }
 }

@@ -322,11 +322,15 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         // }
         $info = Auth::user()->name;
         $info_email = Auth::user()->email;
-        // dd($user);
+        // dd($info_email);
         $email = parent::find($id);
         // dd('abc');
-        $emailTypeAbsence = $email['data']['attributes']['time'][0]['type'];
-        // dd('def');
+        $emailTimeAbsence = $email['data']['attributes']['time'];
+
+        if(count($emailTimeAbsence) != 0) {
+            $emailTypeAbsence = $email['data']['attributes']['time'][0]['type'];
+        } else return "No registered time exists, tracing history has been changed.";
+
         $emailType = $email['data']['attributes']['type']['name'];
         $emailNote = $email['data']['attributes']['note'];
         $emailMessage = $email['data']['attributes']['message'];
@@ -336,6 +340,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         $emailCc = $email['data']['attributes']['mailcc'];
         $emailTo = array_unique(array_merge($emailTo, $emailCc));
         // dd($emailTo);
+
         $timeDetails = $email['data']['attributes']['time'];
         $oldDayOff = array();
         for ($i = 0; $i < count($timeDetails); $i++) {
