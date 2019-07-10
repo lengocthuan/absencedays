@@ -82,6 +82,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('cc', 'ApproversController@getMailcc');
     Route::resource('track', 'TracksController');
 
+    Route::get('statistical', 'TracksController@getStatistical');
+
 });
 
 Route::group(['prefix' => 'v1'], function () {

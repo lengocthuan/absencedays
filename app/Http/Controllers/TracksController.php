@@ -109,4 +109,10 @@ class TracksController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function getStatistical(Request $request)
+    {
+        $general = $this->repository->statistical($request->all());
+        return response()->json($general);
+    }
 }

@@ -33,7 +33,7 @@ class RegistrationTransformer extends BaseTransformer
     public function customAttributes($model): array
     {
         return [
-            'user' => $model->getUser,
+            'user' => $model->getUser(),
             'type' => $model->getType,
             'time' => $model->getTimeAbsence,
             'total' => $model->getTotalTime(),

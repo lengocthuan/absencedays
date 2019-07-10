@@ -18,6 +18,7 @@ class Registration extends BaseModel
      *
      * @var array
      */
+    protected $table = 'registrations';
     protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message'];
 
     public function approvers()
@@ -28,7 +29,15 @@ class Registration extends BaseModel
     {
         // $user = User::find($this->user_id);
         // return $user->name;
-        return $this->belongsTo(\App\User::class, 'user_id');
+        // return $this->belongsTo(\App\User::class, 'user_id');
+        $informationUser = User::where('id', $this->user_id)->get();
+        $result = array();
+        foreach ($informationUser as $value) {
+            // dd('abc');
+            $temp = ['id' => $value->id, 'name' => $value->name, 'phone' => $value->phone, 'address' => $value->address, 'email' => $value->email, 'first_workday' => $value->first_workday, 'team' => $value->getTeam->name, 'position' => $value->getPosition->name, 'avatar' => $value->avatar, 'created_at' => $value->created_at, 'updated_at' => $value->updated_at];
+            $result[] = $temp;
+        }
+        return $result;
     }
 
     public function getType()
