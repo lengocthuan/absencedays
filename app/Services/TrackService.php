@@ -321,4 +321,30 @@ class TrackService
         }
     }
 
+    public static function search($attributes)
+    {
+        // $registration = array();
+        // foreach ($id as $value) {
+        //     $registration[] = $value->id;
+        // // }
+        // dd('abc');
+        // if (isset($attributes['from']) && isset($attributes['to'])) {
+        //     $from = $attributes['from'];
+        //     $to = $attributes['to'];
+        //     $result = TimeAbsence::where('time_details','>=', $from)->where('time_details', '<=', $to)->select('registration_id','time_details', 'at_time', 'absence_days')->get();
+        //     return $result;
+        // } elseif (isset($attributes['month'])) {
+        //     $time = $attributes['month'];
+        //     $cut = explode('-', $time);
+        //     $month = $cut[1];
+        //     $year = $cut[0];
+        //     $result = TimeAbsence::whereMonth('time_details', $month)->whereYear('time_details', $year)->select('registration_id','time_details', 'at_time', 'absence_days')->get();
+        //     return $result;
+        // } else {
+        //     $time = $attributes['year'];
+        //     $result = TimeAbsence::whereYear('time_details', $time)->select('registration_id','time_details', 'at_time', 'absence_days')->get();
+        //     return $result;
+        // }
+    }
+
 }
