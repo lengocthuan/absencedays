@@ -38,18 +38,7 @@ class TeamsController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
-        
-        $includes = request()->get('include', '');
-
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $teams = $this->repository->paginate($limit, $columns = ['*']);
-
+        $teams = $this->repository->all();
         return response()->json($teams);
     }
 
