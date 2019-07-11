@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TimeAbsenceCreateRequest;
 use App\Http\Requests\TimeAbsenceUpdateRequest;
+use App\Models\TimeAbsence;
 use App\Repositories\Contracts\TimeAbsenceRepository;
 use Illuminate\Http\Request;
-use App\Models\TimeAbsence;
+
 /**
  * Class TimeAbsencesController.
  *
@@ -36,18 +37,7 @@ class TimeAbsencesController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
-
-        $includes = request()->get('include', '');
-
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $timeAbsences = $this->repository->paginate($limit, $columns = ['*']);
-
+        $timeAbsences = $this->repository->all();
         return response()->json($timeAbsences);
     }
 
@@ -71,12 +61,10 @@ class TimeAbsencesController extends Controller
         } elseif ($timeAbsence == 'Invalidate') {
             $error = 'Registration time is invalid. Please, try again.';
             return response()->json($error, 404);
-        }
-        elseif ($timeAbsence == 'InvalidateType') {
+        } elseif ($timeAbsence == 'InvalidateType') {
             $error = 'Selection of inappropriate registration. Please try again.';
             return response()->json($error, 404);
-        }
-        else {
+        } else {
             return response()->json($timeAbsence, 201);
         }
     }
@@ -128,7 +116,7 @@ class TimeAbsencesController extends Controller
     {
         /*
         get Total absence days for a user in a registration.
-        */
+         */
         $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
         $sum = 0;
         foreach ($total as $value) {

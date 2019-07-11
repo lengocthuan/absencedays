@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Exports\TracksExport;
+use App\Exports\StatisticalsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests;
 use App\Http\Requests\TrackCreateRequest;
 use App\Http\Requests\TrackUpdateRequest;
 use App\Repositories\Contracts\TrackRepository;
+use Carbon\Carbon;
 
 /**
  * Class TracksController.
@@ -114,5 +117,20 @@ class TracksController extends Controller
     {
         $general = $this->repository->statistical($request->all());
         return response()->json($general);
+    }
+
+    public function export(TrackCreateRequest $request) 
+    {
+        // $now = Carbon::now();
+        // dd($now);
+        // dd($request->year);
+        $general = $this->repository->statistical($request->all());
+        return Excel::download(new TracksExport($general), "Thống kê chi tiết theo đợt $request->from-$request->to$request->year$request->month.xlsx");
+    }
+
+    public function exportStatistical()
+    {
+        $now = Carbon::now()->toDateString();
+        return Excel::download(new StatisticalsExport, "Thống kê tổng quan theo năm-ngày xuất bản-$now.xlsx");
     }
 }

@@ -56,7 +56,7 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         $user = User::select()->get();
         // dd($user);
 
-        $registration = Registration::select('id', 'user_id')->get();
+        $registration = Registration::select('id', 'user_id', 'status')->get();
 
         if (isset($attributes['from']) && isset($attributes['to'])) {
             $from = $attributes['from'];
@@ -83,9 +83,8 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
                 for ($j = 0; $j < count($result); $j++) {
                     if ($value->id == $registration[$i]->user_id) {
                         if ($result[$j]->registration_id == $registration[$i]->id) {
-                            $general[] = ['id' => $value->id, 'name' => $value->name, 'email' => $value->email, 'time_details' => $result[$j]->time_details, 'at_time' => $result[$j]->at_time, 'absence_days' => $result[$j]->absence_days];
-                            $preSum[] = $value->id . '-' . $value->name . '-' . $value->email;
-                            $preSum1[] = $value->id;
+                            $general[] = ['id' => $value->id, 'name' => $value->name, 'email' => $value->email, 'team' => $value->getTeam->name, 'position' => $value->getPosition->name, 'time_details' => $result[$j]->time_details, 'at_time' => $result[$j]->at_time, 'absence_days' => $result[$j]->absence_days];
+                            $preSum[] = $value->id . '-' . $value->name . '-' . $value->email . '-' . $value->getTeam->name . '-' . $value->getPosition->name;
                         }
                     }
 
@@ -93,8 +92,8 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             }
         }
         $totalDayOff = 0;
+        // dd($general);
         $newInitArray = array();
-        $countLoop = array_count_values($preSum1);
         $uniquePreSum = array_unique($preSum);
         $arr = array();
         foreach ($uniquePreSum as $value) {
@@ -103,7 +102,7 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         }
 
         for ($i = 0; $i < count($arr); $i++) {
-            $newInitArray[] = ['id' => $arr[$i][0], 'name' => $arr[$i][1], 'email' => $arr[$i][2], 'time_details' => null, 'at_time' => null, 'absence_days' => null];
+            $newInitArray[] = ['id' => $arr[$i][0], 'name' => $arr[$i][1], 'email' => $arr[$i][2], 'team' => $arr[$i][3], 'position' => $arr[$i][4], 'time_details' => null, 'at_time' => null, 'absence_days' => null];
         }
 
         $mergeTime = array();
@@ -113,13 +112,13 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
                 if ($value['id'] == $newInitArray[$i]['id']) {
                     $mergeTime[] = $value['time_details'];
                     $newInitArray[$i]['time_details'] = $mergeTime;
-                    $str = implode(', ', $newInitArray[$i]['time_details']);
-                    $newInitArray[$i]['time_details'] = $str;
+                    // $str = implode(', ', $newInitArray[$i]['time_details']);
+                    // $newInitArray[$i]['time_details'] = $str;
                     $totalDayOff += $value['absence_days'];
                     $mergeAtTime[] = $value['at_time'];
                     $newInitArray[$i]['at_time'] = $mergeAtTime;
-                    $str1 = implode(', ', $newInitArray[$i]['at_time']);
-                    $newInitArray[$i]['at_time'] = $str1;
+                    // $str1 = implode(', ', $newInitArray[$i]['at_time']);
+                    // $newInitArray[$i]['at_time'] = $str1;
                     $newInitArray[$i]['absence_days'] = $totalDayOff;
                 }
 

@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Registration;
 use App\Models\TimeAbsence;
 use App\User;
-use Illuminate\Support\Facades\Auth;
+use App\Traits\InformationUserTrait;
 
 /**
  * Class Track.
@@ -19,12 +19,14 @@ class Track extends BaseModel
      *
      * @var array
      */
+    use InformationUserTrait;
     protected $fillable = ['user_id', 'year', 'annual_leave_total', 'annual_leave_unused', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    public function getUser()
+    private $user;
+
+    public function getInfoUser()
     {
-        $track = $this->belongsTo(\App\User::class, 'user_id');
-        return $track;
+        return $this->InfoUser($this->user_id);
     }
 
     public function getRegistration()
