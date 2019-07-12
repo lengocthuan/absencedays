@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\TimeAbsence;
 use App\Models\Type;
 use App\User;
+use App\Traits\InformationUserTrait;
 
 /**
  * Class Registration.
@@ -18,28 +19,19 @@ class Registration extends BaseModel
      *
      * @var array
      */
+    use InformationUserTrait;
     protected $table = 'registrations';
     protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message'];
+
 
     public function approvers()
     {
         return $this->belongsToMany(\App\Models\Approver::class)->withTimestamps();
     }
+
     public function getUser()
     {
-        // $user = User::find($this->user_id);
-        // return $user->name;
-        // return $this->belongsTo(\App\User::class, 'user_id');
-        $informationUser = User::where('id', $this->user_id)->get();
-        $result = array();
-        $merge = array();
-        foreach ($informationUser as $value) {
-            // dd('abc');
-            $temp = ['id' => $value->id, 'name' => $value->name, 'phone' => $value->phone, 'address' => $value->address, 'email' => $value->email, 'first_workday' => $value->first_workday, 'team' => $value->getTeam->name, 'position' => $value->getPosition->name, 'avatar' => $value->avatar, 'created_at' => $value->created_at, 'updated_at' => $value->updated_at];
-            $result[] = $temp;
-            $resultMerge = ['id' => $result[0]['id'], 'name' => $result[0]['name'], 'phone' => $result[0]['phone'], 'address' => $result[0]['address'], 'email' => $result[0]['email'], 'first_workday' => $result[0]['first_workday'], 'team' => $result[0]['team'], 'position' => $result[0]['position'], 'avatar' => $result[0]['avatar'], 'created_at' => $result[0]['created_at'], 'updated_at' => $result[0]['updated_at']];
-        }
-        return $resultMerge;
+        return $this->InfoUser($this->user_id);
     }
 
     public function getType()

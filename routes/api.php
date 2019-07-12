@@ -69,6 +69,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('statistic', 'UsersController@getInformation');
 
+
     
     // //edit a registration
     // Route::post('absence/edit', 'RegistrationsController@update');
@@ -81,8 +82,11 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('to', 'ApproversController@getMailto');
     Route::get('cc', 'ApproversController@getMailcc');
     Route::resource('track', 'TracksController');
+    Route::resource('timeabsence', 'TimeAbsenceController');
 
     Route::get('statistical', 'TracksController@getStatistical');
+    Route::get('export', 'TracksController@export');
+    Route::get('exportstatistical', 'TracksController@exportStatistical');
 
 });
 

@@ -33,7 +33,7 @@ class TrackTransformer extends BaseTransformer
     public function customAttributes($model): array
     {
         return [
-            'user' => $model->getUser,
+            'user' => $model->getInfoUser(),
             'registration' => $model->getRegistration(),
         ];
     }
