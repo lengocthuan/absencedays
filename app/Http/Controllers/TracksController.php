@@ -121,9 +121,6 @@ class TracksController extends Controller
 
     public function export(TrackCreateRequest $request) 
     {
-        // $now = Carbon::now();
-        // dd($now);
-        // dd($request->year);
         $general = $this->repository->statistical($request->all());
         return Excel::download(new TracksExport($general), "Thống kê chi tiết theo đợt $request->from-$request->to$request->year$request->month.xlsx");
     }

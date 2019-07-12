@@ -8,6 +8,7 @@ use App\Models\Track;
 use App\Presenters\TrackPresenter;
 use App\Repositories\Contracts\TrackRepository;
 use App\User;
+use Carbon\Carbon;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 
@@ -82,8 +83,9 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             for ($i = 0; $i < count($registration); $i++) {
                 for ($j = 0; $j < count($result); $j++) {
                     if ($value->id == $registration[$i]->user_id) {
+                        // $result[$i]->time_details = new Carbon($result[$i]->time_details);
                         if ($result[$j]->registration_id == $registration[$i]->id) {
-                            $general[] = ['id' => $value->id, 'name' => $value->name, 'email' => $value->email, 'team' => $value->getTeam->name, 'position' => $value->getPosition->name, 'time_details' => $result[$j]->time_details, 'at_time' => $result[$j]->at_time, 'absence_days' => $result[$j]->absence_days];
+                            $general[] = ['id' => $value->id, 'name' => $value->name, 'email' => $value->email, 'team' => $value->getTeam->name, 'position' => $value->getPosition->name, 'time_details' => Carbon::parse($result[$j]->time_details)->format('d-m-Y'), 'at_time' => $result[$j]->at_time, 'absence_days' => $result[$j]->absence_days];
                             $preSum[] = $value->id . '-' . $value->name . '-' . $value->email . '-' . $value->getTeam->name . '-' . $value->getPosition->name;
                         }
                     }
