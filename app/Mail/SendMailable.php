@@ -5,7 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Carbon\Carbon;
 
 class SendMailable extends Mailable
 {
@@ -29,20 +29,22 @@ class SendMailable extends Mailable
      */
     public function build()
     {
-        $subject = '[Nhân sự] Xin ' . $this->data['type_id'];
-        $to = explode(',', $this->data['to']);
-        $cc = explode(',', $this->data['cc']);
+        if(!is_null($this->data['timeStart'])) {
+            $convertTimeStart = Carbon::parse($this->data['timeStart'])->format('d/m/Y');
+        } else $convertTimeStart = null;
+        
+        $subject = '[Nhân sự] Xin ' . $this->data['typeId'] . '-' . $convertTimeStart . $this->data['firstDayOff'];
+        $mailTo = explode(',', $this->data['to']);
+        $mailCc = explode(',', $this->data['cc']);
         $input = [
             'name' => $this->data['name'],
-            'type_id' => $this->data['type_id'],
+            'typeId' => $this->data['typeId'],
             'reason' => $this->data['note'],
-            'type_registration' => $this->data['type'],
-            'timestart' => $this->data['time_start'],
-            'timeend' => $this->data['time_end'],
-            'timeoff' => $this->data['time_off'],
+            'typeAbsence' => $this->data['type'],
+            'timeStart' => $this->data['timeStart'],
+            'timeEnd' => $this->data['timeEnd'],
+            'timeOff' => $this->data['timeOff'],
         ];
-        return $this->to($to)->cc($cc)->subject("$subject")->view('emails.message')->with(['inputs' => $input]);
-        // return $this->to($email)->subject("$subject")->cc('lengocthuan2581997@gmail.com')->view('emails.message')->with(['inputs' => $input]);
-        // return $this->cc('hr@greenglobal.vn')->view('emails.message');
+        return $this->to($mailTo)->cc($mailCc)->subject("$subject")->view('emails.message')->with(['inputs' => $input]);
     }
 }

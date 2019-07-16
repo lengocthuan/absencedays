@@ -29,4 +29,5 @@ class TypeTransformer extends BaseTransformer
      * @var array
      */
     protected $defaultIncludes = [];
+
 }

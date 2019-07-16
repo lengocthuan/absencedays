@@ -11,6 +11,7 @@ use App\Http\Requests\TrackCreateRequest;
 use App\Http\Requests\TrackUpdateRequest;
 use App\Repositories\Contracts\TrackRepository;
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 
 /**
  * Class TracksController.
@@ -41,19 +42,9 @@ class TracksController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
-        
-        $includes = request()->get('include', '');
+        $tracks = $this->repository->all();
 
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $tracks = $this->repository->paginate($limit, $columns = ['*']);
-
-        return response()->json($tracks);
+        return $this->success($tracks, trans('messages.track.success'));
     }
 
     /**
@@ -66,8 +57,10 @@ class TracksController extends Controller
     public function store(TrackCreateRequest $request)
     {
         $track = $this->repository->skipPresenter()->create($request->all());
-
-        return response()->json($track->presenter(), 201);
+        if($track){
+            return $this->success($track->presenter(), trans('messages.track.create'), ['code' => Response::HTTP_CREATED]);
+        }
+        return $this->error(trans('messages.track.errorStore'), trans('messages.track.duplicate'), Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -80,23 +73,8 @@ class TracksController extends Controller
     public function show($id)
     {
         $track = $this->repository->find($id);
-        
-        return response()->json($track);
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  TrackUpdateRequest $request
-     * @param  string $id
-     *
-     * @return Response
-     */
-    public function update(TrackUpdateRequest $request, $id)
-    {
-        $track = $this->repository->skipPresenter()->update($request->all(), $id);
-
-        return response()->json($track->presenter(), 200);
+        return $this->success($track, trans('messages.track.success'));
     }
 
     /**
@@ -110,13 +88,14 @@ class TracksController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.track.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 
     public function getStatistical(TrackCreateRequest $request)
     {
-        $general = $this->repository->statistical($request->all());
-        return response()->json($general);
+        $general = ['data' => $this->repository->statistical($request->all())];
+
+        return $this->success($general, trans('messages.track.statistical'));
     }
 
     public function export(TrackCreateRequest $request) 

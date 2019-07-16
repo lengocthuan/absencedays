@@ -10,6 +10,7 @@ use App\Repositories\Contracts\RegistrationRepository;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -22,6 +23,7 @@ class RegistrationsController extends Controller
     /**
      * @var RegistrationRepository
      */
+
     protected $repository;
 
     /**
@@ -41,19 +43,9 @@ class RegistrationsController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
+        $registrations = $this->repository->all();
 
-        $includes = request()->get('include', '');
-
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $registrations = $this->repository->paginate($limit, $columns = ['*']);
-
-        return response()->json($registrations);
+        return $this->success($registrations, trans('messages.registration.success'));
     }
 
     /**
@@ -65,23 +57,9 @@ class RegistrationsController extends Controller
      */
     public function store(RegistrationCreateRequest $request)
     {
-
         $registration = $this->repository->create($request->all());
-        if ($registration == 'error') {
-            $error = 'You cant registration over 17 days.';
-            return response()->json($error, 404);
-        } elseif ($registration == 'unallow') {
-            $error = 'You are not allowed to set a date that coincides with the previously registered date.';
-            return response()->json($error, 404);
-        } elseif ($registration == 'time_invalid') {
-            $error = 'Registration time is invalid';
-            return response()->json($error, 404);
-        } elseif ($registration == 'time_invalid_1') {
-            $error = 'Total inappropriate absence time, other time options or contact administrator.';
-            return response()->json($error, 404);
-        } else {
-            return response()->json($registration, 201);
-        }
+
+        return $this->success($registration, trans('messages.registration.createSuccess'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**
@@ -94,7 +72,8 @@ class RegistrationsController extends Controller
     public function show($id)
     {
         $registration = $this->repository->find($id);
-        return response()->json($registration);
+
+        return $this->success($registration, trans('messages.registration.success'));
     }
 
     /**
@@ -108,11 +87,11 @@ class RegistrationsController extends Controller
     public function update(RegistrationUpdateRequest $request, $id)
     {
         $registration = $this->repository->update($request->all(), $id);
-        if ($registration == 'unsuitable') {
-            $error = 'Your registration table has an inappropriate state in this case.';
-            return response()->json($error, 404);
+        if ($registration) {
+            return $this->success($registration, trans('messages.registration.updateSuccess'), ['code' => Response::HTTP_CREATED]);
         }
-        return response()->json($registration, 200);
+        return $this->error(trans('messages.registration.invalidRegistration'), trans('messages.registration.statusNotSuitable'), Response::HTTP_BAD_REQUEST);
+
     }
 
     /**
@@ -126,107 +105,88 @@ class RegistrationsController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.registration.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 
     /*
     Get information Time absences of users
      */
-    public function getProfile()
+    public function getStatus(Request $request)
     {
-        $id = Auth::user()->id;
-        $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
-        // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
-        return response()->json($user, 200);
+        $id = Auth::id();
+        switch ($request->status) {
+            case '3':
+                $status = 3;
+                break;
+            case '1':
+                $status = 1;
+                break;
+            case '2':
+                $status = 2;
+                break;
+            
+            default:
+                $status = 0;
+                break;
+        }
+        $user = $this->repository->findwhere(['user_id' => $id, 'status' => $status]);
+        return $this->success($user, trans('messages.registration.success'));
     }
 
-    public function getApproved()
+    public function getRegistrationPending()
     {
-        $id = Auth::user()->id;
-        $user = $this->repository->findwhere(['user_id' => $id, 'status' => '1']);
-        // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
-        return response()->json($user, 200);
+        $email = Auth::user()->email;
+        $pending = $this->repository->getPending($email);
+        return $this->success($pending, trans('messages.registration.search'));
     }
 
-    public function getDisApproved()
+    public function searchRegistrationPending(Request $request)
     {
-        $id = Auth::user()->id;
-        $user = $this->repository->findwhere(['user_id' => $id, 'status' => '2']);
-        // $user = $this->repository->findwhere(['user_id' => $id, 'status' => '3']);
-        return response()->json($user, 200);
+        $pending = $this->repository->searchRegistrationPending($request->all());
+        return $this->success($pending, trans('messages.registration.search'));
     }
 
     public function search(Request $request)
     {
         $days = $this->repository->search($request->all());
-        return response()->json($days);
+
+        return $this->success($days, trans('messages.registration.search'));
     }
 
-    public function searchPending(Request $request)
-    {
-        $days = $this->repository->searchPending($request->all());
-        return response()->json($days);
-    }
-
-    public function searchApproved(Request $request)
-    {
-        $days = $this->repository->searchApproved($request->all());
-        return response()->json($days);
-    }
-
-    public function searchDisApproved(Request $request)
-    {
-        $days = $this->repository->searchDisApproved($request->all());
-        return response()->json($days);
-    }
-
-    public function searchRegisPending(Request $request)
-    {
-        $pending = $this->repository->searchRegisPending($request->all());
-        return response()->json($pending, 200);
-    }
-
-    public function getRegisPending()
-    {
-        $email = Auth::user()->email;
-        $pending = $this->repository->getPending($email);
-        return response()->json($pending, 200);
-    }
-
-    public function updateStatusRegis($id, RegistrationUpdateStatusRequest $request)
+    public function updateStatus1($id, RegistrationUpdateStatusRequest $request)
     {
         $user1 = Registration::where('id', $id)->select('status')->get();
         if ($user1[0]->status == 2) {
-            return "Your request has been disapproved. Please do not disturb the system.";
+            return $this->error(trans('messages.registration.statusDisapproved'), trans('messages.registration.statusDisapproved'), Response::HTTP_BAD_REQUEST);
         } else {
             $user = Registration::where('id', $id)->update(['status' => 1]);
             $date = Carbon::now();
-            $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
+            $aprrovedDate = Registration::where('id', $id)->update(['approved_date' => $date]);
             $message = $this->repository->getMessage($id, $request->all());
             $mailUpdate = $this->repository->updateMail($id, $user);
             $information = $this->repository->findwhere(['id' => $id]);
-            return response()->json($information, 200);
+            return $this->success($information, trans('messages.registration.updateStatus'));
         }
 
     }
 
-    public function updateStatusRegis2($id, RegistrationUpdateStatusRequest $request)
+    public function updateStatus2($id, RegistrationUpdateStatusRequest $request)
     {
         $user1 = Registration::where('id', $id)->select('status')->get();
         if ($user1[0]->status == 1) {
-            return "Your request has been approved. Please do not disturb the system.";
+            return $this->error(trans('messages.registration.statusApproved'), trans('messages.registration.statusApproved'), Response::HTTP_BAD_REQUEST);
         } elseif ($user1[0]->status == 3) {
             $user = Registration::where('id', $id)->update(['status' => 2]);
             $user = Registration::where('id', $id)->select('status')->get();
             $user = $user[0]->status;
             $date = Carbon::now();
-            $aprroved_date = Registration::where('id', $id)->update(['approved_date' => $date]);
+            $aprrovedDate = Registration::where('id', $id)->update(['approved_date' => $date]);
             $message = $this->repository->getMessage($id, $request->all());
             $mailUpdate = $this->repository->updateMail($id, $user);
             $information = $this->repository->findwhere(['id' => $id]);
-            return response()->json($information, 200);
+            return $this->success($information, trans('messages.registration.updateStatus'));
         } else {
-            return "Your request is invalid. Please do not disturb the system.";
+            return $this->error(trans('messages.registration.statusInvalid'), trans('messages.registration.statusInvalid'), Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -234,93 +194,28 @@ class RegistrationsController extends Controller
     {
         $user1 = Registration::where('id', $id)->select('status')->get();
         if ($user1[0]->status == 1) {
-            return "Your request has been approved. Please do not disturb the system.";
+            return $this->error(trans('messages.registration.statusApproved'), trans('messages.registration.statusApproved'), Response::HTTP_BAD_REQUEST);
         } elseif ($user1[0]->status == 2) {
-            return "Your request has been disapproved. Please do not disturb the system.";
+            return $this->error(trans('messages.registration.statusDisapproved'), trans('messages.registration.statusDisapproved'), Response::HTTP_BAD_REQUEST);
         } else {
             $user = 3;
             $message = $this->repository->getMessage($id, $request->all());
             $mailUpdate = $this->repository->updateMail($id, $user);
             $information = $this->repository->findwhere(['id' => $id]);
-            return response()->json($information, 200);
+            return $this->success($information, trans('messages.registration.updateStatus'));
         }
     }
-    // public function searchuser($key)
-    // {
-    //     $user = $this->repository->searchuser($key);
-    //     return response()->json($user);
-    // }
 
     public function test()
     {
+        //use test;
         $approver = Registration::select('approver_id')->get();
         $app = explode(',', $approver[0]->approver_id);
-        // dd($approver[0]->approver_id);
-        // dd($app[0]);
-        $arr = array();
+        $arrayTest = array();
         foreach ($app as $value) {
             $info = User::where('id', $value)->get();
-            $arr[] = $info;
+            $arrayTest[] = $info;
         }
-        dd($arr);
-        // for($i = 0; $i < 3; $i++){
-        //     $array = Array($i);
-        // }
-        // echo $array;
-        // echo [1,2].length;
-        // $y = Carbon::now()->format('Y');
-        // // 2019-06-14
-        // echo $y;
-        // echo "==========";
-        // $m = Carbon::now();
-        // echo $m;
-        //  echo "==========";
-        // // $d = Carbon::now()->format('Y');
-        // echo $y;
-        // echo "==========";
-        // $time1 = "31-12" .$y;
-        // echo $time1;
-        // echo "==========";
-        // $time2 = Carbon::parse($time1);
-        // // $time2 = strtotime($time1);
-        // // $newformat = date('Y-m-d',$time2);
-        // echo $time2;
-        // // echo "==========";
-
-        // // $current = Carbon::now();
-        // $sum = $time2 - $m;
-        // echo $sum;
-
-        // $newformat = date('y',$time1)+1;
-
-        // echo $newformat;
-        // echo"=============";
-        // // $time1 = "2019-06-11";
-        // if($time === $newformat) echo "giong nhau"; else echo "khong giong nhau";
-        // var_dump($time);
-        // if()
-
-        //
-        //
-        //
-        // $registration = Registration::where('id',10)->first();
-        // // $registration1 = Registration::where('id',10)->get(['time_off_ending']);
-        // // if($registration === $registration1) echo "="; else echo "!=";
-
-        // $time = explode(' ', $registration->time_off_beginning);
-        // echo $time[0];
-
-        // $time1 = explode(' ', $registration->time_off_ending);
-        // echo $time1[0];
-
-        // if($time1[0] == $time[0]) echo '='; else echo"!=";
-        // //echo $registration;
-        //
-        //
-        // $time = new Carbon('2019-06-12');
-        // $day = $time->toDateString();
-        // echo $time->addDay(2);
-        // echo "=====";
-        // echo $day;
+        dd($arrayTest);
     }
 }

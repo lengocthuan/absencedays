@@ -56,42 +56,22 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
 
     public function search(array $attributes)
     {
-        // dd($attributes['time']);
-        $id = Auth::user()->id;
-        $search = $this->model()::where('user_id', $id)->select('id')->get();
-        // dd($search);
-        $time = TimeAbsenceService::search($search, $attributes);
-        $result = $this->model()::whereIn('id', $time)->get();
-        return $this->parserResult($result);
-    }
-    public function searchPending(array $attributes)
-    {
-        // dd($attributes['time']);
-        $id = Auth::user()->id;
-        $search = $this->model()::where('user_id', $id)->where('status', 3)->select('id')->get();
-        // dd($search);
-        $time = TimeAbsenceService::search($search, $attributes);
-        $result = $this->model()::whereIn('id', $time)->get();
-        return $this->parserResult($result);
-    }
-
-    public function searchApproved(array $attributes)
-    {
-        // dd($attributes['time']);
-        $id = Auth::user()->id;
-        $search = $this->model()::where('user_id', $id)->where('status', 1)->select('id')->get();
-        // dd($search);
-        $time = TimeAbsenceService::search($search, $attributes);
-        $result = $this->model()::whereIn('id', $time)->get();
-        return $this->parserResult($result);
-    }
-
-    public function searchDisApproved(array $attributes)
-    {
-        // dd($attributes['time']);
-        $id = Auth::user()->id;
-        $search = $this->model()::where('user_id', $id)->where('status', 2)->select('id')->get();
-        // dd($search);
+        $id = Auth::id();
+        switch ($attributes['status']) {
+            case '1':
+                $search = $this->model()::where('user_id', $id)->where('status', 1)->select('id')->get();
+                break;
+            case '2':
+                $search = $this->model()::where('user_id', $id)->where('status', 2)->select('id')->get();
+                break;
+            case '3':
+                $search = $this->model()::where('user_id', $id)->where('status', 3)->select('id')->get();
+                break;
+            
+            default:
+                $search = $this->model()::where('user_id', $id)->select('id')->get();
+                break;
+        }
         $time = TimeAbsenceService::search($search, $attributes);
         $result = $this->model()::whereIn('id', $time)->get();
         return $this->parserResult($result);
@@ -133,31 +113,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
 
     public function create(array $attributes)
     {
-
-        // $daystart = $attributes['time_off_beginning'];
-        // $dayend = $attributes['time_off_ending'];
-        // $holiday = $this->getWorkdays($daystart, $dayend);
-        // // dd($holiday);
-        // // $check = $this->model()::where('user_id', $attributes['user_id'])->exists();
-        // $latest = $this->model()::where('user_id', $attributes['user_id'])
-        //     ->where(function ($query) use ($daystart, $dayend) {
-        //         $query->where([['time_off_beginning', '<=', $daystart], ['time_off_ending', '>=', $dayend]])
-        //             ->orwhere([['time_off_beginning', '>=', $daystart], ['time_off_beginning', '<=', $dayend]])
-        //             ->orwhere([['time_off_ending', '>=', $daystart], ['time_off_ending', '<=', $dayend]]);
-        //     })->get();
-        // $days = $latest->count();
-        // $attributes['status'] = 0;
-        // if($attributes['type_id'] == 1) {
-        //     $attributes['annual_leave_total'] = 12 - $attributes['absence_days'];
-        // }
-        // $timestart = new Carbon($attributes['time_start']);
-        // $timeend = new Carbon($attributes['time_end']);
-        // $check = Registration::where('user_id', $attributes['user_id'])->first();
-
-        // $checkTime = TimeAbsence::where('registration_id', $attributes['id'])
-        // dd($check->user_id);
-
-        if ($attributes['type'] == 'Từ ngày đến hết ngày') {
+        if ($attributes['type'] == Registration::TYPE_ABSENCE) {
             $attributes['status'] = 3;
             if ($attributes['status'] == 3) {
                 $attributes['requested_date'] = Carbon::now()->toDateString();
@@ -169,59 +125,59 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             }
         }
 
-        $res = parent::create($attributes);
+        $resgistration = parent::create($attributes);
         $date = $this->model()::where('user_id', $attributes['user_id'])->select('id')->get();
         $id = array();
         for ($i = 0; $i < count($date); $i++) {
             $id[] = $date[$i]->id;
         }
 
-        $timeabsence = TimeAbsenceService::add($res['data']['id'], $attributes);
-        $approver_id = ApproverService::add($res['data']['id'], $attributes);
-        // $cc = ApproverService::carbonCopy($res['data']['id'], $attributes);
-        $track = TrackService::update($res['data']['id'], $attributes);
+        TimeAbsenceService::add($resgistration['data']['id'], $attributes);
+        ApproverService::add($resgistration['data']['id'], $attributes);
+        TrackService::update($resgistration['data']['id'], $attributes);
 
         //send mail
         $user = Auth::user();
         $type = Type::find($attributes['type_id']);
-        if ($attributes['type'] == 'Từ ngày đến hết ngày') {
-            $time_start = $attributes['time_start'];
-            $time_end = $attributes['time_end'];
-            $str = null;
-
+        if ($attributes['type'] == Registration::TYPE_ABSENCE) {
+            $timeStart = $attributes['time_start'];
+            $timeEnd = $attributes['time_end'];
+            $merge = null;
+            $firstDayOff = null;
         } else {
             $date = explode(';', $attributes['date']);
-            $arr = array();
-            $result = '';
+            $arrayDate = array();
             for ($i = 0; $i < count($date); $i++) {
-                $at_time = explode(',', $date[$i]);
-                $add = "$at_time[0] ($at_time[1])";
-                $arr[] = $add;
+                $atTime = explode(',', $date[$i]);
+                $add = "$atTime[0] ($atTime[1])";
+                $arrayDate[] = $add;
             }
-            $str = implode(', ', $arr);
-            $time_start = null;
-            $time_end = null;
+            $cutArrayDate = explode(' ', $arrayDate[0]);
+            $firstDayOff = Carbon::parse($cutArrayDate[0])->format('d/m/Y');
+            $merge = implode(', ', $arrayDate);
+            $timeStart = null;
+            $timeEnd = null;
         }
+
         $data = [
             'name' => $user->name,
-            'type_id' => $type->name,
+            'typeId' => $type->name,
             'note' => $attributes['note'],
             'type' => $attributes['type'],
-            'time_start' => $time_start,
-            'time_end' => $time_end,
-            'time_off' => $str,
+            'timeStart' => $timeStart,
+            'timeEnd' => $timeEnd,
+            'timeOff' => $merge,
             'to' => $attributes['emails'],
             'cc' => $attributes['cc'],
+            'firstDayOff' => $firstDayOff,
         ];
 
-        // Mail::send(new SendMailable($data));
         Mail::queue(new SendMailable($data));
-        return parent::find($res['data']['id']);
+        return parent::find($resgistration['data']['id']);
     }
 
     public function update(array $attributes, $id)
     {
-        $error = 'unsuitable';
         $status = $this->model()::where('id', $id)->select('status')->get();
         if ($status[0]->status == 3) {
             $oldName = Auth::user()->name;
@@ -233,25 +189,15 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 $time = $date->toDateString() . " " . "(" . $oldTime[$i]['at_time'] . ")";
                 $oldDayOff[] = $time;
             }
+
             $oldDayOff = implode(', ', $oldDayOff);
-            // dd($oldDayOff);
             $oldTo = $old['data']['attributes']['mailto'];
             $oldCc = $old['data']['attributes']['mailcc'];
             $newMessage = $old['data']['attributes']['message'];
             $oldNote = $old['data']['attributes']['note'];
             $oldType = $old['data']['attributes']['type']['name'];
             $oldTypeAbsence = $old['data']['attributes']['time'][0]['type'];
-            // dd($oldTypeAbsence);
-            // $data = [
-            //     'registerName' => $oldName,
-            //     'typeId' => $oldType,
-            //     'note' => $oldNote,
-            //     'type' => $oldTypeAbsence,
-            //     'timeOff' => $oldDayOff,
-            //     'to' => $oldTo,
-            //     'cc' => $oldCc,
-            //     'message' => $newMessage,
-            // ];
+
             $registration = parent::update(array_except($attributes, ['user_id', 'status', 'requested_date']), $id);
             TimeAbsenceService::update($id, $attributes);
             //update email from user;
@@ -263,8 +209,8 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 $time = $date->toDateString() . " " . "(" . $newTime[$i]['at_time'] . ")";
                 $newDayOff[] = $time;
             }
+
             $newDayOff = implode(', ', $newDayOff);
-            // dd($newDayOff);
             $newNote = $new['data']['attributes']['note'];
             $newType = $new['data']['attributes']['type']['name'];
             $newTypeAbsence = $new['data']['attributes']['time'][0]['type'];
@@ -285,25 +231,25 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             Mail::queue(new UpdateMailable($data));
             return $new;
         } else {
-            return $error;
+            return false;
         }
     }
 
     public function getPending($email)
     {
-        $regis = Registration::whereHas('approvers', function ($query) use ($email) {
+        $registration = Registration::whereHas('approvers', function ($query) use ($email) {
             $query->where('email', $email)->where('type', 0);
         })->where('status', 3)->get();
-        return $this->parserResult($regis);
+        return $this->parserResult($registration);
     }
 
-    public function searchRegisPending(array $attributes)
+    public function searchRegistrationPending(array $attributes)
     {
         $email = Auth::user()->email;
-        $regis = Registration::whereHas('approvers', function ($query) use ($email) {
+        $registration = Registration::whereHas('approvers', function ($query) use ($email) {
             $query->where('email', $email)->where('type', 0);
         })->where('status', 3)->select('id')->get();
-        $idSearch = TimeAbsenceService::search($regis, $attributes);
+        $idSearch = TimeAbsenceService::search($registration, $attributes);
         $result = $this->model()::whereIn('id', $idSearch)->get();
         return $this->parserResult($result);
     }
@@ -316,20 +262,14 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
 
     public function updateMail($id, $user)
     {
-        //update mail
-        // if($user == 1) {
-        //     $update = 'Your absence days are approved.';
-        // }
         $info = Auth::user()->name;
-        $info_email = Auth::user()->email;
-        // dd($info_email);
+        $infoEmail = Auth::user()->email;
         $email = parent::find($id);
-        // dd('abc');
         $emailTimeAbsence = $email['data']['attributes']['time'];
 
         if(count($emailTimeAbsence) != 0) {
             $emailTypeAbsence = $email['data']['attributes']['time'][0]['type'];
-        } else return "No registered time exists, tracing history has been changed.";
+        } else return trans('message.registration.timeRegistrationNotExist');
 
         $emailType = $email['data']['attributes']['type']['name'];
         $emailNote = $email['data']['attributes']['note'];
@@ -339,8 +279,6 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         $emailTo = $email['data']['attributes']['mailto'];
         $emailCc = $email['data']['attributes']['mailcc'];
         $emailTo = array_unique(array_merge($emailTo, $emailCc));
-        // dd($emailTo);
-
         $timeDetails = $email['data']['attributes']['time'];
         $oldDayOff = array();
         for ($i = 0; $i < count($timeDetails); $i++) {
@@ -360,10 +298,8 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             'cc' => $emailTo,
             'message' => $emailMessage,
             'user' => $user,
-            'info_email' => $info_email,
+            'info_email' => $infoEmail,
         ];
-
-        // Mail::send(new SendMailable($data));
         Mail::queue(new UpdateMessageMailable($data));
     }
 }

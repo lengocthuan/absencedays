@@ -30,8 +30,8 @@ class UpdateMailable extends Mailable
     public function build()
     {
         $subject = '[Nhân sự] Xin ' . $this->data['typeId'];
-        $to = $this->data['to'];
-        $cc = $this->data['cc'];
+        $mailTo = $this->data['to'];
+        $mailCc = $this->data['cc'];
         $input = [
             'name' => $this->data['registerName'],
             'typeId' => $this->data['typeId'],
@@ -44,9 +44,6 @@ class UpdateMailable extends Mailable
             'oldTimeOff' => $this->data['oldTimeOff'],
             'message' => $this->data['message'],
         ];
-        // dd('abc');
-        return $this->to($to)->cc($cc)->subject("$subject")->view('emails.updateMail')->with(['inputs' => $input]);
-        // return $this->to($email)->subject("$subject")->cc('lengocthuan2581997@gmail.com')->view('emails.message')->with(['inputs' => $input]);
-        // return $this->cc('hr@greenglobal.vn')->view('emails.message');
+        return $this->to($mailTo)->cc($mailCc)->subject("$subject")->view('emails.update-mail')->with(['inputs' => $input]);
     }
 }

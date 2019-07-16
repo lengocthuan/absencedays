@@ -18,27 +18,27 @@ class TypesTableSeeder extends Seeder
                 'requirement' => 'bit.ly/annual_leave'
             ],
             [
-                'name' => 'nghỉ ốm',
+                'name' => 'nghỉ phép ốm',
                 'requirement' => 'bit.ly/sick_leave_01'
             ],
             [
-                'name' => 'nghỉ việc riêng (kết hôn)',
+                'name' => 'nghỉ phép việc riêng (kết hôn)',
                 'requirement' => 'bit.ly/marriage_leave'
             ],
             [
-                'name' => 'nghỉ thai sản (khám thai)',
+                'name' => 'nghỉ phép thai sản (khám thai)',
                 'requirement' => 'bit.ly/maternity_leave_01'
             ],
             [
-                'name' => 'nghỉ việc riêng (ma chay)',
+                'name' => 'nghỉ phép việc riêng (ma chay)',
                 'requirement' => 'bit.ly/bereavement_leave'
             ],
             [
-                'name' => 'nghỉ không lương ngắn hạn',
+                'name' => 'nghỉ phép không lương ngắn hạn',
                 'requirement' => 'bit.ly/short_term_unpaid_leave'
             ],
             [
-                'name' => 'nghỉ không lương dài hạn',
+                'name' => 'nghỉ phép không lương dài hạn',
                 'requirement' => 'bit.ly/long_term_unpaid_leave'
             ],
         ];

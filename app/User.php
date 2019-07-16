@@ -114,14 +114,6 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     /**
      * Define relations images
      */
-    // public function image()
-    // {
-    //     return $this->hasOne(\App\Models\Image::class, 'object_id')->where('object_type', self::IMAGE_TYPE);
-    // }
-
-    /**
-     * Define relations images
-     */
     public function tokens()
     {
         return $this->hasMany(\App\Models\DeviceToken::class, 'user_id');

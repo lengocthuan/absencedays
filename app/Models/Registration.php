@@ -20,6 +20,12 @@ class Registration extends BaseModel
      * @var array
      */
     use InformationUserTrait;
+
+    const TYPE_ABSENCE = 'Từ ngày đến hết ngày';
+    const FULL = 'Cả Ngày';
+    const MORNING = 'Buổi Sáng';
+    const AFTERNOON = 'Buổi Chiều';
+
     protected $table = 'registrations';
     protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message'];
 
@@ -36,29 +42,21 @@ class Registration extends BaseModel
 
     public function getType()
     {
-        // $type = Type::find($this->type_id);
-        // return $type->name;
         return $this->belongsTo(\App\Models\Type::class, 'type_id');
     }
 
     public function getTimeAbsence()
     {
-        $timeAB = $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
-        if(empty($timeAB)) {
-            return $timeAB = null;
+        $timeAbsence = $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
+        if(empty($timeAbsence)) {
+            return $timeAbsence = null;
         }
-        return $timeAB;
+        return $timeAbsence;
     }
 
     public function getTotalTime()
     {
-        // $this->hasMany(\App\Models\TimeAbsence::class, 'registration_id');
-        // $total = $this->getTimeAbsence;
-        // dd($total);
-        // $user = User::find($this->user_id);
-        // return $user->name;
         $total = TimeAbsence::where('registration_id', $this->id)->select('absence_days')->get();
-        // dd($total);
         $sum = 0;
         foreach ($total as $value) {
             $sum += $value->absence_days;
@@ -66,18 +64,6 @@ class Registration extends BaseModel
         return $sum;
     }
 
-    // public function getApprover()
-    // {
-    //     $approver = Registration::where('id', $this->id)->select('approver_id')->get();
-    //     $app = explode(',', $approver[0]->approver_id); //array 0->2 ; 1->3
-    //     $arr = [];
-    //     foreach ($app as $value) {
-    //         $info = User::where('id', $value)->select('id', 'name', 'email')->get();
-    //         $r = ['id' => $info[0]['id'], 'name' => $info[0]['name'], 'email' => $info[0]['email']];
-    //         $arr[] = $r;
-    //     }
-    //     return $arr;
-    // }
     public function getMailto() {
         return $this->approvers()->where('type', 0)->pluck('email')->toArray();
     }
@@ -85,4 +71,5 @@ class Registration extends BaseModel
     public function getMailcc() {
         return $this->approvers()->where('type', 1)->pluck('email')->toArray();
     }
+
 }

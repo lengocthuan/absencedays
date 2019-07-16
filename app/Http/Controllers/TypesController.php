@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Requests\TypeCreateRequest;
 use App\Http\Requests\TypeUpdateRequest;
 use App\Repositories\Contracts\TypeRepository;
+use Illuminate\Http\Response;
 
 /**
  * Class TypesController.
@@ -38,19 +39,9 @@ class TypesController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
-        
-        $includes = request()->get('include', '');
+        $types = $this->repository->all();
 
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $types = $this->repository->paginate($limit, $columns = ['*']);
-
-        return response()->json($types);
+        return $this->success($types, trans('messages.type.success'));
     }
 
     /**
@@ -64,7 +55,7 @@ class TypesController extends Controller
     {
         $type = $this->repository->skipPresenter()->create($request->all());
 
-        return response()->json($type->presenter(), 201);
+        return $this->success($type->presenter(), trans('messages.type.create'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**
@@ -77,8 +68,8 @@ class TypesController extends Controller
     public function show($id)
     {
         $type = $this->repository->find($id);
-        
-        return response()->json($type);
+
+        return $this->success($type, trans('messages.type.success'));
     }
 
     /**
@@ -93,7 +84,7 @@ class TypesController extends Controller
     {
         $type = $this->repository->skipPresenter()->update($request->all(), $id);
 
-        return response()->json($type->presenter(), 200);
+        return $this->success($type->presenter(), trans('messages.type.update'));
     }
 
     /**
@@ -107,6 +98,6 @@ class TypesController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.type.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 }

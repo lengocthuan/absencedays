@@ -13,7 +13,7 @@ class TypeCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class TypeCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'sometimes|required|string|max:191',
         ];
     }
 }

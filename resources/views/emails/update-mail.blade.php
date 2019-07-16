@@ -299,7 +299,7 @@
                                                     <p class="content-title"><b>Xin {{ $inputs['typeId'] }}</b></p>
                                                     <div>
                                                         <h2>Xin chào, </h2>
-                                                        <h2>Tôi là {{$inputs['name']}},</h2>
+                                                        <h2>Tôi là {{ $inputs['name'] }},</h2>
                                                         @if($inputs['message'] == null)
                                                         <p>Tôi muốn cập nhật lại thông tin đăng ký nghỉ phép của mình như sau.</p>
                                                         @else

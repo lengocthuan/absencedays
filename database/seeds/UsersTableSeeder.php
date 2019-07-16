@@ -47,8 +47,7 @@ class UsersTableSeeder extends Seeder
             $roleSuperAdmin->attachPermission($value);
         }
 
-
-                // find or create user PM
+        // find or create user PM
         $user1 = \App\User::firstOrCreate(
             ['email' => 'pm@example.com'],
             [
@@ -61,7 +60,7 @@ class UsersTableSeeder extends Seeder
             ]
         );
 
-        // find or create role admin
+        // find or create role PM
         $rolePM = Role::firstOrCreate(
             ['name' => Role::PM],
             [
@@ -75,10 +74,10 @@ class UsersTableSeeder extends Seeder
             $user1->attachRole($rolePM);
         }
 
-        $per1 = Permission::where('id', '9')->get()->first();
-        $rolePM->attachPermission($per1);
+        $permission1 = Permission::where('id', '9')->get()->first();
+        $rolePM->attachPermission($permission1);
 
-                // find or create user Tech Lead
+        // find or create user Tech Lead
         $user2 = \App\User::firstOrCreate(
             ['email' => 'techlead@example.com'],
             [
@@ -91,7 +90,7 @@ class UsersTableSeeder extends Seeder
             ]
         );
 
-        // find or create role admin
+        // find or create role TechLead
         $roleTechLead = Role::firstOrCreate(
             ['name' => Role::TECH_LEAD],
             [
@@ -105,10 +104,10 @@ class UsersTableSeeder extends Seeder
             $user2->attachRole($roleTechLead);
         }
 
-        $per2 = Permission::where('id', '10')->get()->first();
-        $roleTechLead->attachPermission($per2);
+        $permission2 = Permission::where('id', '10')->get()->first();
+        $roleTechLead->attachPermission($permission2);
 
-                        // find or create user Member
+        // find or create user Member
         $user3 = \App\User::firstOrCreate(
             ['email' => 'member@example.com'],
             [

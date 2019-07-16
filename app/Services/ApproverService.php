@@ -11,41 +11,28 @@ class ApproverService
     {
         $approver = Registration::find($id);
 
-        $cut = explode(',', $atrributes['emails']);
-        $arr = array();
-        for ($i=0; $i < count($cut); $i++) { 
-            $mails = Approver::firstOrCreate(['email' => $cut[$i]]);
-            $arr[] = $mails;
+        $cutMailTo = explode(',', $atrributes['emails']);
+        $arrayMailTo = array();
+        for ($i=0; $i < count($cutMailTo); $i++) { 
+            $mails = Approver::firstOrCreate(['email' => $cutMailTo[$i]]);
+            $arrayMailTo[] = $mails;
         }
 
-        $cc = explode(',', $atrributes['cc']);
-        $arr1 = array();
-        for ($i=0; $i < count($cc); $i++) { 
-            $mails_cc = Approver::firstOrCreate(['email' => $cc[$i]]);
-            $arr1[] = $mails_cc;
+        $cutMailCc = explode(',', $atrributes['cc']);
+        $arrayMailCc = array();
+        for ($i=0; $i < count($cutMailCc); $i++) { 
+            $mailCc = Approver::firstOrCreate(['email' => $cutMailCc[$i]]);
+            $arrayMailCc[] = $mailCc;
         }
 
-        for ($i=0; $i < count($arr) ; $i++) { 
-            $approver->approvers()->attach($arr[$i]);
+        for ($i=0; $i < count($arrayMailTo) ; $i++) { 
+            $approver->approvers()->attach($arrayMailTo[$i]);
         }
 
-        for ($i=0; $i < count($arr1) ; $i++) {
-            $approver->approvers()->attach($arr1[$i]);
+        for ($i=0; $i < count($arrayMailCc) ; $i++) {
+            $approver->approvers()->attach($arrayMailCc[$i]);
         }
         return $approver;
     }
 
-    // public static function sync(User $user, $roleName)
-    // {
-    //     if (!$roleName) {
-    //         throwError('Please insert role name', 422);
-    //     }
-    //     if (!empty($roleName) && !in_array($roleName, Role::roles())) {
-    //         throwError('Some thing went wrong!', 500);
-    //     }
-    //     // find or create role admin
-    //     $role = Role::firstOrCreate(['name' => $roleName]);
-
-    //     return $user->roles()->sync($role);
-    // }
 }

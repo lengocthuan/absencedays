@@ -277,18 +277,18 @@
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <p class="content-title"><b>Xin {{ $inputs['type_id'] }}</b></p>
+                          <p class="content-title"><b>Xin {{ $inputs['typeId'] }}</b></p>
                           <div>
                             <h2>Xin chào, </h2>
                             <h2>Tôi là {{$inputs['name']}},</h2>
-                            @if($inputs['type_registration'] == 'From day to day')
+                            @if($inputs['typeAbsence'] == 'Từ ngày đến hết ngày')
                             <p>Tôi xin phép được nghỉ vào thời gian:<br>
-                              Từ ngày <b>{{ $inputs['timestart'] }}</b><br>
-                              Đến hết ngày <b>{{ $inputs['timeend'] }}</b>
+                              Từ ngày <b>{{ $inputs['timeStart'] }}</b><br>
+                              Đến hết ngày <b>{{ $inputs['timeEnd'] }}</b>
                             </p>
                             @else
                             <p>Tôi xin phép được nghỉ vào các thời gian sau:<br>
-                              <b>{{ $inputs['timeoff'] }}.</b><br>
+                              <b>{{ $inputs['timeOff'] }}.</b><br>
                             </p>
                             @endif
                             <p>Lý do: <i>{{ $inputs['reason'] }}.</i></p>

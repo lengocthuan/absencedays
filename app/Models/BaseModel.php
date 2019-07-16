@@ -9,4 +9,5 @@ use Prettus\Repository\Traits\PresentableTrait;
 class BaseModel extends Model implements Presentable
 {
     use PresentableTrait;
+
 }

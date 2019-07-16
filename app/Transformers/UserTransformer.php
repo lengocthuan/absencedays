@@ -35,13 +35,10 @@ class UserTransformer extends BaseTransformer
     {
         return [
             'roles' => $model->getRoles(),
-            // 'avatar' => $model->image ? Storage::url('thumbnails/' . $model->image->filename) : null,
-            // 'avatar' => $model,
             'tokens' => $model->tokens,
             'team' =>$model->getTeam,
             'position' =>$model->getPosition,
             'track' => $model->getTrack,
-            // 'role' => $model->getRole,
         ];
     }
 
@@ -61,11 +58,4 @@ class UserTransformer extends BaseTransformer
         return $this->item($image, new ImageTransformer, 'Image');
     }
 
-    // public function customAttributes($model): array
-    // {
-    //     return [
-    //         'user' => $model->getUser,
-    //         'type' => $model->getType,
-    //     ];
-    // }
 }

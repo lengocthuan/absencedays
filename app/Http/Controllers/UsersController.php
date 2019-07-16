@@ -10,6 +10,7 @@ use App\Repositories\Contracts\UserRepository;
 use App\User;
 use Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 
 /**
  * Class UsersController.
@@ -40,18 +41,9 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
-        $includes = request()->get('include', 'roles');
+        $users = $this->repository->all();
 
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $users = $this->repository->paginate($limit, $columns = ['*']);
-
-        return response()->json($users);
+        return $this->success($users, trans('messages.user.success'));
     }
 
     /**
@@ -62,8 +54,8 @@ class UsersController extends Controller
     public function me()
     {
         $user = $this->repository->parserResult(Auth::user());
-        // $user = parserResult(Auth::user());
-        return response()->json($user);
+
+        return $this->success($user, trans('messages.user.success'));
     }
 
     /**
@@ -103,7 +95,7 @@ class UsersController extends Controller
     {
         $user = $this->repository->skipPresenter()->create($request->all());
 
-        return $this->presenterPostJson($user);
+        return $this->success($user, trans('messages.user.create'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**
@@ -117,7 +109,7 @@ class UsersController extends Controller
     {
         $user = $this->repository->find($id);
 
-        return response()->json($user);
+        return $this->success($user, trans('messages.user.success'));
     }
 
     /**
@@ -132,7 +124,7 @@ class UsersController extends Controller
     {
         $user = $this->repository->skipPresenter()->update($request->all(), $user->id);
 
-        return $this->presenterPostJson($user, 200);
+        return $this->success($user->presenter(), trans('messages.user.update'));
     }
 
     /**
@@ -146,7 +138,7 @@ class UsersController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.user.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 
     /**
@@ -160,19 +152,13 @@ class UsersController extends Controller
     {
         $user = $this->repository->skipPresenter()->create(array_merge($request->all(), ['role' => 'member']));
 
-        return $this->presenterPostJson($user);
+        return $this->success($user, trans('messages.user.register'), ['code' => Response::HTTP_CREATED]);
     }
 
-    public function getusbyteam($id)
+    public function getUsersByTeam($id)
     {
         $user = $this->repository->findwhere(['team_id' => $id]);
-        return response()->json($user, 200);
-    }
 
-    public function getInformation()
-    {
-        $admin = $this->repository->userStatistics();
-        return response()->json($admin, 200);
+        return $this->success($user, trans('messages.user.success'));
     }
-
 }

@@ -14,9 +14,10 @@ class Approver extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['email'];
+    protected $fillable = ['email', 'type'];
 
     public function registrations() {
         return $this->belongsToMany(\App\Models\Registration::class);
     }
+
 }

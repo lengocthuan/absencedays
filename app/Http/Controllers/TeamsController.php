@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Requests\TeamCreateRequest;
 use App\Http\Requests\TeamUpdateRequest;
 use App\Repositories\Contracts\TeamRepository;
+use Illuminate\Http\Response;
 
 /**
  * Class TeamsController.
@@ -39,7 +40,8 @@ class TeamsController extends Controller
     public function index()
     {
         $teams = $this->repository->all();
-        return response()->json($teams);
+
+        return $this->success($teams, trans('messages.team.success'));
     }
 
     /**
@@ -53,7 +55,8 @@ class TeamsController extends Controller
     {
         $team = $this->repository->skipPresenter()->create($request->all());
 
-        return response()->json($team->presenter(), 201);
+        return $this->success($team->presenter(), trans('messages.team.create'), ['code' => Response::HTTP_CREATED]);
+
     }
 
     /**
@@ -67,7 +70,7 @@ class TeamsController extends Controller
     {
         $team = $this->repository->find($id);
         
-        return response()->json($team);
+        return $this->success($team, trans('messages.team.success'));
     }
 
     /**
@@ -82,7 +85,7 @@ class TeamsController extends Controller
     {
         $team = $this->repository->skipPresenter()->update($request->all(), $id);
 
-        return response()->json($team->presenter(), 200);
+        return $this->success($team->presenter(), trans('messages.team.update'));
     }
 
     /**
@@ -96,6 +99,6 @@ class TeamsController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.team.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 }

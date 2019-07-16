@@ -10,284 +10,281 @@ class TrackService
 {
     public static function update($id, array $attribute)
     {
-        // dd('ohan');
         $user = User::where('id', $attribute['user_id'])->select('first_workday')->get();
-        $first_workday = new Carbon($user[0]->first_workday);
-        $first_workday1 = $first_workday->toDateString();
-        $annual_leave_total = Carbon::parse($first_workday1)->age; //Calculate the total number of working years
-        // dd($annual_leave_total);
-        $year_annual = 12;
-        if ($annual_leave_total >= 5) {
-            for ($i = 0; $i <= $annual_leave_total; $i += 5) {
-                $addtime = $year_annual++;
+
+        $firstWorkday = new Carbon($user[0]->firstWorkday);
+        $firstWorkday1 = $firstWorkday->toDateString();
+        $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
+        $yearAnnual = 12;
+
+        if ($annualLeaveTotal >= 5) {
+            for ($i = 0; $i <= $annualLeaveTotal; $i += 5) {
+                $addTime = $yearAnnual++;
             }
         } else {
-            $addtime = $year_annual;
+            $addTime = $yearAnnual;
         }
 
         $year = Carbon::now()->format('Y');
-        $track_id = Track::where(['user_id' => $attribute['user_id'], 'year' => $year])->get();
-        // dd($track_id);
-        $track = Track::find($track_id[0]->id);
+        $trackId = Track::where(['user_id' => $attribute['user_id'], 'year' => $year])->get();
+        $track = Track::find($trackId[0]->id);
         $time = TimeAbsence::where('registration_id', $id)->select('time_details', 'absence_days')->get();
-        $newoff = 0;
-        $arr = array();
-        $arr1 = array();
-        $arr2 = array();
+
+        // $newOff = 0;
+        $arrayMonth = array();
+        $arrayYear = array();
+
         for ($i = 0; $i < count($time); $i++) {
-            $month = (new Carbon($time[$i]->time_details))->format('m');
-            $year1 = (new Carbon($time[$i]->time_details))->format('Y');
-            $arr[] = $month; //12 01 01              01        12
-            $arr1[] = $year1; //2019 2020 2020 2020 2019
+            $month = Carbon::parse($time[$i]->time_details)->format('m');
+            $year1 = Carbon::parse($time[$i]->time_details)->format('Y'); //this is year;
+            $arrayMonth[] = $month; //12 01 01              01        12
+            $arrayYear[] = $year1; //2019 2020 2020 2020 2019
         }
 
-        //
-        for ($i = 0; $i < count($arr1); $i++) {
-            if ($arr1[$i] == $year) {
-                switch ($arr[$i]) {
+        //check year and month and calculator sum;
+        for ($i = 0; $i < count($arrayYear); $i++) {
+            if ($arrayYear[$i] == $year) {
+                switch ($arrayMonth[$i]) {
                     case "01":
-                        $newoff += $time[$i]->absence_days;
-                        $track->January += $newoff;
+                        $newOff = $track->January;
+                        $track->January = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "02":
-                        $newoff += $time[$i]->absence_days;
-                        $track->February += $newoff;
+                        $newOff = $track->February;
+                        $track->February = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "03":
-                        $newoff += $time[$i]->absence_days;
-                        $track->March += $newoff;
+                        $newOff = $track->March;
+                        $track->March = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "04":
-                        $newoff += $time[$i]->absence_days;
-                        $track->April += $newoff;
+                        $newOff = $track->April;
+                        $track->April = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "05":
-                        $newoff += $time[$i]->absence_days;
-                        $track->May += $newoff;
+                        $newOff = $track->May;
+                        $track->May = $newOff +$time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "06":
-                        $newoff += $time[$i]->absence_days;
-                        $track->June += $newoff;
+                        $newOff = $track->June;
+                        $track->June = $newOff +$time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "07":
-                        $newoff += $time[$i]->absence_days;
-                        $track->July += $newoff;
+                        $newOff = $track->July;
+                        $track->July = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "08":
-                        $newoff += $time[$i]->absence_days;
-                        $track->August += $newoff;
+                        $newOff = $track->August;
+                        $track->August = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "09":
-                        $newoff += $time[$i]->absence_days;
-                        $track->September += $newoff;
+                        $newOff = $track->September;
+                        $track->September = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "10":
-                        $newoff += $time[$i]->absence_days;
-                        $track->October += $newoff;
+                        $newOff = $track->October;
+                        $track->October = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "11":
-                        $newoff += $time[$i]->absence_days;
-                        $track->November += $newoff;
+                        $newOff = $track->November;
+                        $track->November = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "12":
-                        $newoff += $time[$i]->absence_days;
-                        $track->December += $newoff;
+                        $newOff = $track->December;
+                        $track->December = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
 
                     default:
-                        return 'Invalid';
                         break;
                 }
-            } elseif ($arr1[$i] != $year) {
-                $check = Track::where('year', $arr1[$i])->get();
+            } elseif ($arrayYear[$i] != $year) {
+                $check = Track::where('year', $arrayYear[$i])->get();
                 if (count($check) == 0) {
                     $add = new Track;
                     $add->year = $year + 1;
                     $add->user_id = $attribute['user_id'];
-                    $add->annual_leave_total = $addtime;
-                    $timeoff = 0;
-                    switch ($arr[$i]) {
+                    $add->annual_leave_total = $addTime;
+                    // $timeOff = 0;
+                    switch ($arrayMonth[$i]) {
                         case "01":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->January += $timeoff;
+                            $timeOff = $add->January;
+                            $add->January = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "02":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->February += $timeoff;
+                            $timeOff = $add->February;
+                            $add->February = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "03":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->March += $timeoff;
+                            $timeOff = $add->March;
+                            $add->March = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "04":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->April += $timeoff;
+                            $timeOff = $add->April;
+                            $add->April = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "05":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->May += $timeoff;
+                            $timeOff = $add->May;
+                            $add->May = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "06":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->June += $timeoff;
+                            $timeOff = $add->June;
+                            $add->June = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "07":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->July += $timeoff;
+                            $timeOff = $add->July;
+                            $add->July = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "08":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->August += $timeoff;
+                            $timeOff = $add->August;
+                            $add->August = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "09":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->September += $timeoff;
+                            $timeOff = $add->September;
+                            $add->September = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "10":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->October += $timeoff;
+                            $timeOff = $add->October;
+                            $add->October = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "11":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->November += $timeoff;
+                            $timeOff = $add->November;
+                            $add->November = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
                         case "12":
-                            $timeoff += $time[$i]->absence_days;
-                            $add->December += $timeoff;
+                            $timeOff = $add->December;
+                            $add->December = $timeOff + $time[$i]->absence_days;
                             $add->annual_leave_unused = $add->annual_leave_total - ($add->January + $add->February + $add->March + $add->April + $add->May + $add->June + $add->July + $add->August + $add->September + $add->October + $add->November + $add->December);
                             $add->save();
                             break;
 
                         default:
-                            return 'Invalid1';
                             break;
                     }
 
                 } else {
-                    $newtrack = Track::find($check[0]->id);
-                    $timeoff = 0;
-                    switch ($arr[$i]) {
+                    $newTrack = Track::find($check[0]->id);
+                    $timeOff = 0;
+                    switch ($arrayMonth[$i]) {
                         case "01":
-                            $timeoff += $time[$i]->absence_days;
-                            $newtrack->January += $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->January;
+                            $newTrack->January = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "02":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->February = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->February;
+                            $newTrack->February = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "03":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->March = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->March;
+                            $newTrack->March = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "04":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->April = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->April;
+                            $newTrack->April = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "05":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->May = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->May;
+                            $newTrack->May = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "06":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->June = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->June;
+                            $newTrack->June = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "07":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->July = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->July;
+                            $newTrack->July = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "08":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->August = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->August;
+                            $newTrack->August = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "09":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->September = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->September;
+                            $newTrack->September = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "10":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->October = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->October;
+                            $newTrack->October = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "11":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->November = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->November;
+                            $newTrack->November = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
                         case "12":
-                            $timeoff += $time[$i]->absence_days;
-                            $check->December = $timeoff;
-                            $newtrack->annual_leave_unused = $newtrack->annual_leave_total - ($newtrack->January + $newtrack->February + $newtrack->March + $newtrack->April + $newtrack->May + $newtrack->June + $newtrack->July + $newtrack->August + $newtrack->September + $newtrack->October + $newtrack->November + $newtrack->December);
-                            $newtrack->save();
+                            $timeOff = $newTrack->December;
+                            $newTrack->December = $timeOff + $time[$i]->absence_days;
+                            $newTrack->annual_leave_unused = $newTrack->annual_leave_total - ($newTrack->January + $newTrack->February + $newTrack->March + $newTrack->April + $newTrack->May + $newTrack->June + $newTrack->July + $newTrack->August + $newTrack->September + $newTrack->October + $newTrack->November + $newTrack->December);
+                            $newTrack->save();
                             break;
 
                         default:
-                            return 'Invalid2';
                             break;
                     }
                 }
@@ -298,17 +295,17 @@ class TrackService
     public static function create($id)
     {
         $user = User::where('id', $id)->select('first_workday')->get();
-        $first_workday = new Carbon($user[0]->first_workday);
-        $first_workday1 = $first_workday->toDateString();
-        $annual_leave_total = Carbon::parse($first_workday1)->age; //Calculate the total number of working years
-        // dd($annual_leave_total);
+        $firstWorkday = new Carbon($user[0]->firstWorkday);
+        $firstWorkday1 = $firstWorkday->toDateString();
+        $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
         $year = 12;
-        if ($annual_leave_total >= 5) {
-            for ($i = 0; $i <= $annual_leave_total; $i += 5) {
-                $add = $year++;
+
+        if ($annualLeaveTotal >= 5) {
+            for ($i = 0; $i <= $annualLeaveTotal; $i += 5) {
+                $addTime = $year++;
             }
         } else {
-            $add = $year;
+            $addTime = $year;
         }
 
         $check = Track::where('user_id', $id)->get();
@@ -316,35 +313,9 @@ class TrackService
             $new = new Track;
             $new->year = Carbon::now()->format('Y');
             $new->user_id = $id;
-            $new->annual_leave_total = $add;
+            $new->annual_leave_total = $addTime;
             $new->save();
         }
-    }
-
-    public static function search($attributes)
-    {
-        // $registration = array();
-        // foreach ($id as $value) {
-        //     $registration[] = $value->id;
-        // // }
-        // dd('abc');
-        // if (isset($attributes['from']) && isset($attributes['to'])) {
-        //     $from = $attributes['from'];
-        //     $to = $attributes['to'];
-        //     $result = TimeAbsence::where('time_details','>=', $from)->where('time_details', '<=', $to)->select('registration_id','time_details', 'at_time', 'absence_days')->get();
-        //     return $result;
-        // } elseif (isset($attributes['month'])) {
-        //     $time = $attributes['month'];
-        //     $cut = explode('-', $time);
-        //     $month = $cut[1];
-        //     $year = $cut[0];
-        //     $result = TimeAbsence::whereMonth('time_details', $month)->whereYear('time_details', $year)->select('registration_id','time_details', 'at_time', 'absence_days')->get();
-        //     return $result;
-        // } else {
-        //     $time = $attributes['year'];
-        //     $result = TimeAbsence::whereYear('time_details', $time)->select('registration_id','time_details', 'at_time', 'absence_days')->get();
-        //     return $result;
-        // }
     }
 
 }

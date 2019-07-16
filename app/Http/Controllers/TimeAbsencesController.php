@@ -7,6 +7,7 @@ use App\Http\Requests\TimeAbsenceUpdateRequest;
 use App\Models\TimeAbsence;
 use App\Repositories\Contracts\TimeAbsenceRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * Class TimeAbsencesController.
@@ -38,7 +39,8 @@ class TimeAbsencesController extends Controller
     public function index()
     {
         $timeAbsences = $this->repository->all();
-        return response()->json($timeAbsences);
+
+        return $this->success($timeAbsences, trans('messages.timeabsence.success'));
     }
 
     /**
@@ -55,18 +57,8 @@ class TimeAbsencesController extends Controller
         // return response()->json($timeAbsence, 201);
 
         $timeAbsence = $this->repository->skipPresenter()->create($request->all());
-        if ($timeAbsence == 'Over') {
-            $error = 'You must not register for a continuous stay for more than 15 consecutive days.';
-            return response()->json($error, 404);
-        } elseif ($timeAbsence == 'Invalidate') {
-            $error = 'Registration time is invalid. Please, try again.';
-            return response()->json($error, 404);
-        } elseif ($timeAbsence == 'InvalidateType') {
-            $error = 'Selection of inappropriate registration. Please try again.';
-            return response()->json($error, 404);
-        } else {
-            return response()->json($timeAbsence, 201);
-        }
+
+        return $this->success($timeAbsence, trans('messages.timeabsence.create'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**
@@ -80,7 +72,7 @@ class TimeAbsencesController extends Controller
     {
         $timeAbsence = $this->repository->find($id);
 
-        return response()->json($timeAbsence);
+        return $this->success($timeAbsence, trans('messages.timeabsence.success'));
     }
 
     /**
@@ -95,7 +87,7 @@ class TimeAbsencesController extends Controller
     {
         $timeAbsence = $this->repository->skipPresenter()->update($request->all(), $id);
 
-        return response()->json($timeAbsence->presenter(), 200);
+        return $this->success($timeAbsence, trans('messages.timeabsence.update'));
     }
 
     /**
@@ -109,19 +101,7 @@ class TimeAbsencesController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.timeabsence.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 
-    public function statistic($id)
-    {
-        /*
-        get Total absence days for a user in a registration.
-         */
-        $total = TimeAbsence::where('registration_id', $id)->select('absence_days')->get();
-        $sum = 0;
-        foreach ($total as $value) {
-            $sum += $value->absence_days;
-        }
-        return $sum;
-    }
 }

@@ -32,26 +32,29 @@ class Track extends BaseModel
     public function getRegistration()
     {
         $id = $this->user_id;
-        // dd($id);
         $registration = Registration::where('user_id', $id)->get();
-        $arr = array();
+        $arrayRegistration = array();
+
         for ($i = 0; $i < count($registration); $i++) {
-            $arr[] = $registration[$i]->id;
+            $arrayRegistration[] = $registration[$i]->id;
         }
-        // dd($arr);
-        $value = array();
-        $arr2 = array();
-        for ($i = 0; $i < count($arr); $i++) {
-            $time = TimeAbsence::where('registration_id', $arr[$i])->get();
-            // dd($time);
-            $value[] = $time;
+
+        $arrayTimeAbsence = array();
+        $arrayResult = array();
+
+        for ($i = 0; $i < count($arrayRegistration); $i++) {
+            $time = TimeAbsence::where('registration_id', $arrayRegistration[$i])->get();
+            $arrayTimeAbsence[] = $time;
         }
-        foreach ($value as $val) {
+
+        foreach ($arrayTimeAbsence as $val) {
             for ($i = 0; $i < count($val); $i++) {
                 $merge = ['id' => $val[$i]['id'], 'registration_id' => $val[$i]['registration_id'], 'type' => $val[$i]['type'], 'time_details' => $val[$i]['time_details'], 'at_time' => $val[$i]['at_time'], 'absence_days' => $val[$i]['absence_days'], 'current_year' => $val[$i]['current_year'], 'general_information' => $val[$i]['general_information'], 'created_at' => $val[$i]['created_at'], 'updated_at' => $val[$i]['updated_at']];
-                $arr2[] = $merge;
+                $arrayResult[] = $merge;
             }
         }
-        return $arr2;
+
+        return $arrayResult;
     }
+
 }

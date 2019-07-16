@@ -37,4 +37,5 @@ class TrackTransformer extends BaseTransformer
             'registration' => $model->getRegistration(),
         ];
     }
+
 }

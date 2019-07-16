@@ -24,7 +24,6 @@ class UserUpdateRequest extends BaseRequest
     public function rules()
     {
         $id = request()->id ? request()->id : request()->segment(4);
-
         return [
             'name' => 'sometimes|string|max:191',
             'email' => "sometimes|string|unique:users,email,$id",
@@ -33,6 +32,9 @@ class UserUpdateRequest extends BaseRequest
             'password' => 'sometimes|string',
             'address' => 'sometimes|nullable|string|max:191',
             'role' => 'sometimes|string|in:' . implode(',', Role::roles()),
+            'first_workday' => 'sometimes|required|date_format:Y-m-d',
+            'team_id' => 'sometimes|required',
+            'position_id' => 'sometimes|required',
         ];
     }
 
@@ -43,6 +45,7 @@ class UserUpdateRequest extends BaseRequest
     {
         return [
             'role.in' => 'The selected role is invalid. Must be in ' . implode(', ', Role::roles()),
+            'first_workday.date_format' => 'The Please enter the time in accordance with the following format: Year-Month-Day',
         ];
     }
 }

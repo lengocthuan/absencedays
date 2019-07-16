@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Requests\PositionCreateRequest;
 use App\Http\Requests\PositionUpdateRequest;
 use App\Repositories\Contracts\PositionRepository;
+use Illuminate\Http\Response;
 
 /**
  * Class PositionsController.
@@ -38,19 +39,9 @@ class PositionsController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
-        
-        $includes = request()->get('include', '');
+        $positions = $this->repository->all();
 
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $positions = $this->repository->paginate($limit, $columns = ['*']);
-
-        return response()->json($positions);
+        return $this->success($positions, trans('messages.position.success'));
     }
 
     /**
@@ -64,7 +55,7 @@ class PositionsController extends Controller
     {
         $position = $this->repository->skipPresenter()->create($request->all());
 
-        return response()->json($position->presenter(), 201);
+        return $this->success($position->presenter(), trans('messages.position.create'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**
@@ -77,8 +68,8 @@ class PositionsController extends Controller
     public function show($id)
     {
         $position = $this->repository->find($id);
-        
-        return response()->json($position);
+
+        return $this->success($position, trans('messages.position.success'));
     }
 
     /**
@@ -93,7 +84,7 @@ class PositionsController extends Controller
     {
         $position = $this->repository->skipPresenter()->update($request->all(), $id);
 
-        return response()->json($position->presenter(), 200);
+        return $this->success($position->presenter(), trans('messages.position.update'));
     }
 
     /**
@@ -107,6 +98,6 @@ class PositionsController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.position.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 }

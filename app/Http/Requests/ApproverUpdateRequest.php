@@ -13,7 +13,7 @@ class ApproverUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,8 @@ class ApproverUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'email' => 'sometimes|required',
+            'type' => 'sometimes|required|numeric|max:1',
         ];
     }
 }

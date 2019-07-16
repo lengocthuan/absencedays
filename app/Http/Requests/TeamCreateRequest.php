@@ -24,7 +24,8 @@ class TeamCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'sometimes|required',
+            'description' => 'sometimes|string|max:191',
         ];
     }
 }

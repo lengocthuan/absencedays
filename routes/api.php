@@ -15,78 +15,44 @@
  * Authorized resources
  */
 Route::group(['prefix' => 'v1'], function () {
-    Route::get('getusbyteam/{id}', 'UsersController@getusbyteam');
-    Route::post('auth/login', 'Auth\AuthController@login');
     //auth
+    Route::post('auth/login', 'Auth\AuthController@login');
     Route::post('auth/logout', 'Auth\AuthController@logout');
-    Route::post('auth/facebook', 'Auth\AuthFacebookController@login');
     Route::post('auth/google', 'Auth\AuthGoogleController@login');
-    Route::post('password/forgot/request', 'Auth\ForgotPasswordController@getResetToken');
-    Route::post('password/forgot/reset', 'Auth\ResetPasswordController@reset');
 
     //user information
     Route::get('me', 'UsersController@me');
-    // Route::get('teamlead', 'UsersController@getUsTeamLead');
-    //registration a new user
-    Route::post('register', 'UsersController@register');
+    Route::post('registers', 'UsersController@register');
+    Route::get('get_users_by_team/{id}', 'UsersController@getUsersByTeam');
 
-    //create a new user from supper admin with another role
-    // Route::resource('timeabsence', 'TimeAbsencesController');
+    Route::resource('absences', 'RegistrationsController');
 
-    //edit a user
+    Route::get('tests', 'RegistrationsController@test');
+    Route::put('updated_1/{id}', 'RegistrationsController@updateStatus1'); //approved
+    Route::put('updated_2/{id}', 'RegistrationsController@updateStatus2'); //disapproved
+    Route::put('updated_3/{id}', 'RegistrationsController@updateMessage'); //send message and no update status;
 
-    //remove a user
+    Route::get('searches', 'RegistrationsController@search');
+    Route::get('search_regispending', 'RegistrationsController@searchRegistrationPending'); //search trong danh sách mấy cái đang chờ duyệt;
 
-    //create a new team
-    //edit a team
-    //remove a team
-    //create a new position
-    //edit a position
-    //remove a position
-    //create new type
-    //edit a type
-    //remove a type
-    //create new registration
-    // Route::post('absence/registration', 'RegistrationsController@store');
-    Route::resource('absence', 'RegistrationsController');
-
-    Route::get('test', 'RegistrationsController@test');
-    Route::put('updated/{id}', 'RegistrationsController@updateStatusRegis'); //cái này gửi thông tin và thay đổi trạng thái đã duyệt
-    Route::put('updated2/{id}', 'RegistrationsController@updateStatusRegis2'); //cái này gửi thông tin và thay đổi trạng thái ko duyệt
-    Route::put('updated3/{id}', 'RegistrationsController@updateMessage'); //cái này dùng khi chỉ gửi mess mà ko update thông tin;
-
-    Route::get('search', 'RegistrationsController@search');
-    Route::get('searchpending', 'RegistrationsController@searchPending');
-    Route::get('searchapproved', 'RegistrationsController@searchApproved');
-    Route::get('searchdisapproved', 'RegistrationsController@searchDisApproved');
-    Route::get('searchregispending', 'RegistrationsController@searchRegisPending'); //search trong danh sách mấy cái đang chờ duyệt;
-
-    Route::get('information', 'RegistrationsController@getProfile');
-    Route::get('approved', 'RegistrationsController@getApproved');
-    Route::get('disapproved', 'RegistrationsController@getDisApproved');
-    Route::get('pending', 'RegistrationsController@getRegisPending');
+    Route::get('informations', 'RegistrationsController@getStatus');
+    Route::get('pending', 'RegistrationsController@getRegistrationPending');
     Route::get('sum/{id}', 'TimeAbsencesController@statistic');
 
-    Route::get('statistic', 'UsersController@getInformation');
+    Route::resource('types', 'TypesController');
+    Route::resource('teams', 'TeamsController');
+    Route::resource('positions', 'PositionsController');
+    Route::resource('approvers', 'ApproversController');
 
-
+    Route::get('mails_to', 'ApproversController@getMailto');
+    Route::get('mails_cc', 'ApproversController@getMailcc');
     
-    // //edit a registration
-    // Route::post('absence/edit', 'RegistrationsController@update');
-    // //remove a gistration
-    // Route::post('absence/remove', 'RegistrationsController@destroy');
-    Route::resource('type', 'TypesController');
-    Route::resource('team', 'TeamsController');
-    Route::resource('position', 'PositionsController');
-    Route::resource('approver', 'ApproversController');
-    Route::get('to', 'ApproversController@getMailto');
-    Route::get('cc', 'ApproversController@getMailcc');
-    Route::resource('track', 'TracksController');
-    Route::resource('timeabsence', 'TimeAbsenceController');
+    Route::resource('tracks', 'TracksController');
+    Route::resource('time_absences', 'TimeAbsencesController');
 
     Route::get('statistical', 'TracksController@getStatistical');
-    Route::get('export', 'TracksController@export');
-    Route::get('exportstatistical', 'TracksController@exportStatistical');
+    Route::get('exports', 'TracksController@export');
+    Route::get('exports_statistical', 'TracksController@exportStatistical');
 
 });
 
@@ -101,5 +67,4 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('users', 'UsersController');
     //promotions
     // images
-    Route::resource('images', 'ImagesController')->only(['store', 'destroy']);
 });

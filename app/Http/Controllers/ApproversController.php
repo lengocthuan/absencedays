@@ -6,6 +6,7 @@ use App\Http\Requests\ApproverCreateRequest;
 use App\Http\Requests\ApproverUpdateRequest;
 use App\Repositories\Contracts\ApproverRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * Class ApproversController.
@@ -36,19 +37,9 @@ class ApproversController extends Controller
      */
     public function index()
     {
-        $limit = request()->get('limit', null);
+        $approvers = $this->repository->all();
 
-        $includes = request()->get('include', '');
-
-        if ($includes) {
-            $this->repository->with(explode(',', $includes));
-        }
-
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $approvers = $this->repository->paginate($limit, $columns = ['*']);
-
-        return response()->json($approvers);
+        return $this->success($approvers, trans('messages.approver.success'));
     }
 
     /**
@@ -62,7 +53,7 @@ class ApproversController extends Controller
     {
         $approver = $this->repository->skipPresenter()->create($request->all());
 
-        return response()->json($approver->presenter(), 201);
+        return $this->success($approver->presenter(), trans('messages.approver.create'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**
@@ -76,7 +67,7 @@ class ApproversController extends Controller
     {
         $approver = $this->repository->find($id);
 
-        return response()->json($approver);
+        return $this->success($approver, trans('messages.approver.success'));
     }
 
     /**
@@ -91,7 +82,7 @@ class ApproversController extends Controller
     {
         $approver = $this->repository->skipPresenter()->update($request->all(), $id);
 
-        return response()->json($approver->presenter(), 200);
+        return $this->success($approver->presenter(), trans('messages.approver.update'));
     }
 
     /**
@@ -105,18 +96,20 @@ class ApproversController extends Controller
     {
         $this->repository->delete($id);
 
-        return response()->json(null, 204);
+        return $this->success([], trans('messages.approver.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 
     public function getMailto()
     {
-        $to = $this->repository->findwhere(['type' => 0]);
-        return response()->json($to, 200);
+        $mailTo = $this->repository->findwhere(['type' => 0]);
+
+        return $this->success($mailTo, trans('messages.approver.success'));
     }
 
     public function getMailcc()
     {
-        $cc = $this->repository->findwhere(['type' => 1]);
-        return response()->json($cc, 200);
+        $mailCc = $this->repository->findwhere(['type' => 1]);
+
+        return $this->success($mailCc, trans('messages.approver.success'));
     }
 }
