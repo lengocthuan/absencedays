@@ -291,7 +291,7 @@
                               <b>{{ $inputs['timeOff'] }}.</b><br>
                             </p>
                             @endif
-                            <p>Lý do: <i>{{ $inputs['reason'] }}.</i></p>
+                            <p>Lý do: <b><i>{{ $inputs['reason'] }}.</i></b></p>
                             <p><b>Vui lòng kiểm duyệt đợt nghỉ phép này của tôi tại đây:</b></p>
                             <p class="btn"><a class="button-primary" href="">Duyệt ngày phép</a></p>
                           </div>

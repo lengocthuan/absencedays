@@ -99,17 +99,17 @@ class ApproversController extends Controller
         return $this->success([], trans('messages.approver.delete'), ['code' => Response::HTTP_NO_CONTENT, 'isShowData' => false]);
     }
 
-    public function getMailto()
-    {
-        $mailTo = $this->repository->findwhere(['type' => 0]);
+    // public function getMailto()
+    // {
+    //     $mailTo = $this->repository->findwhere(['type' => 0]);
 
-        return $this->success($mailTo, trans('messages.approver.success'));
-    }
+    //     return $this->success($mailTo, trans('messages.approver.success'));
+    // }
 
-    public function getMailcc()
-    {
-        $mailCc = $this->repository->findwhere(['type' => 1]);
+    // public function getMailcc()
+    // {
+    //     $mailCc = $this->repository->findwhere(['type' => 1]);
 
-        return $this->success($mailCc, trans('messages.approver.success'));
-    }
+    //     return $this->success($mailCc, trans('messages.approver.success'));
+    // }
 }

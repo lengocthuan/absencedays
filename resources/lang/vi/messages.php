@@ -12,6 +12,8 @@ return [
         'search' => "Search information successfully.",
         'updateStatus' => "Update status for registration successfully.",
         'invalidRegistration' => 'Registraion Invalid',
+        'error' => 'Bad Request',
+        'duplicate' => 'Attributes mails for to and mails for cc has been matched.',
     ],
     'user' => [
         'success' => 'Get information user successfully.',

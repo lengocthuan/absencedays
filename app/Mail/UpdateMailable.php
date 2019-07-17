@@ -29,7 +29,7 @@ class UpdateMailable extends Mailable
      */
     public function build()
     {
-        $subject = '[Nhân sự] Xin ' . $this->data['typeId'];
+        $subject = '[Nhân sự] Xin ' . $this->data['typeId'] . '-' . $this->data['titleTime'];
         $mailTo = $this->data['to'];
         $mailCc = $this->data['cc'];
         $input = [

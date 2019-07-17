@@ -132,8 +132,11 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             $id[] = $date[$i]->id;
         }
 
+        $addMail = ApproverService::add($resgistration['data']['id'], $attributes);
+        if($addMail == false) {
+            return false;
+        }
         TimeAbsenceService::add($resgistration['data']['id'], $attributes);
-        ApproverService::add($resgistration['data']['id'], $attributes);
         TrackService::update($resgistration['data']['id'], $attributes);
 
         //send mail
@@ -209,7 +212,8 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 $time = $date->toDateString() . " " . "(" . $newTime[$i]['at_time'] . ")";
                 $newDayOff[] = $time;
             }
-
+            $cutDate = explode(' ', $newDayOff[0]);
+            $showTitleTime = Carbon::parse($cutDate[0])->format('d/m/Y');
             $newDayOff = implode(', ', $newDayOff);
             $newNote = $new['data']['attributes']['note'];
             $newType = $new['data']['attributes']['type']['name'];
@@ -227,6 +231,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 'to' => $oldTo,
                 'cc' => $oldCc,
                 'message' => $newMessage,
+                'titleTime' => $showTitleTime,
             ];
             Mail::queue(new UpdateMailable($data));
             return $new;

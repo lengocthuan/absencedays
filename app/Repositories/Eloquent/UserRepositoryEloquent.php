@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\User;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Image;
 use App\Services\RoleService;
 use App\Repositories\Contracts\UserRepository;
@@ -89,5 +90,22 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
         $user = $user->refresh();
 
         return $user;
+    }
+
+    public function getMail()
+    {
+        $email = Auth::user()->email;
+        $emailExcept = User::whereIn('id', ['1', '2', '3', '4'])->select('email')->get();
+        foreach ($emailExcept as $value) {
+            $arrayEmailExcept[] = $value->email;
+        }
+        $emailExceptForTo = array_merge($arrayEmailExcept, (array)$email);
+        $mail = User::whereNotIn('email', $emailExceptForTo)->select('email')->get();
+        for ($i=0; $i < count($mail) ; $i++) { 
+            $emailSend[] = $mail[$i]->email;
+        }
+        $data = ['data' => $emailSend];
+
+        return $data;
     }
 }

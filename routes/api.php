@@ -24,6 +24,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('me', 'UsersController@me');
     Route::post('registers', 'UsersController@register');
     Route::get('get_users_by_team/{id}', 'UsersController@getUsersByTeam');
+    Route::get('get_mails', 'UsersController@getMail');
 
     Route::resource('absences', 'RegistrationsController');
 

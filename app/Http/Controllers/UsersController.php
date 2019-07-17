@@ -161,4 +161,11 @@ class UsersController extends Controller
 
         return $this->success($user, trans('messages.user.success'));
     }
+
+    public function getMail()
+    {
+        $data = $this->repository->getMail();
+
+        return $this->success($data, trans('messages.user.success'));
+    }
 }

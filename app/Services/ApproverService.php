@@ -12,16 +12,23 @@ class ApproverService
         $approver = Registration::find($id);
 
         $cutMailTo = explode(',', $atrributes['emails']);
-        $arrayMailTo = array();
+        $cutMailCc = explode(',', $atrributes['cc']);
+
+        for ($i=0; $i < count($cutMailTo) ; $i++) {
+            for ($j=0; $j < count($cutMailCc); $j++) { 
+                if($cutMailTo[$i] == $cutMailCc[$j]) {
+                    return false; //compare mail to and cc and not allow matched;
+                }
+            }
+        }
+
         for ($i=0; $i < count($cutMailTo); $i++) { 
-            $mails = Approver::firstOrCreate(['email' => $cutMailTo[$i]]);
+            $mails = Approver::create(['email' => $cutMailTo[$i], 'type' => 0]);
             $arrayMailTo[] = $mails;
         }
 
-        $cutMailCc = explode(',', $atrributes['cc']);
-        $arrayMailCc = array();
         for ($i=0; $i < count($cutMailCc); $i++) { 
-            $mailCc = Approver::firstOrCreate(['email' => $cutMailCc[$i]]);
+            $mailCc = Approver::create(['email' => $cutMailCc[$i], 'type' => 1]);
             $arrayMailCc[] = $mailCc;
         }
 
@@ -32,7 +39,9 @@ class ApproverService
         for ($i=0; $i < count($arrayMailCc) ; $i++) {
             $approver->approvers()->attach($arrayMailCc[$i]);
         }
+
         return $approver;
+
     }
 
 }

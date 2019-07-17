@@ -58,8 +58,10 @@ class RegistrationsController extends Controller
     public function store(RegistrationCreateRequest $request)
     {
         $registration = $this->repository->create($request->all());
-
-        return $this->success($registration, trans('messages.registration.createSuccess'), ['code' => Response::HTTP_CREATED]);
+        if($registration) {
+            return $this->success($registration, trans('messages.registration.createSuccess'), ['code' => Response::HTTP_CREATED]);
+        }
+        return $this->error(trans('messages.registration.error'), trans('messages.registration.duplicate'), Response::HTTP_BAD_REQUEST);
     }
 
     /**
