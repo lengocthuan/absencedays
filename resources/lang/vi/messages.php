@@ -29,6 +29,8 @@ return [
         'delete' => 'Delete track successfully.',
         'statistical' => 'Get information for statistical track successfully.',
         'create' => 'Create a track successfully.',
+        'error' => 'Bad request',
+        'newest' => 'Table Track has been updated.',
     ],
     'type' => [
         'success' => 'Get information type successfully',

@@ -24,12 +24,16 @@ class UserCreateRequest extends BaseRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:191',
-            'email' => 'required|string|unique:users,email',
-            'password' => 'required|string',
-            'phone' => 'sometimes|nullable|numeric|unique:users,phone',
+            'name' => 'sometimes|required|string|max:191',
+            'email' => 'sometimes|required|string|unique:users,email',
+            'phone' => 'sometimes|string|unique:users,phone',
+            'photo' => 'sometimes|nullable|numeric|exists:images',
+            'password' => 'sometimes|required|string',
             'address' => 'sometimes|nullable|string|max:191',
-            'role' => 'required|string|in:' . implode(',', Role::roles()),
+            'role' => 'sometimes|required|string|in:' . implode(',', Role::roles()),
+            'first_workday' => 'sometimes|required|date_format:Y-m-d',
+            'team_id' => 'sometimes|required',
+            'position_id' => 'sometimes|required',
         ];
     }
 

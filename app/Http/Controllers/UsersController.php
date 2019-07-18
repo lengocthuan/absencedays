@@ -95,7 +95,7 @@ class UsersController extends Controller
     {
         $user = $this->repository->skipPresenter()->create($request->all());
 
-        return $this->success($user, trans('messages.user.create'), ['code' => Response::HTTP_CREATED]);
+        return $this->success($user->presenter(), trans('messages.user.create'), ['code' => Response::HTTP_CREATED]);
     }
 
     /**

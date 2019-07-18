@@ -20,7 +20,7 @@ class Track extends BaseModel
      * @var array
      */
     use InformationUserTrait;
-    protected $fillable = ['user_id', 'year', 'annual_leave_total', 'annual_leave_unused', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    protected $fillable = ['user_id', 'year', 'annual_leave_total', 'annual_leave_unused', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'sick_leave', 'marriage_leave', 'maternity_leave', 'bereavement_leave', 'unpaid_leave'];
 
     private $user;
 

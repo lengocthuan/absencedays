@@ -12,6 +12,8 @@ use App\Http\Requests\TrackUpdateRequest;
 use App\Repositories\Contracts\TrackRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
+use App\User;
+use App\Models\Track;
 
 /**
  * Class TracksController.
@@ -108,5 +110,15 @@ class TracksController extends Controller
     {
         $now = Carbon::now()->toDateString();
         return Excel::download(new StatisticalsExport, "Thống kê tổng quan theo năm-ngày xuất bản-$now.xlsx");
+    }
+
+    public function updateFromUser()
+    {
+        $result = $this->repository->fromUser();
+        $data = $this->repository->all();
+        if($result) {
+            return $this->success($data, trans('messages.track.success'));
+        }
+        return $this->error(trans('messages.track.error'), trans('messages.track.newest'), Response::HTTP_BAD_REQUEST);
     }
 }

@@ -11,6 +11,7 @@ use App\User;
 use Carbon\Carbon;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
+use App\Services\TrackService;
 
 /**
  * Class TrackRepositoryEloquent.
@@ -123,11 +124,48 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
     {
         $currentUsers = $this->model()::where('user_id', $attributes['user_id'])->select('id', 'user_id', 'year')->get();
         foreach ($currentUsers as $value) {
-            if($value->year == $attributes['year']) {
+            if ($value->year == $attributes['year']) {
                 return false;
             }
         }
         return parent::create($attributes);
+    }
+
+    public function fromUser()
+    {
+        $newUser = Track::select('user_id', 'year')->get();
+
+        for ($i = 0; $i < count($newUser); $i++) {
+            $newArray[] = $newUser[$i]->user_id . ' ' . $newUser[$i]->year;
+        }
+        $oldArray = $newArray;
+
+        $now = Carbon::now()->format('Y');
+        $user = User::select('id')->get();
+        foreach ($user as $key => $value) {
+            $newArray[] = $value->id . ' ' . $now;
+        }
+
+        $result = array_diff($newArray, $oldArray);
+
+        if ($result != null) {
+            foreach ($result as $value) {
+                $arrayCut[] = explode(' ', $value);
+            }
+
+            
+            for ($i = 0; $i < count($arrayCut); $i++) {
+                $addTime = TrackService::calculatorYear($arrayCut[$i][0]);
+                $arrayNull[] = ['year' => $arrayCut[$i][1], 'user_id' => $arrayCut[$i][0], 'annual_leave_total' => $addTime, 'annual_leave_unused' => null, 'January' => 0.0, 'February' => 0.0, 'March' => 0.0, 'April' => 0.0, 'May' => 0.0, 'June' => 0.0, 'July' => 0.0, 'August' => 0.0, 'September' => 0.0, 'October' => 0, 'November' => 0.0, 'December' => 0.0, 'sick_leave' => 0.0, 'marriage_leave' => 0.0, 'maternity_leave' => 0.0, 'bereavement_leave' => 0.0, 'unpaid_leave' => 0.0];
+            }
+            for ($i = 0; $i < count($arrayNull); $i++) {
+                Track::create($arrayNull[$i]);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
 }

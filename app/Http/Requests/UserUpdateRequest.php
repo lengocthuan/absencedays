@@ -26,8 +26,8 @@ class UserUpdateRequest extends BaseRequest
         $id = request()->id ? request()->id : request()->segment(4);
         return [
             'name' => 'sometimes|string|max:191',
-            'email' => "sometimes|string|unique:users,email,$id",
-            'phone' => "sometimes|string|unique:users,phone,$id",
+            'email' => 'sometimes|string|unique:users,email,$id',
+            'phone' => 'sometimes|string|unique:users,phone,$id',
             'photo' => 'sometimes|nullable|numeric|exists:images,id',
             'password' => 'sometimes|string',
             'address' => 'sometimes|nullable|string|max:191',

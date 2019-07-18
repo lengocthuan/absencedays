@@ -5,27 +5,22 @@ use App\Models\TimeAbsence;
 use App\Models\Track;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class TrackService
 {
     public static function update($id, array $attribute)
     {
-        $user = User::where('id', $attribute['user_id'])->select('first_workday')->get();
+        $user_id = Auth::id();
+        $year = Carbon::now()->format('Y');
+        $check = Track::where('user_id', $user_id)->where('year', $year)->first();
 
-        $firstWorkday = new Carbon($user[0]->firstWorkday);
-        $firstWorkday1 = $firstWorkday->toDateString();
-        $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
-        $yearAnnual = 12;
-
-        if ($annualLeaveTotal >= 5) {
-            for ($i = 0; $i <= $annualLeaveTotal; $i += 5) {
-                $addTime = $yearAnnual++;
-            }
-        } else {
-            $addTime = $yearAnnual;
+        if($check->annual_leave_total == null) {
+            $addTime = TrackService::calculatorYear($user_id);
+            $check->annual_leave_total = $addTime;
+            $check->save();
         }
 
-        $year = Carbon::now()->format('Y');
         $trackId = Track::where(['user_id' => $attribute['user_id'], 'year' => $year])->get();
         $track = Track::find($trackId[0]->id);
         $time = TimeAbsence::where('registration_id', $id)->select('time_details', 'absence_days')->get();
@@ -294,20 +289,7 @@ class TrackService
 
     public static function create($id)
     {
-        $user = User::where('id', $id)->select('first_workday')->get();
-        $firstWorkday = new Carbon($user[0]->firstWorkday);
-        $firstWorkday1 = $firstWorkday->toDateString();
-        $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
-        $year = 12;
-
-        if ($annualLeaveTotal >= 5) {
-            for ($i = 0; $i <= $annualLeaveTotal; $i += 5) {
-                $addTime = $year++;
-            }
-        } else {
-            $addTime = $year;
-        }
-
+        $addTime = TrackService::calculatorYear($id);
         $check = Track::where('user_id', $id)->get();
         if (empty($check[0]->user_id)) {
             $new = new Track;
@@ -316,6 +298,24 @@ class TrackService
             $new->annual_leave_total = $addTime;
             $new->save();
         }
+    }
+
+    public static function calculatorYear($attribute)
+    {
+        $user = User::where('id', $attribute)->select('first_workday')->get();
+        $firstWorkday = new Carbon($user[0]->first_workday);
+        $firstWorkday1 = $firstWorkday->toDateString();
+        $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
+        $yearAnnual = 12;
+        if ($annualLeaveTotal >= 5) {
+            for ($i = 0; $i <= $annualLeaveTotal; $i += 5) {
+                $addTime = $yearAnnual++;
+            }
+        } else {
+            $addTime = $yearAnnual;
+        }
+
+        return $addTime;
     }
 
 }
