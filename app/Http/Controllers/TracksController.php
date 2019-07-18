@@ -112,13 +112,13 @@ class TracksController extends Controller
         return Excel::download(new StatisticalsExport, "Thống kê tổng quan theo năm-ngày xuất bản-$now.xlsx");
     }
 
-    public function updateFromUser()
+    public function updateFromUser(Request $request)
     {
-        $result = $this->repository->fromUser();
+        $result = ['data' => $this->repository->fromUser($request->all())];
         $data = $this->repository->all();
-        if($result) {
+        if($result['data'] != true) {
             return $this->success($data, trans('messages.track.success'));
         }
-        return $this->error(trans('messages.track.error'), trans('messages.track.newest'), Response::HTTP_BAD_REQUEST);
+        return $this->success($result, trans('messages.track.success'));
     }
 }

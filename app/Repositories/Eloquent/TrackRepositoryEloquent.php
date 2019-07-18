@@ -7,11 +7,11 @@ use App\Models\TimeAbsence;
 use App\Models\Track;
 use App\Presenters\TrackPresenter;
 use App\Repositories\Contracts\TrackRepository;
+use App\Services\TrackService;
 use App\User;
 use Carbon\Carbon;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
-use App\Services\TrackService;
 
 /**
  * Class TrackRepositoryEloquent.
@@ -54,10 +54,8 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         //1. From day to day
         //2. For month of year
         //3. For year
-
         $user = User::select()->get();
         $registration = Registration::select('id', 'user_id', 'status')->get();
-
         if (isset($attributes['from']) && isset($attributes['to'])) {
             $from = $attributes['from'];
             $to = $attributes['to'];
@@ -92,9 +90,25 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         $newInitArray = array(); //array is final result;
         $uniquePreSum = array_unique($preSum);
         $arrayNull = array();
+
         foreach ($uniquePreSum as $value) {
             $cut = explode('-', $value);
             $arrayNull[] = $cut;
+        }
+
+        for ($i = 0; $i < count($arrayNull); $i++) {
+            $mergeId[] = (integer) $arrayNull[$i][0];
+        }
+
+        for ($i = 0; $i < count($user); $i++) {
+            $mergeIdUser[] = $user[$i]->id;
+        }
+
+        $uniqueId = array_diff($mergeIdUser, $mergeId);
+        $addUserNull = User::whereIn('id', $uniqueId)->get();
+
+        for ($i = 0; $i < count($addUserNull); $i++) {
+            $resultFinal[] = ['id' => $addUserNull[$i]->id, 'name' => $addUserNull[$i]->name, 'email' => $addUserNull[$i]->email, 'team' => $addUserNull[$i]->getTeam->name, 'position' => $addUserNull[$i]->getPosition->name, 'time_details' => null, 'at_time' => null, 'absence_days' => null];
         }
 
         for ($i = 0; $i < count($arrayNull); $i++) {
@@ -117,6 +131,15 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             unset($mergeTime);
             unset($mergeAtTime);
         }
+        if(isset($attributes['absences'])) {
+            if($attributes['absences'] == 1) {
+                return $newInitArray;
+            }
+            else return $resultFinal;
+        }
+        $newInitArray = array_merge($resultFinal, $newInitArray);
+        asort($newInitArray);
+
         return $newInitArray;
     }
 
@@ -131,29 +154,37 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         return parent::create($attributes);
     }
 
-    public function fromUser()
+    public function fromUser(array $attributes)
     {
+        $now = Carbon::now()->format('Y');
         $newUser = Track::select('user_id', 'year')->get();
-
+        $currentYearNonNull = Track::where('year', $now)->where('annual_leave_unused','!=',null)->get();
+        $currentYearNull = Track::where('year', $now)->where('annual_leave_unused', null)->get();
+        // dd($currentYear);
         for ($i = 0; $i < count($newUser); $i++) {
             $newArray[] = $newUser[$i]->user_id . ' ' . $newUser[$i]->year;
         }
-        $oldArray = $newArray;
 
-        $now = Carbon::now()->format('Y');
+        $oldArray = $newArray;
         $user = User::select('id')->get();
+
         foreach ($user as $key => $value) {
             $newArray[] = $value->id . ' ' . $now;
         }
 
         $result = array_diff($newArray, $oldArray);
-
+        if($result == null) {
+            if(isset($attributes['absences'])) {
+                if($attributes['absences'] == 1) {
+                    return $this->parserResult($currentYearNonNull);
+                } else return $this->parserResult($currentYearNull);
+            }
+        }
         if ($result != null) {
             foreach ($result as $value) {
                 $arrayCut[] = explode(' ', $value);
             }
 
-            
             for ($i = 0; $i < count($arrayCut); $i++) {
                 $addTime = TrackService::calculatorYear($arrayCut[$i][0]);
                 $arrayNull[] = ['year' => $arrayCut[$i][1], 'user_id' => $arrayCut[$i][0], 'annual_leave_total' => $addTime, 'annual_leave_unused' => null, 'January' => 0.0, 'February' => 0.0, 'March' => 0.0, 'April' => 0.0, 'May' => 0.0, 'June' => 0.0, 'July' => 0.0, 'August' => 0.0, 'September' => 0.0, 'October' => 0, 'November' => 0.0, 'December' => 0.0, 'sick_leave' => 0.0, 'marriage_leave' => 0.0, 'maternity_leave' => 0.0, 'bereavement_leave' => 0.0, 'unpaid_leave' => 0.0];
@@ -162,9 +193,12 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
                 Track::create($arrayNull[$i]);
             }
 
-            return true;
+            if(isset($attributes['absences'])) {
+                if($attributes['absences'] == 1) {
+                    return $this->parserResult($currentYearNonNull);
+                } else return $this->parserResult($arrayNull);
+            }
         }
-
         return false;
     }
 

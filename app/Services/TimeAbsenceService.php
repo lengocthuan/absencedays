@@ -4,14 +4,44 @@ namespace App\Services;
 use App\Models\Registration;
 use App\Models\TimeAbsence;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class TimeAbsenceService
 {
     public static function add($id, array $attribute)
     {
+        $userCurrent = Auth::id();
+        $checkUser = Registration::where('user_id', $userCurrent)->get();
+        // dd($checkUser[0]);
+        for ($i=0; $i < count($checkUser) ; $i++) {
+            $findRegistration[] = TimeAbsence::where('registration_id', $checkUser[$i]->id)->get();
+            if($findRegistration[$i] == null) {
+                unset($findRegistration[$i]);
+            }
+        }
+        // dd(count($findRegistration[1]));
+        dd($findRegistration);
+        for ($i=0; $i < count($findRegistration); $i++) { 
+            $findTimeDetail[] = $findRegistration[0][$i]->time_details;
+        }
+        dd($findTimeDetail);
+
         if ($attribute['type'] == Registration::TYPE_ABSENCE) {
             $timeStart = new Carbon($attribute['time_start']);
             $timeEnd = new Carbon($attribute['time_end']);
+            $checkTimeDuplicate = TimeAbsence::where('time_details', $timeStart)->get();
+
+            if($checkTimeDuplicate != null) {
+                for ($i=0; $i < count($checkTimeDuplicate); $i++) { 
+                    $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
+                }
+
+                for ($i=0; $i < count($userId) ; $i++) { 
+                    if($userId[$i][0]->user_id == $userCurrent) {
+                        return false;
+                    }
+                }
+            }
             $n = $timeEnd->diffInDays($timeStart) + 1;
             for ($i = 0; $i < $n; $i++) {
                 $timeAbsence = new TimeAbsence;
@@ -29,6 +59,7 @@ class TimeAbsenceService
             $time = explode(';', $attribute['date']);
             for ($i = 0; $i < count($time); $i++) {
                 $timeChildren = explode(',', $time[$i]);
+                dd($timeChildren);
                 $newTimeAbsence = new TimeAbsence;
                 $newTimeAbsence->registration_id = $id;
                 $newTimeAbsence->type = $attribute['type'];
