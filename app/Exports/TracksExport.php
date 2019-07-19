@@ -2,12 +2,12 @@
 
 namespace App\Exports;
 
-use PhpOffice\PhpSpreadsheet;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet;
 
 class TracksExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
 {
@@ -23,11 +23,15 @@ class TracksExport implements FromCollection, WithHeadings, ShouldAutoSize, With
     public function collection()
     {
         $newData = $this->data;
+
         for ($i = 0; $i < count($newData); $i++) {
-            $timeDetails = implode(', ', $newData[$i]['time_details']);
-            $newData[$i]['time_details'] = $timeDetails;
-            $atTime = implode(', ', $newData[$i]['at_time']);
-            $newData[$i]['at_time'] = $atTime;
+            if (!empty($newData[$i]['time_details'])) {
+                $timeDetails = implode(', ', $newData[$i]['time_details']);
+                $newData[$i]['time_details'] = $timeDetails;
+                $atTime = implode(', ', $newData[$i]['at_time']);
+                $newData[$i]['at_time'] = $atTime;
+            }
+
         }
         return (collect($newData));
     }
@@ -43,6 +47,8 @@ class TracksExport implements FromCollection, WithHeadings, ShouldAutoSize, With
             'Thời gian nghỉ phép',
             'Buổi',
             'Tổng ngày nghỉ',
+            'Loại ngày phép',
+            'Ghi chú lý do',
         ];
     }
 
@@ -61,7 +67,7 @@ class TracksExport implements FromCollection, WithHeadings, ShouldAutoSize, With
                 ];
                 $styleAlignment = [
                     'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                     ],
                 ];
                 $event->sheet->getDelegate()->getParent()->getDefaultStyle()->applyFromArray($styleAlignment);

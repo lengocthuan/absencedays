@@ -89,15 +89,17 @@ class StatisticalsExport implements FromCollection, WithHeadings, ShouldAutoSize
 
         for ($i = 0; $i < count($merge); $i++) {
             $cut = explode('+', $merge[$i]);
-            $newcut[] = $cut;
+            array_unshift($cut, $i+1)  ;
+            $newResult[] = $cut;
         }
 
-        return (collect($newcut));
+        return (collect($newResult));
     }
 
     public function headings(): array
     {
         return [
+            'STT',
             'Năm hiện tại',
             'Địa chỉ email',
             'Đội/Khối',
@@ -128,7 +130,7 @@ class StatisticalsExport implements FromCollection, WithHeadings, ShouldAutoSize
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $cellRange = 'A1:W1'; // All headers
+                $cellRange = 'A1:Z1'; // All headers
                 $styleArray = [
                     'borders' => [
                         'outline' => [

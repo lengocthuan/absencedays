@@ -25,6 +25,7 @@ class Registration extends BaseModel
     const FULL = 'Cả Ngày';
     const MORNING = 'Buổi Sáng';
     const AFTERNOON = 'Buổi Chiều';
+    const DUPLICATE_TIME = 'Duplicate Time Registration';
 
     protected $table = 'registrations';
     protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message'];

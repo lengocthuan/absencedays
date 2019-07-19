@@ -77,7 +77,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         return $this->parserResult($result);
     }
 
-    public function getWorkdays($date1, $date2, $workSat = false, $patron = null)
+    public static function getWorkdays($date1, $date2, $workSat = false, $patron = null)
     {
         if (!defined('SATURDAY')) {
             define('SATURDAY', 6);
@@ -133,10 +133,13 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         }
 
         $addMail = ApproverService::add($resgistration['data']['id'], $attributes);
-        if($addMail == false) {
+        if(!$addMail) {
             return false;
         }
-        TimeAbsenceService::add($resgistration['data']['id'], $attributes);
+        $addTimeDetails = TimeAbsenceService::add($resgistration['data']['id'], $attributes);
+        if(!is_null($addTimeDetails)) {
+            return Registration::DUPLICATE_TIME;
+        }
         TrackService::update($resgistration['data']['id'], $attributes);
 
         //send mail
@@ -202,7 +205,8 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             $oldTypeAbsence = $old['data']['attributes']['time'][0]['type'];
 
             $registration = parent::update(array_except($attributes, ['user_id', 'status', 'requested_date']), $id);
-            TimeAbsenceService::update($id, $attributes);
+            TimeAbsenceService::delete($id);
+            TimeAbsenceService::add($id, $attributes);
             //update email from user;
             $new = parent::find($id);
             $newTime = $new['data']['attributes']['time'];

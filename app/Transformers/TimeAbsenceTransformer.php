@@ -34,6 +34,7 @@ class TimeAbsenceTransformer extends BaseTransformer
     {
         return [
             'user' => $model->getInfoUser(),
+            'type' => $model->getInfoRegistration(),
         ];
     }
 

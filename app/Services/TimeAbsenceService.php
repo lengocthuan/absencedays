@@ -11,39 +11,28 @@ class TimeAbsenceService
     public static function add($id, array $attribute)
     {
         $userCurrent = Auth::id();
-        $checkUser = Registration::where('user_id', $userCurrent)->get();
-        // dd($checkUser[0]);
-        for ($i=0; $i < count($checkUser) ; $i++) {
-            $findRegistration[] = TimeAbsence::where('registration_id', $checkUser[$i]->id)->get();
-            if($findRegistration[$i] == null) {
-                unset($findRegistration[$i]);
-            }
-        }
-        // dd(count($findRegistration[1]));
-        dd($findRegistration);
-        for ($i=0; $i < count($findRegistration); $i++) { 
-            $findTimeDetail[] = $findRegistration[0][$i]->time_details;
-        }
-        dd($findTimeDetail);
-
         if ($attribute['type'] == Registration::TYPE_ABSENCE) {
             $timeStart = new Carbon($attribute['time_start']);
             $timeEnd = new Carbon($attribute['time_end']);
-            $checkTimeDuplicate = TimeAbsence::where('time_details', $timeStart)->get();
+            $countDay = $timeEnd->diffInDays($timeStart) + 1;
 
-            if($checkTimeDuplicate != null) {
-                for ($i=0; $i < count($checkTimeDuplicate); $i++) { 
-                    $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
-                }
-
-                for ($i=0; $i < count($userId) ; $i++) { 
-                    if($userId[$i][0]->user_id == $userCurrent) {
-                        return false;
+            for ($i = 0; $i < $countDay; $i++) {
+                $checkTimeDuplicate = TimeAbsence::where('time_details', $timeStart)->get();
+                if (count($checkTimeDuplicate)) {
+                    for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
+                        $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
+                    }
+                    for ($i = 0; $i < count($userId); $i++) {
+                        if ($userId[$i][0]->user_id == $userCurrent) {
+                            return false;
+                        }
                     }
                 }
+                $timeStart->addDay();
             }
-            $n = $timeEnd->diffInDays($timeStart) + 1;
-            for ($i = 0; $i < $n; $i++) {
+
+            $timeStart = Carbon::parse($attribute['time_start']);
+            for ($i = 0; $i < $countDay; $i++) {
                 $timeAbsence = new TimeAbsence;
                 $timeAbsence->registration_id = $id;
                 $timeAbsence->type = $attribute['type'];
@@ -51,7 +40,7 @@ class TimeAbsenceService
                 $timeAbsence->at_time = Registration::FULL;
                 $timeAbsence->absence_days = 1;
                 $timeAbsence->current_year = Carbon::parse($timeStart->toDateString())->format('Y');
-                $timeAbsence->general_information = 'The time absence of you at: ' .$timeStart;
+                $timeAbsence->general_information = 'The time absence of you at: ' . $timeStart;
                 $timeStart = $timeStart->addDay();
                 $timeAbsence->save();
             }
@@ -59,7 +48,37 @@ class TimeAbsenceService
             $time = explode(';', $attribute['date']);
             for ($i = 0; $i < count($time); $i++) {
                 $timeChildren = explode(',', $time[$i]);
-                dd($timeChildren);
+                
+                if ($timeChildren[1] == Registration::FULL) {
+                    $checkTimeDuplicate = TimeAbsence::where('time_details', $timeChildren[0])->get();
+                    if (count($checkTimeDuplicate)) {
+                        for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
+                            $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
+                        }
+                        for ($i = 0; $i < count($userId); $i++) {
+                            if ($userId[$i][0]->user_id == $userCurrent) {
+                                return false;
+                            }
+                        }
+                    }
+                } else {
+                    $checkTimeDuplicate = TimeAbsence::where(['time_details' => $timeChildren[0],'at_time' => $timeChildren[1]])->get();
+                    if (count($checkTimeDuplicate)) {
+                        for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
+                            $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
+                        }
+                        for ($i = 0; $i < count($userId); $i++) {
+                            if ($userId[$i][0]->user_id == $userCurrent) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for ($i = 0; $i < count($time); $i++) {
+                $timeChildren = explode(',', $time[$i]);
+
                 $newTimeAbsence = new TimeAbsence;
                 $newTimeAbsence->registration_id = $id;
                 $newTimeAbsence->type = $attribute['type'];
@@ -77,44 +96,9 @@ class TimeAbsenceService
         }
     }
 
-    public static function update($id, array $attribute)
+    public static function delete($id)
     {
         $oldTimeDelete = TimeAbsence::where('registration_id', $id)->delete();
-        if ($attribute['type'] == Registration::TYPE_ABSENCE) {
-            $timeStart = new Carbon($attribute['time_start']);
-            $timeEnd = new Carbon($attribute['time_end']);
-            $n = $timeEnd->diffInDays($timeStart) + 1;
-            for ($i = 0; $i < $n; $i++) {
-                $timeAbsence = new TimeAbsence;
-                $timeAbsence->registration_id = $id;
-                $timeAbsence->type = $attribute['type'];
-                $timeAbsence->time_details = $timeStart->toDateString();
-                $timeAbsence->at_time = Registration::FULL;
-                $timeAbsence->absence_days = 1;
-                $timeAbsence->current_year = Carbon::parse($timeStart->toDateString())->format('Y');
-                $timeAbsence->general_information = 'The time absence of you at: ' . $timeStart;
-                $timeStart = $timeStart->addDay();
-                $timeAbsence->save();
-            }
-        } else {
-            $time = explode(';', $attribute['date']);
-            for ($i = 0; $i < count($time); $i++) {
-                $timeChildren = explode(',', $time[$i]);
-                $newTimeAbsence = new TimeAbsence;
-                $newTimeAbsence->registration_id = $id;
-                $newTimeAbsence->type = $attribute['type'];
-                $newTimeAbsence->time_details = $timeChildren[0];
-                $newTimeAbsence->at_time = $timeChildren[1];
-                if ($newTimeAbsence->at_time == Registration::MORNING || $newTimeAbsence->at_time == Registration::AFTERNOON) {
-                    $newTimeAbsence->absence_days = 0.5;
-                } else {
-                    $newTimeAbsence->absence_days = 1;
-                }
-                $newTimeAbsence->current_year = Carbon::parse($timeChildren[0])->format('Y');
-                $newTimeAbsence->general_information = 'Time absence of you at: ' . $timeChildren[1] . $timeChildren[0];
-                $newTimeAbsence->save();
-            }
-        }
     }
 
     public static function search($id, $attributes)
@@ -140,4 +124,5 @@ class TimeAbsenceService
             return $registrationId;
         }
     }
+
 }
