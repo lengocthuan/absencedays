@@ -45,9 +45,6 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('positions', 'PositionsController');
     Route::resource('approvers', 'ApproversController');
 
-    // Route::get('mails_to', 'ApproversController@getMailto');
-    // Route::get('mails_cc', 'ApproversController@getMailcc');
-    
     Route::resource('tracks', 'TracksController');
     Route::resource('time_absences', 'TimeAbsencesController');
 

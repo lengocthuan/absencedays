@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Registration;
 use App\User;
 use App\Traits\InformationUserTrait;
+use App\Models\TimeAbsence;
 /**
  * Class TimeAbsence.
  *
@@ -31,4 +32,12 @@ class TimeAbsence extends BaseModel
         return $this->InfoUser($user_id[0]->id);
     }
 
+    public function getInfoRegistration()
+    {
+        $timeAbsence = Registration::where('id', $this->registration_id)->select('type_id', 'note')->get();
+        for ($i=0; $i < count($timeAbsence); $i++) { 
+            $type = ['type' => $timeAbsence[$i]->getType->name, 'note' => $timeAbsence[$i]->note];
+        }
+        return $type;
+    }
 }

@@ -14,6 +14,7 @@ return [
         'invalidRegistration' => 'Registraion Invalid',
         'error' => 'Bad Request',
         'duplicate' => 'Attributes mails for to and mails for cc has been matched.',
+        'duplicateTime' => 'Time registration has been matched.',
     ],
     'user' => [
         'success' => 'Get information user successfully.',

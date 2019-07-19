@@ -95,7 +95,7 @@ class TracksController extends Controller
 
     public function getStatistical(TrackCreateRequest $request)
     {
-        $general = ['data' => $this->repository->statistical($request->all())];
+        $general =['data' => $this->repository->statistical($request->all())];
 
         return $this->success($general, trans('messages.track.statistical'));
     }
@@ -103,22 +103,25 @@ class TracksController extends Controller
     public function export(TrackCreateRequest $request) 
     {
         $general = $this->repository->statistical($request->all());
+
         return Excel::download(new TracksExport($general), "Thống kê chi tiết theo đợt $request->from-$request->to$request->year$request->month.xlsx");
     }
 
     public function exportStatistical()
     {
         $now = Carbon::now()->toDateString();
+
         return Excel::download(new StatisticalsExport, "Thống kê tổng quan theo năm-ngày xuất bản-$now.xlsx");
     }
 
     public function updateFromUser(Request $request)
     {
-        $result = ['data' => $this->repository->fromUser($request->all())];
+        $result = $this->repository->fromUser($request->all());
         $data = $this->repository->all();
         if($result['data'] != true) {
             return $this->success($data, trans('messages.track.success'));
         }
+
         return $this->success($result, trans('messages.track.success'));
     }
 }
