@@ -93,6 +93,9 @@ class RegistrationsController extends Controller
     public function update(RegistrationUpdateRequest $request, $id)
     {
         $registration = $this->repository->update($request->all(), $id);
+         if($registration == Registration::DUPLICATE_TIME) {
+            return $this->error(trans('messages.registration.error'), trans('messages.registration.duplicateTime'), Response::HTTP_BAD_REQUEST);
+        }
         if ($registration) {
             return $this->success($registration, trans('messages.registration.updateSuccess'), ['code' => Response::HTTP_CREATED]);
         }

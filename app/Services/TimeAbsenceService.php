@@ -52,7 +52,6 @@ class TimeAbsenceService
 
     public static function check($attribute)
     {
-
         $userCurrent = Auth::id();
         if ($attribute['type'] == Registration::TYPE_ABSENCE) {
             $timeStart = new Carbon($attribute['time_start']);
@@ -62,14 +61,25 @@ class TimeAbsenceService
             for ($i = 0; $i < $countDay; $i++) {
                 $checkTimeDuplicate = TimeAbsence::where('time_details', $timeStart)->get();
                 if (count($checkTimeDuplicate)) {
+                    $userId = [];
                     for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
-                        $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
-                    }
-                    for ($i = 0; $i < count($userId); $i++) {
-                        if ($userId[$i][0]->user_id == $userCurrent) {
-                            return false;
+                        if (isset($attribute['_method'])) {
+                            $temp = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->whereNotIn('id', [$attribute['id']])->get();
+                            if (!$temp->isEmpty()) {
+                                $userId[] = $temp;
+                            }
+                        } else {
+                            $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
                         }
                     }
+                    if (count($useId)) {
+                        for ($i = 0; $i < count($userId); $i++) {
+                            if ($userId[$i][0]->user_id == $userCurrent) {
+                                return false;
+                            }
+                        }
+                    }
+
                 }
                 $timeStart->addDay();
             }
@@ -79,37 +89,57 @@ class TimeAbsenceService
             $time = explode(';', $attribute['date']);
             for ($i = 0; $i < count($time); $i++) {
                 $timeChildren = explode(',', $time[$i]);
-                
+
                 if ($timeChildren[1] == Registration::FULL) {
                     $checkTimeDuplicate = TimeAbsence::where('time_details', $timeChildren[0])->get();
                     if (count($checkTimeDuplicate)) {
+                        $useId = [];
                         for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
-                            $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
+                            if (isset($attribute['_method'])) {
+                                $temp = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->whereNotIn('id', [$attribute['id']])->get();
+                                if (!$temp->isEmpty()) {
+                                    $userId[] = $temp;
+                                }
+                            } else {
+                                $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
+                            }
                         }
-                        for ($i = 0; $i < count($userId); $i++) {
-                            if ($userId[$i][0]->user_id == $userCurrent) {
-                                return false;
+                        if (count($useId)) {
+                            for ($i = 0; $i < count($userId); $i++) {
+                                if ($userId[$i][0]->user_id == $userCurrent) {
+                                    return false;
+                                }
                             }
                         }
                     }
                 } else {
-                    $checkTimeDuplicate = TimeAbsence::where(['time_details' => $timeChildren[0],'at_time' => $timeChildren[1]])->get();
+                    $checkTimeDuplicate = TimeAbsence::where(['time_details' => $timeChildren[0], 'at_time' => $timeChildren[1]])->get();
                     if (count($checkTimeDuplicate)) {
+                        $userId = [];
                         for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
-                            $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
-                        }
-                        for ($i = 0; $i < count($userId); $i++) {
-                            if ($userId[$i][0]->user_id == $userCurrent) {
-                                return false;
+                            if (isset($attribute['_method'])) {
+                                $temp = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->whereNotIn('id', [$attribute['id']])->get();
+                                if (!$temp->isEmpty()) {
+                                    $userId[] = $temp;
+                                }
+                            } else {
+                                $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
                             }
                         }
+                        if (count($userId)) {
+                            for ($i = 0; $i < count($userId); $i++) {
+                                if ($userId[$i][0]->user_id == $userCurrent) {
+                                    return false;
+                                }
+                            }
+                        }
+
                     }
                 }
             }
             return true;
         }
     }
-
 
     public static function delete($id)
     {

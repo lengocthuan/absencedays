@@ -43,6 +43,7 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         'avatar',
     ];
 
+
     /**
      * The attributes that should be hidden for arrays.
      *

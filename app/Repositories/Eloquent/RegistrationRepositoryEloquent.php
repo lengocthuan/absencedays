@@ -139,7 +139,6 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 return false;
             }
             TimeAbsenceService::add($resgistration['data']['id'], $attributes);
-
             TrackService::update($resgistration['data']['id'], $attributes);
 
             //send mail
@@ -207,43 +206,50 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             $oldTypeAbsence = $old['data']['attributes']['time'][0]['type'];
 
             $registration = parent::update(array_except($attributes, ['user_id', 'status', 'requested_date']), $id);
-            TimeAbsenceService::delete($id);
-            TimeAbsenceService::add($id, $attributes);
-            //update email from user;
-            $new = parent::find($id);
-            $newTime = $new['data']['attributes']['time'];
-            $newDayOff = array();
-            for ($i = 0; $i < count($newTime); $i++) {
-                $date = new Carbon($newTime[$i]['time_details']);
-                $time = $date->toDateString() . " " . "(" . $newTime[$i]['at_time'] . ")";
-                $newDayOff[] = $time;
+
+            $attributes['id'] = $id;
+            $checkTime = TimeAbsenceService::check($attributes);
+            if ($checkTime == true) {
+                TimeAbsenceService::delete($id);
+                TimeAbsenceService::add($id, $attributes);
+
+                //update email from user;
+                $new = parent::find($id);
+                $newTime = $new['data']['attributes']['time'];
+                $newDayOff = array();
+                for ($i = 0; $i < count($newTime); $i++) {
+                    $date = new Carbon($newTime[$i]['time_details']);
+                    $time = $date->toDateString() . " " . "(" . $newTime[$i]['at_time'] . ")";
+                    $newDayOff[] = $time;
+                }
+                $cutDate = explode(' ', $newDayOff[0]);
+                $showTitleTime = Carbon::parse($cutDate[0])->format('d/m/Y');
+                $newDayOff = implode(', ', $newDayOff);
+                $newNote = $new['data']['attributes']['note'];
+                $newType = $new['data']['attributes']['type']['name'];
+                $newTypeAbsence = $new['data']['attributes']['time'][0]['type'];
+                $data = [
+                    'registerName' => $oldName,
+                    'oldTypeId' => $oldType,
+                    'oldNote' => $oldNote,
+                    'oldType' => $oldTypeAbsence,
+                    'oldTimeOff' => $oldDayOff,
+                    'typeId' => $newType,
+                    'note' => $newNote,
+                    'type' => $newTypeAbsence,
+                    'timeOff' => $newDayOff,
+                    'to' => $oldTo,
+                    'cc' => $oldCc,
+                    'message' => $newMessage,
+                    'titleTime' => $showTitleTime,
+                ];
+                Mail::queue(new UpdateMailable($data));
+                return $new;
             }
-            $cutDate = explode(' ', $newDayOff[0]);
-            $showTitleTime = Carbon::parse($cutDate[0])->format('d/m/Y');
-            $newDayOff = implode(', ', $newDayOff);
-            $newNote = $new['data']['attributes']['note'];
-            $newType = $new['data']['attributes']['type']['name'];
-            $newTypeAbsence = $new['data']['attributes']['time'][0]['type'];
-            $data = [
-                'registerName' => $oldName,
-                'oldTypeId' => $oldType,
-                'oldNote' => $oldNote,
-                'oldType' => $oldTypeAbsence,
-                'oldTimeOff' => $oldDayOff,
-                'typeId' => $newType,
-                'note' => $newNote,
-                'type' => $newTypeAbsence,
-                'timeOff' => $newDayOff,
-                'to' => $oldTo,
-                'cc' => $oldCc,
-                'message' => $newMessage,
-                'titleTime' => $showTitleTime,
-            ];
-            Mail::queue(new UpdateMailable($data));
-            return $new;
-        } else {
-            return false;
+            return Registration::DUPLICATE_TIME;
+
         }
+        return false;
     }
 
     public function getPending($email)

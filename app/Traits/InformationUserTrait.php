@@ -9,8 +9,7 @@ trait InformationUserTrait
     public function InfoUser($id)
     {
         $informationUser = User::where('id', $id)->get();
-        $result = array();
-        $merge = array();
+
         foreach ($informationUser as $value) {
             $resultMerge = $value->attributes;
             $resultMerge['team'] = $value->getTeam->name;
