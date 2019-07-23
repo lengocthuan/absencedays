@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Track;
 use App\User;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -18,7 +19,8 @@ class StatisticalsExport implements FromCollection, WithHeadings, ShouldAutoSize
 
     public function collection()
     {
-        $getInformation = Track::select()->get();
+        $currentYear = Carbon::now()->format('Y');
+        $getInformation = Track::where('year', $currentYear)->get();
         $getInformation->makeHidden('id');
         foreach ($getInformation as $value) {
             $user_id = User::where('id', $value->user_id)->select()->get();

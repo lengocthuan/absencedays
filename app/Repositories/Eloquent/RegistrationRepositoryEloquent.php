@@ -3,8 +3,8 @@
 namespace App\Repositories\Eloquent;
 
 use App\Mail\SendMailable;
-use App\Mail\UpdateMessageMailable;
 use App\Mail\UpdateMailable;
+use App\Mail\UpdateMessageMailable;
 use App\Models\Registration;
 use App\Models\Type;
 use App\Presenters\RegistrationPresenter;
@@ -67,7 +67,7 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             case '3':
                 $search = $this->model()::where('user_id', $id)->where('status', 3)->select('id')->get();
                 break;
-            
+
             default:
                 $search = $this->model()::where('user_id', $id)->select('id')->get();
                 break;
@@ -125,61 +125,63 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             }
         }
 
-        $resgistration = parent::create($attributes);
-        $date = $this->model()::where('user_id', $attributes['user_id'])->select('id')->get();
-        $id = array();
-        for ($i = 0; $i < count($date); $i++) {
-            $id[] = $date[$i]->id;
-        }
-
-        $addMail = ApproverService::add($resgistration['data']['id'], $attributes);
-        if(!$addMail) {
-            return false;
-        }
-        $addTimeDetails = TimeAbsenceService::add($resgistration['data']['id'], $attributes);
-        if(!is_null($addTimeDetails)) {
-            return Registration::DUPLICATE_TIME;
-        }
-        TrackService::update($resgistration['data']['id'], $attributes);
-
-        //send mail
-        $user = Auth::user();
-        $type = Type::find($attributes['type_id']);
-        if ($attributes['type'] == Registration::TYPE_ABSENCE) {
-            $timeStart = $attributes['time_start'];
-            $timeEnd = $attributes['time_end'];
-            $merge = null;
-            $firstDayOff = null;
-        } else {
-            $date = explode(';', $attributes['date']);
-            $arrayDate = array();
+        $checkTime = TimeAbsenceService::check($attributes);
+        if ($checkTime == true) {
+            $resgistration = parent::create($attributes);
+            $date = $this->model()::where('user_id', $attributes['user_id'])->select('id')->get();
+            $id = array();
             for ($i = 0; $i < count($date); $i++) {
-                $atTime = explode(',', $date[$i]);
-                $add = "$atTime[0] ($atTime[1])";
-                $arrayDate[] = $add;
+                $id[] = $date[$i]->id;
             }
-            $cutArrayDate = explode(' ', $arrayDate[0]);
-            $firstDayOff = Carbon::parse($cutArrayDate[0])->format('d/m/Y');
-            $merge = implode(', ', $arrayDate);
-            $timeStart = null;
-            $timeEnd = null;
+
+            $addMail = ApproverService::add($resgistration['data']['id'], $attributes);
+            if (!$addMail) {
+                return false;
+            }
+            TimeAbsenceService::add($resgistration['data']['id'], $attributes);
+
+            TrackService::update($resgistration['data']['id'], $attributes);
+
+            //send mail
+            $user = Auth::user();
+            $type = Type::find($attributes['type_id']);
+            if ($attributes['type'] == Registration::TYPE_ABSENCE) {
+                $timeStart = $attributes['time_start'];
+                $timeEnd = $attributes['time_end'];
+                $merge = null;
+                $firstDayOff = null;
+            } else {
+                $date = explode(';', $attributes['date']);
+                $arrayDate = array();
+                for ($i = 0; $i < count($date); $i++) {
+                    $atTime = explode(',', $date[$i]);
+                    $add = "$atTime[0] ($atTime[1])";
+                    $arrayDate[] = $add;
+                }
+                $cutArrayDate = explode(' ', $arrayDate[0]);
+                $firstDayOff = Carbon::parse($cutArrayDate[0])->format('d/m/Y');
+                $merge = implode(', ', $arrayDate);
+                $timeStart = null;
+                $timeEnd = null;
+            }
+
+            $data = [
+                'name' => $user->name,
+                'typeId' => $type->name,
+                'note' => $attributes['note'],
+                'type' => $attributes['type'],
+                'timeStart' => $timeStart,
+                'timeEnd' => $timeEnd,
+                'timeOff' => $merge,
+                'to' => $attributes['emails'],
+                'cc' => $attributes['cc'],
+                'firstDayOff' => $firstDayOff,
+            ];
+
+            Mail::queue(new SendMailable($data));
+            return parent::find($resgistration['data']['id']);
         }
-
-        $data = [
-            'name' => $user->name,
-            'typeId' => $type->name,
-            'note' => $attributes['note'],
-            'type' => $attributes['type'],
-            'timeStart' => $timeStart,
-            'timeEnd' => $timeEnd,
-            'timeOff' => $merge,
-            'to' => $attributes['emails'],
-            'cc' => $attributes['cc'],
-            'firstDayOff' => $firstDayOff,
-        ];
-
-        Mail::queue(new SendMailable($data));
-        return parent::find($resgistration['data']['id']);
+        return Registration::DUPLICATE_TIME;
     }
 
     public function update(array $attributes, $id)
@@ -276,9 +278,11 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
         $email = parent::find($id);
         $emailTimeAbsence = $email['data']['attributes']['time'];
 
-        if(count($emailTimeAbsence) != 0) {
+        if (count($emailTimeAbsence) != 0) {
             $emailTypeAbsence = $email['data']['attributes']['time'][0]['type'];
-        } else return trans('message.registration.timeRegistrationNotExist');
+        } else {
+            return trans('message.registration.timeRegistrationNotExist');
+        }
 
         $emailType = $email['data']['attributes']['type']['name'];
         $emailNote = $email['data']['attributes']['note'];

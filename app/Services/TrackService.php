@@ -122,8 +122,8 @@ class TrackService
                     $add = new Track;
                     $add->year = $year + 1;
                     $add->user_id = $attribute['user_id'];
-                    $add->annual_leave_total = $addTime;
-                    // $timeOff = 0;
+                    $add->annual_leave_total = TrackService::calculatorYear($user_id);
+                    
                     switch ($arrayMonth[$i]) {
                         case "01":
                             $timeOff = $add->January;
