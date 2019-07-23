@@ -44,7 +44,8 @@ class TracksController extends Controller
      */
     public function index()
     {
-        $tracks = $this->repository->all();
+        $yearNow = Carbon::now()->format('Y');
+        $tracks = $this->repository->findwhere(['year' => $yearNow]);
 
         return $this->success($tracks, trans('messages.track.success'));
     }
