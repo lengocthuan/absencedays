@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Response;
 use App\User;
 use App\Models\Track;
+use App\Models\Registration;
 
 /**
  * Class TracksController.
@@ -45,6 +46,8 @@ class TracksController extends Controller
     public function index()
     {
         $yearNow = Carbon::now()->format('Y');
+        // $timeDetails = $this->repository->getTimeDetailForEachUser();
+        // dd($timeDetails);
         $tracks = $this->repository->findwhere(['year' => $yearNow]);
 
         return $this->success($tracks, trans('messages.track.success'));
@@ -97,8 +100,10 @@ class TracksController extends Controller
     public function getStatistical(TrackCreateRequest $request)
     {
         $general =['data' => $this->repository->statistical($request->all())];
-
-        return $this->success($general, trans('messages.track.statistical'));
+        if($general['data']) {
+            return $this->success($general, trans('messages.track.statistical'));
+        }
+        return $this->error(trans('messages.track.error'), trans('messages.track.notExist'), Response::HTTP_BAD_REQUEST);
     }
 
     public function export(TrackCreateRequest $request) 
@@ -125,4 +130,5 @@ class TracksController extends Controller
 
         return $this->success($result, trans('messages.track.success'));
     }
+
 }

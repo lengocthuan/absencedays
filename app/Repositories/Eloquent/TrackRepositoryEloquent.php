@@ -86,74 +86,82 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
                 }
             }
         }
-
-        $totalDayOff = 0;
-        $newInitArray = array(); //array is final result;
-        $uniquePreSum = array_unique($preSum);
-        $arrayNull = array();
-
-        foreach ($uniquePreSum as $value) {
-            $cut = explode('-', $value);
-            $arrayNull[] = $cut;
-        }
-
-        for ($i = 0; $i < count($arrayNull); $i++) {
-            $mergeId[] = (integer) $arrayNull[$i][0];
-        }
-
-        for ($i = 0; $i < count($user); $i++) {
-            $mergeIdUser[] = $user[$i]->id;
-        }
-
-        $uniqueId = array_diff($mergeIdUser, $mergeId);
-        $addUserNull = User::whereIn('id', $uniqueId)->get();
-
-        for ($i = 0; $i < count($addUserNull); $i++) {
-            $resultFinal[] = ['id' => $addUserNull[$i]->id, 'name' => $addUserNull[$i]->name, 'email' => $addUserNull[$i]->email, 'team' => $addUserNull[$i]->getTeam->name, 'position' => $addUserNull[$i]->getPosition->name, 'time_details' => null, 'at_time' => null, 'absence_days' => null, 'type_off' => null, 'note' => null];
-        }
-
-        for ($i = 0; $i < count($arrayNull); $i++) {
-            $newInitArray[] = ['id' => $arrayNull[$i][0], 'name' => $arrayNull[$i][1], 'email' => $arrayNull[$i][2], 'team' => $arrayNull[$i][3], 'position' => $arrayNull[$i][4], 'time_details' => null, 'at_time' => null, 'absence_days' => null, 'type_off' => null, 'note' => null];
-        }
-
-        $mergeTime = array();
-
-        for ($i = 0; $i < count($newInitArray); $i++) {
-            foreach ($general as $value) {
-                if ($value['id'] == $newInitArray[$i]['id']) {
-                    $mergeTime[] = $value['time_details'];
-                    $newInitArray[$i]['time_details'] = $mergeTime;
-                    $totalDayOff += $value['absence_days'];
-                    $mergeAtTime[] = $value['at_time'];
-                    $newInitArray[$i]['at_time'] = $mergeAtTime;
-                    $newInitArray[$i]['absence_days'] = $totalDayOff;
-                    $newInitArray[$i]['type_off'] = $value['type_off'];
-                    $newInitArray[$i]['note'] = $value['note'];
-                }
-
-            }
+        if (count($general)) {
             $totalDayOff = 0;
-            unset($mergeTime);
-            unset($mergeAtTime);
-        }
+            $newInitArray = array(); //array is final result;
+            $uniquePreSum = array_unique($preSum);
+            $arrayNull = array();
 
-        if (isset($attributes['absences'])) {
-            switch ($attributes['absences']) {
-                case 0:
-                    return $resultFinal;
-                    break;
-
-                case 1:
-                    return $newInitArray;
-                    break;
-
-                default:
-                    break;
+            foreach ($uniquePreSum as $value) {
+                $cut = explode('-', $value);
+                $arrayNull[] = $cut;
             }
-        }
 
-        $result = array_merge($resultFinal, $newInitArray);
-        return $result;
+            for ($i = 0; $i < count($arrayNull); $i++) {
+                $mergeId[] = (integer) $arrayNull[$i][0];
+            }
+
+            for ($i = 0; $i < count($user); $i++) {
+                $mergeIdUser[] = $user[$i]->id;
+            }
+
+            $uniqueId = array_diff($mergeIdUser, $mergeId);
+            $addUserNull = User::whereIn('id', $uniqueId)->get();
+
+            for ($i = 0; $i < count($addUserNull); $i++) {
+                $resultFinal[] = ['id' => $addUserNull[$i]->id, 'name' => $addUserNull[$i]->name, 'email' => $addUserNull[$i]->email, 'team' => $addUserNull[$i]->getTeam->name, 'position' => $addUserNull[$i]->getPosition->name, 'time_details' => null, 'at_time' => null, 'absence_days' => null, 'type_off' => null, 'note' => null];
+            }
+
+            for ($i = 0; $i < count($arrayNull); $i++) {
+                $newInitArray[] = ['id' => $arrayNull[$i][0], 'name' => $arrayNull[$i][1], 'email' => $arrayNull[$i][2], 'team' => $arrayNull[$i][3], 'position' => $arrayNull[$i][4], 'time_details' => null, 'at_time' => null, 'absence_days' => null, 'type_off' => null, 'note' => null];
+            }
+
+            $mergeTime = array();
+
+            for ($i = 0; $i < count($newInitArray); $i++) {
+                foreach ($general as $value) {
+                    if ($value['id'] == $newInitArray[$i]['id']) {
+                        $mergeTime[] = $value['time_details'];
+                        $newInitArray[$i]['time_details'] = $mergeTime;
+                        $totalDayOff += $value['absence_days'];
+                        $mergeAtTime[] = $value['at_time'];
+                        $newInitArray[$i]['at_time'] = $mergeAtTime;
+                        $newInitArray[$i]['absence_days'] = $totalDayOff;
+                        $newInitArray[$i]['type_off'] = $value['type_off'];
+                        $newInitArray[$i]['note'] = $value['note'];
+                    }
+
+                }
+                $totalDayOff = 0;
+                unset($mergeTime);
+                unset($mergeAtTime);
+            }
+
+            if (isset($attributes['absences'])) {
+                switch ($attributes['absences']) {
+                    case 0:
+                        return $resultFinal;
+                        break;
+
+                    case 1:
+                        return $newInitArray;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            $result = array_merge($resultFinal, $newInitArray);
+
+            if (isset($attributes['year'])) {
+                for ($i=0; $i < count($result); $i++) { 
+                    $result[$i]['year'] = $attributes['year'];
+                }
+            }
+
+            return $result;
+        }
+        return false;
     }
 
     public function create(array $attributes)
@@ -218,7 +226,7 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             if (isset($attributes['absences'])) {
                 switch ($attributes['absences']) {
                     case 0:
-                        return$this->parserResult($arrayNull);
+                        return $this->parserResult($arrayNull);
                         break;
 
                     case 1:
@@ -234,4 +242,17 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         return false;
     }
 
+    // public function getTimeDetailForEachUser()
+    // {
+    //     $now = Carbon::now()->format('Y');
+    //     $user = Track::where('year', $now)->select(['user_id', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'sick_leave', 'marriage_leave', 'maternity_leave', 'bereavement_leave', 'unpaid_leave'])->get();
+
+    //     for ($i=0; $i < count($user); $i++) {
+    //         if ($user[$i]) {
+    //             if (count('January')) {
+    //                 $registration = Regis
+    //             }
+    //         }
+    //     }
+    // }
 }

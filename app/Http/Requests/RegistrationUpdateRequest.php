@@ -24,7 +24,7 @@ class RegistrationUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'type_id' => 'string|max:191',
+            'type_id' => 'integer',
             'note' => 'string|min:10',
             'requested_date' => 'date_format:Y-m-d H:i:s|before_or_equal:time_off_beginning',
         ];

@@ -32,6 +32,7 @@ return [
         'create' => 'Create a track successfully.',
         'error' => 'Bad request',
         'newest' => 'Table Track has been updated.',
+        'notExist' => 'Data not exist with your required',
     ],
     'type' => [
         'success' => 'Get information type successfully',

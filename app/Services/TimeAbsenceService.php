@@ -72,7 +72,7 @@ class TimeAbsenceService
                             $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
                         }
                     }
-                    if (count($useId)) {
+                    if (count($userId)) {
                         for ($i = 0; $i < count($userId); $i++) {
                             if ($userId[$i][0]->user_id == $userCurrent) {
                                 return false;
@@ -93,7 +93,7 @@ class TimeAbsenceService
                 if ($timeChildren[1] == Registration::FULL) {
                     $checkTimeDuplicate = TimeAbsence::where('time_details', $timeChildren[0])->get();
                     if (count($checkTimeDuplicate)) {
-                        $useId = [];
+                        $userId = [];
                         for ($i = 0; $i < count($checkTimeDuplicate); $i++) {
                             if (isset($attribute['_method'])) {
                                 $temp = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->whereNotIn('id', [$attribute['id']])->get();
@@ -104,7 +104,7 @@ class TimeAbsenceService
                                 $userId[] = Registration::where('id', $checkTimeDuplicate[$i]->registration_id)->get();
                             }
                         }
-                        if (count($useId)) {
+                        if (count($userId)) {
                             for ($i = 0; $i < count($userId); $i++) {
                                 if ($userId[$i][0]->user_id == $userCurrent) {
                                     return false;
