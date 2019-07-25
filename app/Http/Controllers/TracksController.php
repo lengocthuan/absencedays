@@ -46,8 +46,6 @@ class TracksController extends Controller
     public function index()
     {
         $yearNow = Carbon::now()->format('Y');
-        // $timeDetails = $this->repository->getTimeDetailForEachUser();
-        // dd($timeDetails);
         $tracks = $this->repository->findwhere(['year' => $yearNow]);
 
         return $this->success($tracks, trans('messages.track.success'));

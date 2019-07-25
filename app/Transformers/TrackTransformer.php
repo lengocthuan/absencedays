@@ -35,6 +35,7 @@ class TrackTransformer extends BaseTransformer
         return [
             'user' => $model->getInfoUser(),
             'registration' => $model->getRegistration(),
+            'dateDetails' => $model->getTimeDetailForEachUser(),
         ];
     }
 

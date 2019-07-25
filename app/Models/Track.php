@@ -4,8 +4,8 @@ namespace App\Models;
 
 use App\Models\Registration;
 use App\Models\TimeAbsence;
-use App\User;
 use App\Traits\InformationUserTrait;
+use Carbon\Carbon;
 
 /**
  * Class Track.
@@ -57,4 +57,63 @@ class Track extends BaseModel
         return $arrayResult;
     }
 
+    public function getTimeDetailForEachUser()
+    {
+        $date1 = $date2 = $date3 = $date4 = $date5 = $date6 = $date7 = $date8 = $date9 = $date10 = $date11 = $date12 = NULL;
+        $registration = Registration::where('user_id', $this->user_id)->get();
+
+        for ($i = 0; $i < count($registration); $i++) {
+            $time = TimeAbsence::where('registration_id', $registration[$i]->id)->whereYear('time_details', $this->year)->get();
+            for ($j = 0; $j < count($time); $j++) {
+                $month = Carbon::parse($time[$j]['time_details'])->format('m');
+
+                switch ($month) {
+                    case '01':
+                        $date1[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '02':
+                        $date2[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '03':
+                        $date3[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '04':
+                        $date4[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '05':
+                        $date5[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '06':
+                        $date6[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '07':
+                        $date7[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '08':
+                        $date8[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '09':
+                        $date9[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '10':
+                        $date10[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '11':
+                        $date11[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+                    case '12':
+                        $date12[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];
+                        break;
+
+                    default:
+                        # code...
+                        break;
+                }
+
+            }
+
+        }
+        $result[] = ['January' => $date1, 'February' => $date2, 'March' => $date3, 'April' => $date4, 'May' => $date5, 'June' => $date6, 'July' => $date7, 'August' => $date8, 'September' => $date9, 'October' => $date10, 'November' => $date11, 'December' => $date12];
+        return $result;
+    }
 }
