@@ -54,6 +54,9 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         //1. From day to day
         //2. For month of year
         //3. For year
+        Carbon::setWeekStartsAt(Carbon::SUNDAY);
+        Carbon::setWeekEndsAt(Carbon::SATURDAY);
+
         $user = User::select()->get();
         $registration = Registration::select('id', 'user_id', 'status', 'type_id', 'note')->get();
         if (isset($attributes['from']) && isset($attributes['to'])) {
@@ -66,7 +69,14 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             $month = $cut[1];
             $year = $cut[0];
             $result = TimeAbsence::whereMonth('time_details', $month)->whereYear('time_details', $year)->select('registration_id', 'time_details', 'at_time', 'absence_days')->get();
-        } else {
+        } elseif (isset($attributes['week'])) {    
+            $week = Carbon::parse($attributes['week']);
+            $start = $week->startOfWeek()->toDateString();
+            $end = $week->endOfWeek()->toDateString();
+
+            $result = TimeAbsence::whereBetween('time_details', [$start, $end])->select('registration_id', 'time_details', 'at_time', 'absence_days')->get();
+        }
+        else {
             $time = $attributes['year'];
             $result = TimeAbsence::whereYear('time_details', $time)->select('registration_id', 'time_details', 'at_time', 'absence_days')->get();
         }
@@ -154,7 +164,7 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             $result = array_merge($resultFinal, $newInitArray);
 
             if (isset($attributes['year'])) {
-                for ($i=0; $i < count($result); $i++) { 
+                for ($i = 0; $i < count($result); $i++) {
                     $result[$i]['year'] = $attributes['year'];
                 }
             }
@@ -246,13 +256,114 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
     // {
     //     $now = Carbon::now()->format('Y');
     //     $user = Track::where('year', $now)->select(['user_id', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'sick_leave', 'marriage_leave', 'maternity_leave', 'bereavement_leave', 'unpaid_leave'])->get();
-
-    //     for ($i=0; $i < count($user); $i++) {
-    //         if ($user[$i]) {
-    //             if (count('January')) {
-    //                 $registration = Regis
+    //     for ($i = 1; $i < 2; $i++) {
+    //         $registration = Registration::where('user_id', $user[$i]['user_id'])->select(['id'])->get();
+    //         if ($user[$i]['January'] && $user[$i]['January'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 1)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date1[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
     //             }
+    //         } else {
+    //             $date1 = NULL;
+
+    //         }
+    //         if ($user[$i]['February'] && $user[$i]['February'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 2)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date2[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+
+    //         } else {
+    //             $date2 = NULL;
+
+    //         }
+
+    //         if ($user[$i]['March'] && $user[$i]['March'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 3)->select(['time_details', 'at_time'])->get();
+    //             // for ($i=0; $i < count($date); $i++) {
+    //             //     $date3[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             // }
+    //         } else {
+    //             $date3 = NULL;
+    //         }
+
+    //         if ($user[$i]['April'] && $user[$i]['April'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 4)->select(['time_details', 'at_time'])->get();
+    //             // for ($i=0; $i < count($date); $i++) {
+    //             //     $date4[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             // }
+    //         } else {
+    //             $date4 = NULL;
+    //         }
+    //         if ($user[$i]['May'] && $user[$i]['May'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 5)->select('time_details', 'at_time')->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date5[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //             dd($date5);
+    //         } else {
+    //             $date5 = NULL;
+    //         }
+    //         if ($user[$i]['June'] && $user[$i]['June'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 6)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date6[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date6 = NULL;
+    //         }
+    //         if ($user[$i]['July'] && $user[$i]['July'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 7)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date7[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date7 = NULL;
+    //         }
+    //         if ($user[$i]['August'] && $user[$i]['August'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 8)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date8[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date8 = NULL;
+    //         }
+    //         if ($user[$i]['September'] && $user[$i]['September'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 9)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date9[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date9 =NULL;
+    //         }
+    //         if ($user[$i]['October'] && $user[$i]['October'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 10)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date10[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date10 = NULL;
+    //         }
+    //         if ($user[$i]['November'] && $user[$i]['November'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 11)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date11[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date11 = NULL;
+    //         }
+    //         if ($user[$i]['December'] && $user[$i]['December'] != 0) {
+    //             $date = TimeAbsence::where('registration_id', $registration[$i]['id'])->whereYear('time_details', $now)->whereMonth('time_details', 12)->select(['time_details', 'at_time'])->get();
+    //             for ($i=0; $i < count($date); $i++) {
+    //                 $date12[] = $date[$i]['time_details']. '-' .$date[$i]['at_time'];
+    //             }
+    //         } else {
+    //             $date12 = NULL;
     //         }
     //     }
+    //     // dd( $date5);
+    //     // $result = ['thang 5' => $date, 'thang 6' => $date6];
+    //     // return $result;
     // }
+
 }
