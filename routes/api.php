@@ -17,11 +17,13 @@
 Route::group(['prefix' => 'v1'], function () {
     //auth
     Route::post('auth/login', 'Auth\AuthController@login');
-    Route::post('auth/logout', 'Auth\AuthController@logout');
+    // Route::post('auth/logout', 'Auth\AuthController@logout');
     Route::post('auth/google', 'Auth\AuthGoogleController@login');
 
     //user information
     Route::get('me', 'UsersController@me');
+        //users
+    Route::resource('users', 'UsersController');
     Route::post('registers', 'UsersController@register');
     Route::get('get_users_by_team/{id}', 'UsersController@getUsersByTeam');
     Route::get('get_mails', 'UsersController@getMail');
@@ -55,15 +57,14 @@ Route::group(['prefix' => 'v1'], function () {
 
 });
 
-Route::group(['prefix' => 'v1'], function () {
+Route::group(['prefix' => 'v1/user', 'middleware' => ['auth:api']], function () {
     //auth
     Route::post('auth/logout', 'Auth\AuthController@logout');
     //password
     Route::post('password/change', 'UsersController@changePass');
     //user information
-    Route::get('me', 'UsersController@me');
-    //users
-    Route::resource('users', 'UsersController');
-    //promotions
-    // images
+    // Route::get('me', 'UsersController@me');
+    //Statistical
+    Route::get('statistical', 'TracksController@getStatistical');
+    Route::resource('tracks', 'TracksController');
 });

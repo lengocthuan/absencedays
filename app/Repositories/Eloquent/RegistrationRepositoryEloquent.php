@@ -124,7 +124,8 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 $attributes['requested_date'] = Carbon::now()->toDateString();
             }
         }
-
+        $checkTrack = TimeAbsenceService::checkTrack($attributes);
+        dd($checkTrack);
         $checkTime = TimeAbsenceService::check($attributes);
         if ($checkTime == true) {
             $resgistration = parent::create($attributes);

@@ -125,7 +125,7 @@ class TracksController extends Controller
         if($result['data'] != true) {
             return $this->success($data, trans('messages.track.success'));
         }
-
+        
         return $this->success($result, trans('messages.track.success'));
     }
 

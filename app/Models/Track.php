@@ -113,7 +113,7 @@ class Track extends BaseModel
             }
 
         }
-        $result[] = ['January' => $date1, 'February' => $date2, 'March' => $date3, 'April' => $date4, 'May' => $date5, 'June' => $date6, 'July' => $date7, 'August' => $date8, 'September' => $date9, 'October' => $date10, 'November' => $date11, 'December' => $date12];
+        $result = ['January' => $date1, 'February' => $date2, 'March' => $date3, 'April' => $date4, 'May' => $date5, 'June' => $date6, 'July' => $date7, 'August' => $date8, 'September' => $date9, 'October' => $date10, 'November' => $date11, 'December' => $date12];
         return $result;
     }
 }

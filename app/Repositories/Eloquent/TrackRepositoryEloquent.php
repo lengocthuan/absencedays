@@ -69,14 +69,13 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
             $month = $cut[1];
             $year = $cut[0];
             $result = TimeAbsence::whereMonth('time_details', $month)->whereYear('time_details', $year)->select('registration_id', 'time_details', 'at_time', 'absence_days')->get();
-        } elseif (isset($attributes['week'])) {    
+        } elseif (isset($attributes['week'])) {
             $week = Carbon::parse($attributes['week']);
             $start = $week->startOfWeek()->toDateString();
             $end = $week->endOfWeek()->toDateString();
 
             $result = TimeAbsence::whereBetween('time_details', [$start, $end])->select('registration_id', 'time_details', 'at_time', 'absence_days')->get();
-        }
-        else {
+        } else {
             $time = $attributes['year'];
             $result = TimeAbsence::whereYear('time_details', $time)->select('registration_id', 'time_details', 'at_time', 'absence_days')->get();
         }
@@ -191,65 +190,70 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
         $newUser = Track::select('user_id', 'year')->get();
         $currentYearNonNull = Track::where('year', $now)->where('annual_leave_unused', '!=', null)->get();
         $currentYearNull = Track::where('year', $now)->where('annual_leave_unused', null)->get();
-        for ($i = 0; $i < count($newUser); $i++) {
-            $newArray[] = $newUser[$i]->user_id . ' ' . $newUser[$i]->year;
-        }
 
-        $oldArray = $newArray;
-        $user = User::select('id')->get();
+        if (!empty($newUser)) {
+            for ($i = 0; $i < count($newUser); $i++) {
+                $newArray[] = $newUser[$i]->user_id . ' ' . $newUser[$i]->year;
+            }
 
-        foreach ($user as $key => $value) {
-            $newArray[] = $value->id . ' ' . $now;
-        }
+            $oldArray = $newArray;
+            $user = User::select('id')->get();
 
-        $result = array_diff($newArray, $oldArray);
-        if (empty($result)) {
-            if (isset($attributes['absences'])) {
-                switch ($attributes['absences']) {
-                    case 0:
-                        return $this->parserResult($currentYearNull);
-                        break;
+            foreach ($user as $key => $value) {
+                $newArray[] = $value->id . ' ' . $now;
+            }
 
-                    case 1:
-                        return $this->parserResult($currentYearNonNull);
-                        break;
+            $result = array_diff($newArray, $oldArray);
+            if (empty($result)) {
+                if (isset($attributes['absences'])) {
+                    switch ($attributes['absences']) {
+                        case 0:
+                            return $this->parserResult($currentYearNull);
+                            break;
 
-                    default:
-                        break;
+                        case 1:
+                            return $this->parserResult($currentYearNonNull);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                }
+            }
+            if (!empty($result)) {
+                foreach ($result as $value) {
+                    $arrayCut[] = explode(' ', $value);
                 }
 
-            }
-        }
-        if (!empty($result)) {
-            foreach ($result as $value) {
-                $arrayCut[] = explode(' ', $value);
-            }
-
-            for ($i = 0; $i < count($arrayCut); $i++) {
-                $addTime = TrackService::calculatorYear($arrayCut[$i][0]);
-                $arrayNull[] = ['year' => $arrayCut[$i][1], 'user_id' => $arrayCut[$i][0], 'annual_leave_total' => $addTime, 'annual_leave_unused' => null, 'January' => 0.0, 'February' => 0.0, 'March' => 0.0, 'April' => 0.0, 'May' => 0.0, 'June' => 0.0, 'July' => 0.0, 'August' => 0.0, 'September' => 0.0, 'October' => 0, 'November' => 0.0, 'December' => 0.0, 'sick_leave' => 0.0, 'marriage_leave' => 0.0, 'maternity_leave' => 0.0, 'bereavement_leave' => 0.0, 'unpaid_leave' => 0.0];
-            }
-            for ($i = 0; $i < count($arrayNull); $i++) {
-                Track::create($arrayNull[$i]);
-            }
-
-            if (isset($attributes['absences'])) {
-                switch ($attributes['absences']) {
-                    case 0:
-                        return $this->parserResult($arrayNull);
-                        break;
-
-                    case 1:
-                        return $this->parserResult($currentYearNonNull);
-                        break;
-
-                    default:
-                        break;
+                for ($i = 0; $i < count($arrayCut); $i++) {
+                    $addTime = TrackService::calculatorYear($arrayCut[$i][0]);
+                    $arrayNull[] = ['year' => $arrayCut[$i][1], 'user_id' => $arrayCut[$i][0], 'annual_leave_total' => $addTime, 'annual_leave_unused' => null, 'January' => 0.0, 'February' => 0.0, 'March' => 0.0, 'April' => 0.0, 'May' => 0.0, 'June' => 0.0, 'July' => 0.0, 'August' => 0.0, 'September' => 0.0, 'October' => 0, 'November' => 0.0, 'December' => 0.0, 'sick_leave' => 0.0, 'marriage_leave' => 0.0, 'maternity_leave' => 0.0, 'bereavement_leave' => 0.0, 'unpaid_leave' => 0.0];
+                }
+                for ($i = 0; $i < count($arrayNull); $i++) {
+                    Track::create($arrayNull[$i]);
                 }
 
+                if (isset($attributes['absences'])) {
+                    switch ($attributes['absences']) {
+                        case 0:
+                            return $this->parserResult($arrayNull);
+                            break;
+
+                        case 1:
+                            return $this->parserResult($currentYearNonNull);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                }
             }
+            return false;
         }
-        return false;
+        return $this->parserResult($currentYearNull);
+
     }
 
 }

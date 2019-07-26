@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Registration;
 use App\Models\TimeAbsence;
+use App\Models\Track;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -138,6 +139,39 @@ class TimeAbsenceService
                 }
             }
             return true;
+        }
+    }
+
+    public static function checkTrack($attribute)
+    {
+        $day = 0;
+        $userCurrent = Auth::id();
+        if ($attribute['type'] == Registration::TYPE_ABSENCE) {
+            $timeStart = new Carbon($attribute['time_start']);
+            $timeEnd = new Carbon($attribute['time_end']);
+
+            $countDay = $timeEnd->diffInDays($timeStart) + 1;
+            for ($i = 0; $i < $countDay; $i++) {
+                // $day += 1;
+                $current_year[] = Carbon::parse($timeStart->toDateString())->format('Y');
+                $total = Track::where('user_id', $userCurrent)->where('year', $current_year)->select(['annual_leave_unused'])->first();
+                $tru = (double)$total->annual_leave_unused - 1;
+                $timeStart = $timeStart->addDay();
+            }
+            // dd($current_year);
+
+            dd($current_year);
+        } else {
+            $time = explode(';', $attribute['date']);
+            for ($i = 0; $i < count($time); $i++) {
+                $timeChildren = explode(',', $time[$i]);
+                if ($timeChildren[1] == Registration::MORNING || $timeChildren[1] == Registration::AFTERNOON) {
+                    $day += 0.5;
+                } else {
+                    $day += 1;
+                }
+            }
+            dd($day);
         }
     }
 
