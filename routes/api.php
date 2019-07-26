@@ -51,7 +51,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('time_absences', 'TimeAbsencesController');
 
     Route::get('statistical', 'TracksController@getStatistical');
-    Route::get('update_all_users', 'TracksController@updateFromUser');
+    Route::get('filters', 'TracksController@filter');
     Route::get('exports', 'TracksController@export');
     Route::get('exports_statistical', 'TracksController@exportStatistical');
 

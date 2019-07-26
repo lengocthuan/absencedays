@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Exports\TracksExport;
 use App\Exports\StatisticalsExport;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests;
+use App\Exports\TracksExport;
 use App\Http\Requests\TrackCreateRequest;
-use App\Http\Requests\TrackUpdateRequest;
+use App\Models\Track;
 use App\Repositories\Contracts\TrackRepository;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\User;
-use App\Models\Track;
-use App\Models\Registration;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Class TracksController.
@@ -45,6 +41,7 @@ class TracksController extends Controller
      */
     public function index()
     {
+        $result = $this->repository->fromUser();
         $yearNow = Carbon::now()->format('Y');
         $tracks = $this->repository->findwhere(['year' => $yearNow]);
 
@@ -61,7 +58,7 @@ class TracksController extends Controller
     public function store(TrackCreateRequest $request)
     {
         $track = $this->repository->skipPresenter()->create($request->all());
-        if($track){
+        if ($track) {
             return $this->success($track->presenter(), trans('messages.track.create'), ['code' => Response::HTTP_CREATED]);
         }
         return $this->error(trans('messages.track.errorStore'), trans('messages.track.duplicate'), Response::HTTP_BAD_REQUEST);
@@ -97,18 +94,18 @@ class TracksController extends Controller
 
     public function getStatistical(TrackCreateRequest $request)
     {
-        $general =['data' => $this->repository->statistical($request->all())];
-        if($general['data']) {
+        $general = ['data' => $this->repository->statistical($request->all())];
+        if ($general['data']) {
             return $this->success($general, trans('messages.track.statistical'));
         }
         return $this->error(trans('messages.track.error'), trans('messages.track.notExist'), Response::HTTP_BAD_REQUEST);
     }
 
-    public function export(TrackCreateRequest $request) 
+    public function export(TrackCreateRequest $request)
     {
         $general = $this->repository->statistical($request->all());
 
-        return Excel::download(new TracksExport($general), "Thống kê chi tiết theo đợt $request->from-$request->to$request->year$request->month.xlsx");
+        return Excel::download(new TracksExport($general), "Thống kê chi tiết theo đợt $request->from-$request->to $request->year $request->month.xlsx");
     }
 
     public function exportStatistical()
@@ -118,15 +115,14 @@ class TracksController extends Controller
         return Excel::download(new StatisticalsExport, "Thống kê tổng quan theo năm-ngày xuất bản-$now.xlsx");
     }
 
-    public function updateFromUser(Request $request)
+    public function filter(Request $request)
     {
-        $result = $this->repository->fromUser($request->all());
-        $data = $this->repository->all();
-        if($result['data'] != true) {
-            return $this->success($data, trans('messages.track.success'));
+        $filter = $this->repository->filterForRequest($request->all());
+
+        if ($filter) {
+            return $this->success($filter, trans('messages.track.success'));
         }
-        
-        return $this->success($result, trans('messages.track.success'));
+        return $this->error(trans('messages.track.error'), trans('messages.track.notExist'), Response::HTTP_BAD_REQUEST);
     }
 
 }
