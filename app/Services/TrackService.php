@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\TimeAbsence;
+use App\Models\Registration;
 use App\Models\Track;
 use App\User;
 use Carbon\Carbon;
@@ -9,23 +10,24 @@ use Illuminate\Support\Facades\Auth;
 
 class TrackService
 {
-    public static function update($id, array $attribute)
+    public static function update($id,  $attribute)
     {
-        $user_id = Auth::id();
+        $user_id = Registration::where('id', $id)->select(['user_id'])->first();
         $year = Carbon::now()->format('Y');
-        $check = Track::where('user_id', $user_id)->where('year', $year)->first();
+        $check = Track::where('user_id', $user_id->user_id)->where('year', $year)->first();
 
-        if($check->annual_leave_total == null) {
-            $addTime = TrackService::calculatorYear($user_id);
+        if ($check->annual_leave_total == null) {
+            $addTime = TrackService::calculatorYear($user_id->user_id, $year);
             $check->annual_leave_total = $addTime;
             $check->save();
         }
 
-        $trackId = Track::where(['user_id' => $attribute['user_id'], 'year' => $year])->get();
+        $trackId = Track::where(['user_id' => $attribute[0]['user_id'], 'year' => $year])->get();
+
         $track = Track::find($trackId[0]->id);
+
         $time = TimeAbsence::where('registration_id', $id)->select('time_details', 'absence_days')->get();
 
-        // $newOff = 0;
         $arrayMonth = array();
         $arrayYear = array();
 
@@ -66,13 +68,13 @@ class TrackService
                         break;
                     case "05":
                         $newOff = $track->May;
-                        $track->May = $newOff +$time[$i]->absence_days;
+                        $track->May = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
                     case "06":
                         $newOff = $track->June;
-                        $track->June = $newOff +$time[$i]->absence_days;
+                        $track->June = $newOff + $time[$i]->absence_days;
                         $track->annual_leave_unused = $track->annual_leave_total - ($track->January + $track->February + $track->March + $track->April + $track->May + $track->June + $track->July + $track->August + $track->September + $track->October + $track->November + $track->December);
                         $track->save();
                         break;
@@ -117,13 +119,13 @@ class TrackService
                         break;
                 }
             } elseif ($arrayYear[$i] != $year) {
-                $check = Track::where('year', $arrayYear[$i])->get();
+                $check = Track::where('year', $arrayYear[$i])->where('user_id', $attribute[0]['user_id'])->get();
                 if (count($check) == 0) {
                     $add = new Track;
                     $add->year = $year + 1;
-                    $add->user_id = $attribute['user_id'];
-                    $add->annual_leave_total = TrackService::calculatorYear($user_id);
-                    
+                    $add->user_id = $attribute[0]['user_id'];
+                    $add->annual_leave_total = TrackService::calculatorYear($user_id, $add->year);
+
                     switch ($arrayMonth[$i]) {
                         case "01":
                             $timeOff = $add->January;
@@ -289,24 +291,36 @@ class TrackService
 
     public static function create($id)
     {
-        $addTime = TrackService::calculatorYear($id);
+        $now = Carbon::now()->format('Y');
+        $addTime = TrackService::calculatorYear($id, $now);
         $check = Track::where('user_id', $id)->get();
         if (empty($check[0]->user_id)) {
             $new = new Track;
             $new->year = Carbon::now()->format('Y');
             $new->user_id = $id;
             $new->annual_leave_total = $addTime;
+            $new->annual_leave_unused = $addTime;
             $new->save();
         }
     }
 
-    public static function calculatorYear($attribute)
+    public static function calculatorYear($attribute, $year)
     {
+        $now = Carbon::now()->format('Y');
         $user = User::where('id', $attribute)->select('first_workday')->get();
         $firstWorkday = new Carbon($user[0]->first_workday);
         $firstWorkday1 = $firstWorkday->toDateString();
-        $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
         $yearAnnual = 12;
+        if ($now == $year) {
+            $annualLeaveTotal = Carbon::parse($firstWorkday1)->age; //Calculate the total number of working years
+        } elseif ($year == $now + 1) {
+            $annualLeaveTotal = Carbon::parse($firstWorkday1)->age;
+            $annualLeaveTotal += 1;
+        } else {
+
+            return false;
+        }
+
         if ($annualLeaveTotal >= 5) {
             for ($i = 0; $i <= $annualLeaveTotal; $i += 5) {
                 $addTime = $yearAnnual++;

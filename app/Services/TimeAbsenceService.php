@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Registration;
 use App\Models\TimeAbsence;
 use App\Models\Track;
+use App\Services\TrackService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -142,36 +143,161 @@ class TimeAbsenceService
         }
     }
 
+    public static function process($time, $now, $userCurrent, $at_time)
+    {
+        $result = 0;
+        $newResult = 0;
+        $temp = Carbon::parse($time)->format('Y');
+        $checkTotal = Track::where('user_id', $userCurrent)->where('year', $temp)->select(['annual_leave_unused'])->first();
+        if (is_null($checkTotal)) {
+            $add = new Track;
+            $add->year = $temp;
+            $add->user_id = $userCurrent;
+            $add->annual_leave_total = TrackService::calculatorYear($userCurrent, $temp);
+            $add->annual_leave_unused = $add->annual_leave_total;
+            if ($add->annual_leave_total == false) {
+                return false;
+            }
+            $add->save();
+        }
+
+        if ($temp == $now) {
+            if ($at_time == Registration::MORNING || $at_time == Registration::AFTERNOON) {
+                $result += 0.5;
+            } else {
+                $result += 1;
+            }
+        } else {
+            if ($at_time == Registration::MORNING || $at_time == Registration::AFTERNOON) {
+                $newResult += 0.5;
+            } else {
+                $newResult += 1;
+            }
+        }
+        return $result . '-' . $newResult;
+
+    }
     public static function checkTrack($attribute)
     {
         $day = 0;
+        $now = Carbon::now()->format('Y');
+        $result = 0;
+        $newResult = 0;
         $userCurrent = Auth::id();
+        // if ($attribute['type_id'] != Registration::ANNUAL_LEAVE) {
+        //     switch ($attribute) {
+        //         case 2:
+        //             # code...
+        //             break;
+        //         case 3:
+        //             # code...
+        //             break;
+        //         case 4:
+        //             # code...
+        //             break;
+        //         case 5:
+        //             # code...
+        //             break;
+        //         case 6:
+        //             # code...
+        //             break;
+        //         case 7:
+        //             # code...
+        //             break;
+                
+        //         default:
+        //             # code...
+        //             break;
+        //     }
+        // }
         if ($attribute['type'] == Registration::TYPE_ABSENCE) {
             $timeStart = new Carbon($attribute['time_start']);
             $timeEnd = new Carbon($attribute['time_end']);
 
             $countDay = $timeEnd->diffInDays($timeStart) + 1;
-            for ($i = 0; $i < $countDay; $i++) {
-                // $day += 1;
-                $current_year[] = Carbon::parse($timeStart->toDateString())->format('Y');
-                $total = Track::where('user_id', $userCurrent)->where('year', $current_year)->select(['annual_leave_unused'])->first();
-                $tru = (double)$total->annual_leave_unused - 1;
-                $timeStart = $timeStart->addDay();
-            }
-            // dd($current_year);
 
-            dd($current_year);
+            for ($i = 0; $i < $countDay; $i++) {
+                $currentYear[] = Carbon::parse($timeStart->toDateString())->format('Y');
+                $timeStart->addDay();
+            }
+            $firstYear = $currentYear[0];
+            $count[] = array_count_values($currentYear);
+
+            for ($i = 0; $i < count($currentYear); $i++) {
+
+                $total = Track::where('user_id', $userCurrent)->where('year', $currentYear[$i])->select(['annual_leave_unused'])->first();
+
+                if (is_null($total)) {
+                    $add = new Track;
+                    $add->year = $currentYear[$i];
+                    $add->user_id = $userCurrent;
+                    $add->annual_leave_total = TrackService::calculatorYear($userCurrent, $currentYear[$i]);
+                    $add->annual_leave_unused = $add->annual_leave_total;
+                    if ($add->annual_leave_total == false) {
+                        return false;
+                    }
+                    $add->save();
+                }
+                if ($currentYear[$i] != $firstYear) {
+                    $totalNew = Track::where('user_id', $userCurrent)->where('year', $currentYear[$i])->select(['annual_leave_unused'])->first();
+                    $addOldTotal = (double) $totalNew->annual_leave_unused;
+
+                    $newResult += 1;
+                } else {
+                    $oldTotal = (double) $total->annual_leave_unused;
+
+                    $result = $oldTotal - ($i + 1);
+                }
+            }
+
+            if (isset($newResult)) {
+                $resultForNextYear = $addOldTotal - $newResult;
+                if ($result < 0 || $resultForNextYear < 0) {
+                    return false;
+                }
+                return true;
+            }
+
+            if ($result < 0) {
+                return false;
+            }
+            return true;
+
         } else {
             $time = explode(';', $attribute['date']);
             for ($i = 0; $i < count($time); $i++) {
                 $timeChildren = explode(',', $time[$i]);
-                if ($timeChildren[1] == Registration::MORNING || $timeChildren[1] == Registration::AFTERNOON) {
-                    $day += 0.5;
-                } else {
-                    $day += 1;
+                $resultProcess[] = TimeAbsenceService::process($timeChildren[0], $now, $userCurrent, $timeChildren[1]);
+            }
+            $tempNewResult = 0;
+            $tempResult = 0;
+            for ($i = 0; $i < count($resultProcess); $i++) {
+                $cutResultProcess = explode('-', $resultProcess[$i]);
+
+                for ($j = 0; $j < count($cutResultProcess); $j++) {
+
+                    $tempResult += $cutResultProcess[0];
+                    $tempNewResult += $cutResultProcess[1];
+                    break;
                 }
             }
-            dd($day);
+            $total = Track::where('user_id', $userCurrent)->where('year', $now)->select(['annual_leave_unused'])->first();
+            $resultForCurrentYear = $total->annual_leave_unused - $tempResult;
+
+            if ($tempNewResult > 0) {
+                $totalNew = Track::where('user_id', $userCurrent)->where('year', $now + 1)->select(['annual_leave_unused'])->first();
+                $resultForNextYear = $totalNew->annual_leave_unused - $tempNewResult;
+
+                if ($resultForCurrentYear < 0 || $resultForNextYear < 0) {
+                    return false;
+                }
+                return true;
+            }
+
+            if ($resultForCurrentYear < 0) {
+                return false;
+            }
+            return true;
         }
     }
 

@@ -207,7 +207,7 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
 
         for ($i = 0; $i < count($merge); $i++) {
             $addTime = TrackService::calculatorYear($merge[$i]);
-            $arrayNull[] = ['year' => $now, 'user_id' => $merge[$i], 'annual_leave_total' => $addTime];
+            $arrayNull[] = ['year' => $now, 'user_id' => $merge[$i], 'annual_leave_total' => $addTime, 'annual_leave_unused' => $addTime];
         }
 
         for ($i = 0; $i < count($arrayNull); $i++) {

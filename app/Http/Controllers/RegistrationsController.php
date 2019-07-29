@@ -7,6 +7,7 @@ use App\Http\Requests\RegistrationUpdateRequest;
 use App\Http\Requests\RegistrationUpdateStatusRequest;
 use App\Models\Registration;
 use App\Repositories\Contracts\RegistrationRepository;
+use App\Services\TrackService;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -168,11 +169,15 @@ class RegistrationsController extends Controller
         if ($user1[0]->status == 2) {
             return $this->error(trans('messages.registration.statusDisapproved'), trans('messages.registration.statusDisapproved'), Response::HTTP_BAD_REQUEST);
         } else {
-            $user = Registration::where('id', $id)->update(['status' => 1]);
-            $date = Carbon::now();
-            $aprrovedDate = Registration::where('id', $id)->update(['approved_date' => $date]);
+            // $userRegistration = Registration::where('id', $id)->update(['status' => 1]);
+            // $date = Carbon::now();
+            // $aprrovedDate = Registration::where('id', $id)->update(['approved_date' => $date]);
+            $attributes = Registration::where('id', $id)->get();
+
+            TrackService::update($id, $attributes);
+
             $message = $this->repository->getMessage($id, $request->all());
-            $mailUpdate = $this->repository->updateMail($id, $user);
+            $mailUpdate = $this->repository->updateMail($id, $userRegistration);
             $information = $this->repository->findwhere(['id' => $id]);
             return $this->success($information, trans('messages.registration.updateStatus'));
         }

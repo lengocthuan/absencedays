@@ -124,10 +124,11 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 $attributes['requested_date'] = Carbon::now()->toDateString();
             }
         }
+
         $checkTrack = TimeAbsenceService::checkTrack($attributes);
-        dd($checkTrack);
         $checkTime = TimeAbsenceService::check($attributes);
-        if ($checkTime == true) {
+
+        if ($checkTime == true && $checkTrack == true) {
             $resgistration = parent::create($attributes);
             $date = $this->model()::where('user_id', $attributes['user_id'])->select('id')->get();
             $id = array();
@@ -140,7 +141,6 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
                 return false;
             }
             TimeAbsenceService::add($resgistration['data']['id'], $attributes);
-            TrackService::update($resgistration['data']['id'], $attributes);
 
             //send mail
             $user = Auth::user();
