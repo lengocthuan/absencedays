@@ -6,6 +6,7 @@ use App\Http\Requests\RegistrationCreateRequest;
 use App\Http\Requests\RegistrationUpdateRequest;
 use App\Http\Requests\RegistrationUpdateStatusRequest;
 use App\Models\Registration;
+use App\Services\TrackService;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\User;
 use Carbon\Carbon;

@@ -221,24 +221,26 @@ class TrackRepositoryEloquent extends BaseRepository implements TrackRepository
     public function filterForRequest($attributes)
     {
         $now = Carbon::now()->format('Y');
-        $currentYearNonNull = Track::where('year', $now)->where('annual_leave_unused', '!=', null)->get();
-        $currentYearNull = Track::where('year', $now)->where('annual_leave_unused', null)->get();
         $newUser = Track::select('user_id')->get();
+
         if (!$newUser->isEmpty()) {
             if (isset($attributes['absences'])) {
                 switch ($attributes['absences']) {
                     case 0:
-                        return $this->parserResult($currentYearNull);
+                        $track = Track::where('year', $now)->whereColumn('annual_leave_total', '=', 'annual_leave_unused')->get();
+                        return $this->parserResult($track);
                         break;
 
                     case 1:
-                        return $this->parserResult($currentYearNonNull);
+                        $track = Track::where('year', $now)->whereColumn('annual_leave_total', '!=', 'annual_leave_unused')->get();
+                        return $this->parserResult($track);
                         break;
 
                     default:
                         break;
                 }
             }
+            return true;
         }
         return false;
     }

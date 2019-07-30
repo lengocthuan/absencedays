@@ -118,7 +118,12 @@ class TracksController extends Controller
     public function filter(Request $request)
     {
         $filter = $this->repository->filterForRequest($request->all());
+        $yearNow = Carbon::now()->format('Y');
+        $tracks = $this->repository->findwhere(['year' => $yearNow]);
 
+        if ($filter === true) {
+            return $this->success($tracks, trans('messages.track.success'));
+        }
         if ($filter) {
             return $this->success($filter, trans('messages.track.success'));
         }
