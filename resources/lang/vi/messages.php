@@ -11,10 +11,12 @@ return [
         'success' => "Get information registration successfully.",
         'search' => "Search information successfully.",
         'updateStatus' => "Update status for registration successfully.",
-        'invalidRegistration' => 'Registraion Invalid',
+        'invalidRegistration' => 'Registration Invalid',
         'error' => 'Bad Request',
         'duplicate' => 'Attributes mails for to and mails for cc has been matched.',
         'duplicateTime' => 'Time registration has been matched.',
+        'badRequest' => 'Bad request',
+        'trackInvalid' => 'The absence days has registered be not appropriate for browsing, please check back before browsing for this case.',
     ],
     'user' => [
         'success' => 'Get information user successfully.',
@@ -59,10 +61,10 @@ return [
         'delete' => 'Delete a approver successfully',
     ],
     'timeabsence' => [
-        'success' => 'Get information timeabsence successfully',
-        'create' => 'Create a timeabsence successfully',
-        'update' => 'Update a timeabsence successfully',
-        'delete' => 'Delete a timeabsence successfully',
+        'success' => 'Get information time absence successfully',
+        'create' => 'Create a time absence successfully',
+        'update' => 'Update a time absence successfully',
+        'delete' => 'Delete a time absence successfully',
     ],
 ]
 ?>

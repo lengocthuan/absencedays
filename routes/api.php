@@ -30,6 +30,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::resource('absences', 'RegistrationsController');
 
+    Route::get('find_status_ok', 'RegistrationsController@registrationApprovedBy');
     Route::get('tests', 'RegistrationsController@test');
     Route::put('updated_1/{id}', 'RegistrationsController@updateStatus1'); //approved
     Route::put('updated_2/{id}', 'RegistrationsController@updateStatus2'); //disapproved

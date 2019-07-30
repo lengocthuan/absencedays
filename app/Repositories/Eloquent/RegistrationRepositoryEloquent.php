@@ -7,6 +7,8 @@ use App\Mail\UpdateMailable;
 use App\Mail\UpdateMessageMailable;
 use App\Models\Registration;
 use App\Models\Type;
+use App\Models\TimeAbsence;
+use App\Models\Track;
 use App\Presenters\RegistrationPresenter;
 use App\Repositories\Contracts\RegistrationRepository;
 use App\Services\ApproverService;
@@ -321,5 +323,38 @@ class RegistrationRepositoryEloquent extends BaseRepository implements Registrat
             'info_email' => $infoEmail,
         ];
         Mail::queue(new UpdateMessageMailable($data));
+    }
+
+    public function checkBeforeApply($id)
+    {
+        $countNow = 0;
+        $countNextYear = 0;
+        $now = Carbon::now()->format('Y');
+        $user = Registration::where('id', $id)->first();
+        $track = Track::where(['year' => $now, 'user_id' => $user['user_id']])->first();
+        $check = TimeAbsence::where('registration_id', $id)->get();
+
+        for ($i=0; $i < count($check); $i++) {
+            if($check[$i]['current_year'] == $now) {
+                $countNow += (double)$check[$i]['absence_days'];
+            } else {
+                $countNextYear += (double)$check[$i]['absence_days'];
+            }
+
+        }
+
+        $track = $track->annual_leave_unused - $countNow;
+        if ($countNextYear > 0) {
+            $trackOfNextYear = Track::where(['year' => ($now + 1), 'user_id' => $user['user_id']])->first();
+            $newTrack = $trackOfNextYear->annual_leave_unused - $countNextYear;
+            if ($newTrack < 0 || $track < 0) {
+                return false;
+            }
+            return true;
+        }
+        if ($track < 0) {
+            return false;
+        }
+        return true;
     }
 }

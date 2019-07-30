@@ -7,7 +7,6 @@ use App\Http\Requests\RegistrationUpdateRequest;
 use App\Http\Requests\RegistrationUpdateStatusRequest;
 use App\Models\Registration;
 use App\Repositories\Contracts\RegistrationRepository;
-use App\Services\TrackService;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -60,10 +59,10 @@ class RegistrationsController extends Controller
     {
         $registration = $this->repository->create($request->all());
 
-        if($registration == Registration::DUPLICATE_TIME) {
+        if ($registration == Registration::DUPLICATE_TIME) {
             return $this->error(trans('messages.registration.error'), trans('messages.registration.duplicateTime'), Response::HTTP_BAD_REQUEST);
         }
-        if($registration) {
+        if ($registration) {
             return $this->success($registration, trans('messages.registration.createSuccess'), ['code' => Response::HTTP_CREATED]);
         }
         return $this->error(trans('messages.registration.error'), trans('messages.registration.duplicate'), Response::HTTP_BAD_REQUEST);
@@ -94,7 +93,7 @@ class RegistrationsController extends Controller
     public function update(RegistrationUpdateRequest $request, $id)
     {
         $registration = $this->repository->update($request->all(), $id);
-         if($registration == Registration::DUPLICATE_TIME) {
+        if ($registration == Registration::DUPLICATE_TIME) {
             return $this->error(trans('messages.registration.error'), trans('messages.registration.duplicateTime'), Response::HTTP_BAD_REQUEST);
         }
         if ($registration) {
@@ -134,7 +133,7 @@ class RegistrationsController extends Controller
             case '2':
                 $status = 2;
                 break;
-            
+
             default:
                 $status = 0;
                 break;
@@ -165,21 +164,29 @@ class RegistrationsController extends Controller
 
     public function updateStatus1($id, RegistrationUpdateStatusRequest $request)
     {
+        $info = Auth::id();
         $user1 = Registration::where('id', $id)->select('status')->get();
         if ($user1[0]->status == 2) {
             return $this->error(trans('messages.registration.statusDisapproved'), trans('messages.registration.statusDisapproved'), Response::HTTP_BAD_REQUEST);
         } else {
-            // $userRegistration = Registration::where('id', $id)->update(['status' => 1]);
-            // $date = Carbon::now();
-            // $aprrovedDate = Registration::where('id', $id)->update(['approved_date' => $date]);
-            $attributes = Registration::where('id', $id)->get();
+            $checkBeforeApply = $this->repository->checkBeforeApply($id);
+            if ($checkBeforeApply) {
+                $approvedBy = User::where('id', $info)->first();
+                $userRegistration = Registration::where('id', $id)->update(['status' => 1, 'approved_by' => $approvedBy->name]);
+                $date = Carbon::now();
+                $aprrovedDate = Registration::where('id', $id)->update(['approved_date' => $date]);
+                $attributes = Registration::where('id', $id)->get();
 
-            TrackService::update($id, $attributes);
+                TrackService::update($id, $attributes);
 
-            $message = $this->repository->getMessage($id, $request->all());
-            $mailUpdate = $this->repository->updateMail($id, $userRegistration);
-            $information = $this->repository->findwhere(['id' => $id]);
-            return $this->success($information, trans('messages.registration.updateStatus'));
+                $message = $this->repository->getMessage($id, $request->all());
+                $mailUpdate = $this->repository->updateMail($id, $userRegistration);
+                $information = $this->repository->findwhere(['id' => $id]);
+
+                return $this->success($information, trans('messages.registration.updateStatus'));
+            }
+            return $this->error(trans('messages.registration.badRequest'), trans('messages.registration.trackInvalid'), Response::HTTP_BAD_REQUEST);
+
         }
 
     }
@@ -231,5 +238,12 @@ class RegistrationsController extends Controller
             $arrayTest[] = $info;
         }
         dd($arrayTest);
+    }
+
+    public function registrationApprovedBy()
+    {
+        $registrations = $this->repository->findwhere(['status' => 1]);
+
+        return $this->success($registrations, trans('messages.registration.success'));
     }
 }

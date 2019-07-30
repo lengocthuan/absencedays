@@ -26,10 +26,11 @@ class Registration extends BaseModel
     const MORNING = 'Buổi Sáng';
     const AFTERNOON = 'Buổi Chiều';
     const DUPLICATE_TIME = 'Duplicate Time Registration';
+    const APPROVED = 1; 
     const ANNUAL_LEAVE = 1;
 
     protected $table = 'registrations';
-    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message'];
+    protected $fillable = ['user_id', 'type_id', 'note', 'status', 'requested_date', 'approved_date', 'message', 'approved_by'];
 
 
     public function approvers()

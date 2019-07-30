@@ -59,14 +59,18 @@ class Track extends BaseModel
 
     public function getTimeDetailForEachUser()
     {
-        $date1 = $date2 = $date3 = $date4 = $date5 = $date6 = $date7 = $date8 = $date9 = $date10 = $date11 = $date12 = NULL;
-        $registration = Registration::where('user_id', $this->user_id)->get();
+        $date1 = $date2 = $date3 = $date4 = $date5 = $date6 = $date7 = $date8 = $date9 = $date10 = $date11 = $date12 = null;
+        $registration = Registration::where(['user_id' => $this->user_id, 'status' => Registration::APPROVED])->get();
 
+        if ($registration->isEmpty()) {
+            $result = ['January' => $date1, 'February' => $date2, 'March' => $date3, 'April' => $date4, 'May' => $date5, 'June' => $date6, 'July' => $date7, 'August' => $date8, 'September' => $date9, 'October' => $date10, 'November' => $date11, 'December' => $date12];
+            return $result;
+        }
         for ($i = 0; $i < count($registration); $i++) {
             $time = TimeAbsence::where('registration_id', $registration[$i]->id)->whereYear('time_details', $this->year)->get();
             for ($j = 0; $j < count($time); $j++) {
                 $month = Carbon::parse($time[$j]['time_details'])->format('m');
-
+                $time[$j]['time_details'] = Carbon::parse($time[$j]['time_details'])->format('d/m/Y');
                 switch ($month) {
                     case '01':
                         $date1[] = $time[$j]['time_details'] . '-' . $time[$j]['at_time'];

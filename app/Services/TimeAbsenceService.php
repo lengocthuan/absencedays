@@ -250,7 +250,7 @@ class TimeAbsenceService
                 }
             }
 
-            if (isset($newResult)) {
+            if ($newResult > 0) {
                 $resultForNextYear = $addOldTotal - $newResult;
                 if ($result < 0 || $resultForNextYear < 0) {
                     return false;
