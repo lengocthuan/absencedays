@@ -2,14 +2,14 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Models\Image;
+use App\Repositories\Contracts\UserRepository;
+use App\Services\RoleService;
 use App\User;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Image;
-use App\Services\RoleService;
-use App\Repositories\Contracts\UserRepository;
-use Prettus\Repository\Eloquent\BaseRepository;
-use Prettus\Repository\Criteria\RequestCriteria;
 use Illuminate\Support\Facades\Storage;
+use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * Class UserRepositoryEloquent.
@@ -66,6 +66,17 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
      */
     public function update(array $attributes, $id)
     {
+        $oldEmail = $this->model->whereNotIn('id', [$id])->get();
+
+        for ($i=0; $i < count($oldEmail); $i++) { 
+            if ($oldEmail[$i]['email'] == $attributes['email']) {
+                return User::UNIQUE_EMAIL;
+            }
+            if ($oldEmail[$i]['phone'] == $attributes['phone']) {
+                return User::UNIQUE_PHONE;
+            }
+        }
+
         if (!empty($attributes['password'])) {
             $attributes['password'] = bcrypt($attributes['password']);
         }
@@ -99,9 +110,9 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
         foreach ($emailExcept as $value) {
             $arrayEmailExcept[] = $value->email;
         }
-        $emailExceptForTo = array_merge($arrayEmailExcept, (array)$email);
+        $emailExceptForTo = array_merge($arrayEmailExcept, (array) $email);
         $mail = User::whereNotIn('email', $emailExceptForTo)->select('email')->get();
-        for ($i=0; $i < count($mail) ; $i++) { 
+        for ($i = 0; $i < count($mail); $i++) {
             $emailSend[] = $mail[$i]->email;
         }
         $data = ['data' => $emailSend];

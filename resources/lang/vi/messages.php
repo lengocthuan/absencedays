@@ -24,6 +24,9 @@ return [
         'update' => 'Update user successfully.',
         'register' => 'You have successfully registered a member account.',
         'create' => 'Create user successfully.',
+        'error' => 'Bad Request',
+        'duplicateEmail' => 'This email has exist in system, please input another email.',
+        'duplicatePhone' => 'This phone has exist in system, please input another email.',
     ],
     'track' => [
         'success' => 'Get information track successfully.',

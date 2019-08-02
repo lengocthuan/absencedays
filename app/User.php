@@ -25,6 +25,9 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     const PF_TechLead = 'web_techlead';
     const PF_USER = 'web_user';
     const IMAGE_TYPE = 'user';
+    const UNIQUE_EMAIL = 'email_has_exist';
+    const UNIQUE_PHONE = 'phone_has_exist';
+
     /**
      * The attributes that are mass assignable.
      *

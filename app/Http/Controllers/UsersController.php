@@ -123,8 +123,14 @@ class UsersController extends Controller
     public function update(UserUpdateRequest $request, User $user)
     {
         $user = $this->repository->skipPresenter()->update($request->all(), $user->id);
-
+        if ($user == User::UNIQUE_EMAIL) {
+            return $this->error(trans('messages.user.error'), trans('messages.user.duplicateEmail'), Response::HTTP_BAD_REQUEST);
+        }
+        if ($user == User::UNIQUE_PHONE) {
+            return $this->error(trans('messages.user.error'), trans('messages.user.duplicatePhone'), Response::HTTP_BAD_REQUEST);
+        }
         return $this->success($user->presenter(), trans('messages.user.update'));
+        
     }
 
     /**
